@@ -1,5 +1,13 @@
+.git
 .idea
 coverage
 docs
 node_modules
 src
+babel.config.js
+build.sh
+jest.config.ts
+test.sh
+tsconfig.commonjs.json
+tsconfig.es.json
+tsconfig.json
