@@ -3,7 +3,7 @@ import Aggregator from './Aggregator';
 import Converter from './Converter';
 
 describe('Registry', () => {
-	const even = new Converter((input: any) => !Boolean(input % 2), () => 2);
+	const even = new Converter((input: any) => !(input % 2), () => 2);
 
 	test(`register adds items`, () => {
 

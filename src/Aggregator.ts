@@ -1,8 +1,11 @@
 import Converter from './Converter';
 import EV from './Error';
 
+// eslint-disable-next-line
 export class DuplicateConvertor extends EV {};
+// eslint-disable-next-line
 export class InvalidConverter extends EV {};
+// eslint-disable-next-line
 export class AbsentConverter extends EV {};
 
 /**

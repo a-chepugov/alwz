@@ -2,9 +2,7 @@ import assert from 'assert';
 import Converter from './Converter';
 
 describe('Converter', () => {
-	test('sdf', () => {
-		assert(true);
-	})
+
 	const converter = new Converter((input) => typeof input === 'number' && input > 0, () => 1);
 	converter
 		.undefined(() => 1)

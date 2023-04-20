@@ -30,6 +30,7 @@ export const boolean = presets.boolean.convert;
  */
 export const number = presets.number.convert;
 
+
 /**
  * @description cast to string
  * @example

@@ -50,7 +50,7 @@ describe('presets', () => {
 			[ new WeakSet()          , [ true     , NaN       , '[object WeakSet]'        , Symbol.for('[object WeakSet]')        , ] ],
 			[ Promise.resolve()      , [ true     , NaN       , '[object Promise]'        , Symbol.for('[object Promise]')        , ] ],
 		];
-
+		// eslint-disable-next-line
 		const [[ _, names ], ...datas ] = sets;
 
 		for (let converterIndex = 0; converterIndex < names.length; converterIndex++) {
@@ -61,7 +61,7 @@ describe('presets', () => {
 				for (const data of datas) {
 					const [ input, results ] = data;
 					const result = results[converterIndex];
-					let name = `${String(converterName)} (${String(input)}) -> ${String(result)}`;
+					const name = `${String(converterName)} (${String(input)}) -> ${String(result)}`;
 
 					test(name, () => {
 						assert.strictEqual(converter(input), result);
@@ -125,7 +125,7 @@ describe('presets', () => {
 		}, {
 			name: 'array', tests: [
 				{ input: undefined, check: (o: any) => o.length === 0},
-				{ input: null, check: (o: any, i: any) => o.length === 0},
+				{ input: null, check: (o: any) => o.length === 0},
 				{ input: true, check: (o: any, i: any) => o[0] === i},
 				{ input: 2, check: (o: any, i: any) => o[0] === i},
 				{ input: 2.5, check: (o: any, i: any) => o[0] === i},
@@ -149,11 +149,11 @@ describe('presets', () => {
 		}, {
 			name: 'map', tests: [
 				{ input: undefined, check: (o: any) => o.size === 0},
-					{ input: null, check: (o: any) => o.size === 0},
-					{ input: 2, check: (o: any) => o.size === 0},
-					{ input: [3], check: (o: any) => o.size === 0},
-					{ input: [[3, 3]], check: (o: any) => o.has(3)},
-					{ input: new Map, check: (o: any, i: any) => (o === i)},
+				{ input: null, check: (o: any) => o.size === 0},
+				{ input: 2, check: (o: any) => o.size === 0},
+				{ input: [3], check: (o: any) => o.size === 0},
+				{ input: [[3, 3]], check: (o: any) => o.has(3)},
+				{ input: new Map, check: (o: any, i: any) => (o === i)},
 			].map(({ input, result, check }) => ({ work: a.map, instance: Map, input, result, check	}))
 		}, {
 			name: 'weakmap', tests: [
@@ -203,7 +203,7 @@ describe('presets', () => {
 		for (const {name, tests } of sets) {
 			describe(name, () => {
 				for (const index in tests) {
-					const { work, input, type, instance, result, check } = tests[index];
+					const {work, input, type, instance, result, check} = tests[index];
 					let n = `${String(name)}: ${index} | [${typeof input}] i:${String(input)} => `;
 					n += type ? ` | [${type}]` : '';
 					n += instance ? ` | [${instance}]` : '';
@@ -224,12 +224,12 @@ describe('presets', () => {
 						if (check) {
 							assert(check(data, input));
 						}
-						expect(check(work(input), input)).toBe(true)
 					});
 				}
 			});
 		}
-	})
 
-})
+	});
+
+});
 

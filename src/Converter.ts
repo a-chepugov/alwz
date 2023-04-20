@@ -1,8 +1,12 @@
 import EV from './Error';
 
+// eslint-disable-next-line
 export class InvalidCheckFunction extends EV {};
+// eslint-disable-next-line
 export class InvalidFallbackFunction extends EV {};
+// eslint-disable-next-line
 export class InvalidConvertFunction extends EV {};
+// eslint-disable-next-line
 export class InvalidConverter extends EV {};
 
 type Convert<INPUT, OUTPUT> = (input: INPUT) => OUTPUT;
