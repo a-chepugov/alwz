@@ -6,7 +6,7 @@ export class InvalidConvertFunction extends EV {};
 export class InvalidConverter extends EV {};
 
 type Convert<INPUT, OUTPUT> = (input: INPUT) => OUTPUT;
-type IS<T> = (input: any) => boolean;
+type IS<T> = (input: any) => input is T;
 
 /**
  * @description Converts input data to specific type
