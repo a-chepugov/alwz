@@ -1,8 +1,8 @@
 import Aggregator from './Aggregator';
 import * as presets from './presets';
 
-export {default as Converter} from './Converter';
-
+export { default as Converter } from './Converter';
+export { default as Aggregator } from './Aggregator';
 /**
  * @name import
  * @example
@@ -29,32 +29,6 @@ export const boolean = presets.boolean.convert;
  * a.number(['42']); // 42
  */
 export const number = presets.number.convert;
-
-/**
- * @description cast to int
- * @example
- * a.int(42.5); // 42
- * a.int('42.5'); // 42
- * a.int('abc'); // 0
- * a.number(Symbol.for('42.5')); // 42
- */
-export const int = presets.int.convert;
-
-/**
-* @description synonym for `number`
- */
-export const float = presets.number.convert;
-
-/**
- * @description cast to bigint
- * @example
- * a.bigint(42.5); // 42n
- * a.bigint('42'); // 42n
- * a.bigint('42.5'); // 0n
- * a.bigint(Symbol.for('42')); // 42n
- * a.bigint(new Date('1970-01-01T00:00:00.999Z')); // 999n
- */
-export const bigint = presets.bigint.convert;
 
 /**
  * @description cast to string
@@ -160,9 +134,6 @@ export const promise = presets.promise.convert;
 export const aggregator = new Aggregator()
 	.register('boolean', presets.boolean)
 	.register('number', presets.number)
-	.register('int', presets.int)
-	.register('float', presets.number)
-	.register('bigint', presets.bigint)
 	.register('string', presets.string)
 	.register('symbol', presets.symbol)
 	.register('fn', presets.fn)
