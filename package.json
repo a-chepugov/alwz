@@ -12,9 +12,9 @@
     "build": "parallel -- 'npm run build:commonjs' 'npm run build:es'",
     "build:commonjs": "tsc --project tsconfig.commonjs.json",
     "build:es": "tsc --project tsconfig.es.json",
-    "build:watch": "tsc --watch",
-    "build:delete": "rm -rf ./build",
-    "build:clear": "npm run js:delete && npm run js:build",
+    "build:development": "tsc --watch",
+    "clean": "rm -rf ./build",
+    "build:clear": "npm run clean && npm run build",
     "readme": "documentation readme build/es/index.js --section=Usage",
     "preversion": "npm run test",
     "version:major": "npm version major",
@@ -22,12 +22,13 @@
     "version:patch": "npm version patch",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --fix --ext .ts",
+    "test:development": "jest --watch",
     "test": "jest"
   },
   "keywords": [
     "casting"
   ],
-   "repository": {
+  "repository": {
     "type": "git",
     "url": "git+https://github.com/a-chepugov/alwz.git"
   },
