@@ -1,51 +1,67 @@
-import Convertor from './Converter';
+import Converter from './Converter';
+import EV from './Error';
+
+export class DuplicateConvertor extends EV {};
+export class InvalidConverter extends EV {};
+export class AbsentConverter extends EV {};
 
 /**
  * @description Aggregates converters
  */
 export class Aggregator {
-	converters: Map<any, Convertor<any>>;
+	#converters: Map<string, Converter<any>>;
 
 	constructor() {
-		this.converters = new Map();
+		this.#converters = new Map();
 		Object.freeze(this);
+	}
+
+	get converters() {
+		return Array.from(this.#converters);
 	}
 
 	/**
 	 * @description add converter
 	 */
-	register(name: any, converter: Convertor<any>) {
-		this.converters.set(name, converter);
+	register(name: string, converter: Converter<any>) {
+		if (this.#converters.has(name)) {
+			throw new DuplicateConvertor('converter has already been registered', name);
+		} else {
+			if (converter instanceof Converter) {
+				this.#converters.set(name, converter);
+			} else {
+				throw new InvalidConverter('must be an instance of Converter', converter);
+			}
+		}
 		return this;
 	}
 
 	/**
 	 * @description del converter
 	 */
-	unregister(name: any) {
-		this.converters.delete(name);
+	unregister(name: string) {
+		this.#converters.delete(name);
 		return this;
 	}
 
 	/**
 	 * @description seek converter by name
 	 */
-	converter = (name: any): Convertor<any> => {
-		if (this.converters.has(name)) {
-			const converter = this.converters.get(name);
-			if (converter instanceof Convertor) {
-				return converter;
-			}
+	converter = (name: string): Converter<any> => {
+		if (this.#converters.has(name)) {
+			return this.#converters.get(name) as Converter<any>;
+		} else {
+			throw new AbsentConverter('converter has not been registered', name);
 		}
-		throw new Error(`Unknown converter name: ${name}`);
 	}
 
 	/**
 	 * @description generate simple function to convert data
 	 */
-	to = (name: string) => {
-		const converter = this.converter(name);
-		return (i: any) => converter.convert(i);
+	to = (name: any) => this.converter(name).convert
+
+	get size() {
+		return this.#converters.size;
 	}
 }
 
