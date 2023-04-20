@@ -12,26 +12,26 @@ export class AbsentConverter extends EV {};
  * @description Aggregates converters
  */
 export class Aggregator {
-	#converters: Map<string, Converter<any>>;
+	protected _converters: Map<string, Converter<any>>;
 
 	constructor() {
-		this.#converters = new Map();
+		this._converters = new Map();
 		Object.freeze(this);
 	}
 
 	get converters() {
-		return Array.from(this.#converters);
+		return Array.from(this._converters);
 	}
 
 	/**
 	 * @description add converter
 	 */
 	register(name: string, converter: Converter<any>) {
-		if (this.#converters.has(name)) {
+		if (this._converters.has(name)) {
 			throw new DuplicateConvertor('converter has already been registered', name);
 		} else {
 			if (converter instanceof Converter) {
-				this.#converters.set(name, converter);
+				this._converters.set(name, converter);
 			} else {
 				throw new InvalidConverter('must be an instance of Converter', converter);
 			}
@@ -43,7 +43,7 @@ export class Aggregator {
 	 * @description del converter
 	 */
 	unregister(name: string) {
-		this.#converters.delete(name);
+		this._converters.delete(name);
 		return this;
 	}
 
@@ -51,8 +51,8 @@ export class Aggregator {
 	 * @description seek converter by name
 	 */
 	converter = (name: string): Converter<any> => {
-		if (this.#converters.has(name)) {
-			return this.#converters.get(name) as Converter<any>;
+		if (this._converters.has(name)) {
+			return this._converters.get(name) as Converter<any>;
 		} else {
 			throw new AbsentConverter('converter has not been registered', name);
 		}
@@ -64,7 +64,7 @@ export class Aggregator {
 	to = (name: any) => this.converter(name).convert
 
 	get size() {
-		return this.#converters.size;
+		return this._converters.size;
 	}
 }
 

@@ -19,8 +19,8 @@ export class Converter<T> {
 	is: IS<T>;
 	fallback: () => T;
 
-	#types: Record<string, Convert<any, T>>;
-	#converters: Map<IS<any>, Convert<any, T>>;
+	protected _types: Record<string, Convert<any, T>>;
+	protected _converters: Map<IS<any>, Convert<any, T>>;
 
 	/**
 	 * @param {IS} is - input data type checker
@@ -39,18 +39,18 @@ export class Converter<T> {
 			throw new InvalidFallbackFunction('second argument must be a function', fallback);
 		}
 
-		this.#types = {};
-		this.#converters = new Map();
+		this._types = {};
+		this._converters = new Map();
 
 		Object.freeze(this);
 	}
 
 	get types() {
-		return Object.entries(this.#types);
+		return Object.entries(this._types);
 	}
 
 	get converters() {
-		return Array.from(this.#converters);
+		return Array.from(this._converters);
 	}
 
 	/**
@@ -61,13 +61,13 @@ export class Converter<T> {
 		if (this.is(i)) return i;
 
 		const type = typeof i;
-		if (type in this.#types) {
-			const convert = this.#types[type] as Convert<any, T>;
+		if (type in this._types) {
+			const convert = this._types[type] as Convert<any, T>;
 			return convert(i);
 		} else {
-			for (const is of this.#converters.keys()) {
+			for (const is of this._converters.keys()) {
 				if (is(i)) {
-					const convert = this.#converters.get(is) as Convert<any, T>;
+					const convert = this._converters.get(is) as Convert<any, T>;
 					return convert(i);
 				}
 			}
@@ -88,7 +88,7 @@ export class Converter<T> {
 			throw new InvalidConvertFunction('second argument must be a function', convert);
 		}
 
-		this.#converters.set(is, convert);
+		this._converters.set(is, convert);
 		return this;
 	}
 
@@ -97,7 +97,7 @@ export class Converter<T> {
 	 * @param {IS} is - input data type checker
 	 */
 	unregister<INPUT>(is: IS<INPUT>) {
-		this.#converters.delete(is);
+		this._converters.delete(is);
 		return this;
 	}
 
@@ -105,7 +105,7 @@ export class Converter<T> {
 	 * @description conversion rule for `undefined`
 	 */
 	undefined(convert: Convert<undefined, T>) {
-		this.#types.undefined = convert;
+		this._types.undefined = convert;
 		return this;
 	}
 
@@ -113,7 +113,7 @@ export class Converter<T> {
 	 * @description conversion rule for `boolean`
 	 */
 	boolean(convert: Convert<boolean, T>) {
-		this.#types.boolean = convert;
+		this._types.boolean = convert;
 		return this;
 	}
 
@@ -121,7 +121,7 @@ export class Converter<T> {
 	 * @description conversion rule for `number`
 	 */
 	number(convert: Convert<number, T>) {
-		this.#types.number = convert;
+		this._types.number = convert;
 		return this;
 	}
 
@@ -129,7 +129,7 @@ export class Converter<T> {
 	 * @description conversion rule for `bigint`
 	 */
 	bigint(convert: Convert<bigint, T>) {
-		this.#types.bigint = convert;
+		this._types.bigint = convert;
 		return this;
 	}
 
@@ -137,7 +137,7 @@ export class Converter<T> {
 	 * @description conversion rule for `string`
 	 */
 	string(convert: Convert<string, T>) {
-		this.#types.string = convert;
+		this._types.string = convert;
 		return this;
 	}
 
@@ -145,7 +145,7 @@ export class Converter<T> {
 	 * @description conversion rule for `symbol`
 	 */
 	symbol(convert: Convert<symbol, T>) {
-		this.#types.symbol = convert;
+		this._types.symbol = convert;
 		return this;
 	}
 
