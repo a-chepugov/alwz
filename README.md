@@ -2,8 +2,6 @@ Extendable library for typecasting.
 
 # Usage
 
-## import
-
 ### Examples
 
 ```javascript
@@ -35,37 +33,6 @@ a.number('abc'); // NaN
 a.number(Symbol.for('42')); // 42
 a.number(new Date('1970-01-01T00:00:00.042Z')); // 42
 a.number(['42']); // 42
-```
-
-## int
-
-cast to int
-
-### Examples
-
-```javascript
-a.int(42.5); // 42
-a.int('42.5'); // 42
-a.int('abc'); // 0
-a.number(Symbol.for('42.5')); // 42
-```
-
-## float
-
-synonym for `number`
-
-## bigint
-
-cast to bigint
-
-### Examples
-
-```javascript
-a.bigint(42.5); // 42n
-a.bigint('42'); // 42n
-a.bigint('42.5'); // 0n
-a.bigint(Symbol.for('42')); // 42n
-a.bigint(new Date('1970-01-01T00:00:00.999Z')); // 999n
 ```
 
 ## string
@@ -238,7 +205,7 @@ generate simple function to convert data
 
 *   `name`
 
-## Convertor
+## Converter
 
 Converts input data to specific type
 
@@ -262,7 +229,8 @@ add `type checker` & `conversion rule` pair into conversions set
 #### Parameters
 
 *   `is` **IS** input data type checker
-*   `converter` **[Convertor](#convertor)\<any, T>** conversion rule
+*   `convert`
+*   `converter` **[Converter](#converter)\<any, T>** conversion rule
 
 ### unregister
 
@@ -270,7 +238,6 @@ del `type checker` & `conversion rule` pair from conversions set
 
 #### Parameters
 
-*   `IS`
 *   `is` **IS** input data type checker
 
 ### undefined
@@ -279,7 +246,7 @@ conversion rule for `undefined`
 
 #### Parameters
 
-*   `convertor`
+*   `convert`
 
 ### boolean
 
@@ -287,7 +254,7 @@ conversion rule for `boolean`
 
 #### Parameters
 
-*   `convertor`
+*   `convert`
 
 ### number
 
@@ -295,7 +262,7 @@ conversion rule for `number`
 
 #### Parameters
 
-*   `convertor`
+*   `convert`
 
 ### bigint
 
@@ -303,7 +270,7 @@ conversion rule for `bigint`
 
 #### Parameters
 
-*   `convertor`
+*   `convert`
 
 ### string
 
@@ -311,7 +278,7 @@ conversion rule for `string`
 
 #### Parameters
 
-*   `convertor`
+*   `convert`
 
 ### symbol
 
@@ -319,4 +286,4 @@ conversion rule for `symbol`
 
 #### Parameters
 
-*   `convertor`
+*   `convert`
