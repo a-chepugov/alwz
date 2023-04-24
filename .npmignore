@@ -4,6 +4,9 @@ coverage
 docs
 node_modules
 src
+.editorconfig
+.eslintignore
+.eslintrc.yml
 babel.config.js
 build.sh
 jest.config.ts
