@@ -1,6 +1,6 @@
 {
   "name": "alwz",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Extendable library for typecasting.",
   "main": "./build/commonjs/index.js",
   "exports": {

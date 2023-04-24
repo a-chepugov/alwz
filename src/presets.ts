@@ -25,6 +25,52 @@ number
 	.register(Array.isArray, (i: Array<any>) => number.convert(i[0]))
 ;
 
+export const [
+	byte,
+	short,
+	int,
+	long
+] = [
+	[-128, 127],
+	[-32768, 32767],
+	[-2147483648, 2147483647],
+	[
+		Number.MIN_SAFE_INTEGER > -9223372036854775808 ? Number.MIN_SAFE_INTEGER : -9223372036854775808,
+		Number.MAX_SAFE_INTEGER < 9223372036854775807 ?	Number.MAX_SAFE_INTEGER : 9223372036854775807
+	],
+]
+	.map(([min, max]) => {
+		const convertor = new Convertor<number>(
+			(i): i is number => typeof i === 'number' && Number.isInteger(i) && min <= i && i <= max,
+			() => 0
+		);
+		convertor
+			.undefined(convertor.fallback)
+			.boolean(Number)
+			.number((i) => {
+				if (i <= min) {
+					return min;
+				} else if (i >= max) {
+					return max;
+				} else {
+					const value = Math.trunc(i);
+					if (Number.isInteger(value)) {
+						return value;
+					} else {
+						return convertor.fallback();
+					}
+				}
+			})
+			.bigint((i) => convertor.convert(Number(i)))
+			.string((i) => convertor.convert(Number(i)))
+			.symbol((i) => convertor.convert(string.convert(i)))
+			.register((i): i is null => i === null, convertor.fallback)
+			.register((i): i is Date => i instanceof Date, (i: Date) => convertor.convert(i.getTime()))
+			.register(Array.isArray, (i: Array<any>) => convertor.convert(i[0]));
+		return convertor;
+	})
+;
+
 export const string = new Convertor<string>((i): i is string => typeof i === 'string', () => '');
 string
 	.undefined(string.fallback)

@@ -30,6 +30,25 @@ export const boolean = presets.boolean.convert;
  */
 export const number = presets.number.convert;
 
+/**
+ * @description cast to integer
+ * @example
+ * a.byte(Infinity); // 127
+ * a.short(Infinity); // 327677
+ * a.int(Infinity); // 2147483647
+ * a.long(Infinity); // MAX_SAFE_INTEGER
+ * a.int(42.5); // 42
+ * a.int('42.5'); // 42
+ * a.int('abc'); // 0
+ * a.int(NaN); // 0
+ * a.int(Symbol.for('42.5')); // 42
+ * a.byte(new Date('1970-01-01T00:00:00.999Z')); // 127
+ * a.int(new Date(NaN)); // 0
+ */
+export const byte = presets.byte.convert;
+export const short = presets.short.convert;
+export const int = presets.int.convert;
+export const long = presets.long.convert;
 
 /**
  * @description cast to string
@@ -135,6 +154,10 @@ export const promise = presets.promise.convert;
 export const aggregator = new Aggregator()
 	.register('boolean', presets.boolean)
 	.register('number', presets.number)
+	.register('byte', presets.byte)
+	.register('short', presets.short)
+	.register('int', presets.int)
+	.register('long', presets.long)
 	.register('string', presets.string)
 	.register('symbol', presets.symbol)
 	.register('fn', presets.fn)
