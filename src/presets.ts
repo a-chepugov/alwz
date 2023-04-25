@@ -6,7 +6,7 @@ boolean
 	.number(Boolean)
 	.bigint(Boolean)
 	.string(Boolean)
-	.symbol(Boolean)
+	.symbol((i) => boolean.convert(string.convert(i)))
 	.register((i): i is null => i === null, boolean.fallback)
 	.register((i): i is Date => i instanceof Date, (i: Date) => Boolean(i.getTime()))
 	.register(Array.isArray, (i: Array<any>) => boolean.convert(i[0]))

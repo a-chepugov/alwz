@@ -43,7 +43,7 @@ describe('presets', () => {
 			[ 'abc'                 , [ true     , NaN      , 0     , 0      , 0          , 0     , 'abc'                     , Symbol.for('abc')                     , ] ],
 			[ Symbol.for('Infinity'), [ true     , Infinity , 127   , 32767  , 2147483647 , IntMax, 'Infinity'                , Symbol.for('Infinity')                , ] ],
 			[ Symbol.for('NaN')     , [ true     , NaN      , 0     , 0      , 0          , 0     , 'NaN'                     , Symbol.for('NaN')                     , ] ],
-			[ Symbol.for('')        , [ true     , 0        , 0     , 0      , 0          , 0     , ''                        , Symbol.for('')                        , ] ],
+			[ Symbol.for('')        , [ false    , 0        , 0     , 0      , 0          , 0     , ''                        , Symbol.for('')                        , ] ],
 			[ Symbol.for('123')     , [ true     , 123      , 123   , 123    , 123        , 123   , '123'                     , Symbol.for('123')                     , ] ],
 			[ null                  , [ false    , 0        , 0     , 0      , 0          , 0     , ''                        , Symbol.for('')                        , ] ],
 			[ { 6: 6 }              , [ true     , NaN      , 0     , 0      , 0          , 0     , '[object Object]'         , Symbol.for('[object Object]')         , ] ],
