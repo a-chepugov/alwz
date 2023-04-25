@@ -35,6 +35,26 @@ a.number(new Date('1970-01-01T00:00:00.042Z')); // 42
 a.number(['42']); // 42
 ```
 
+## byte
+
+cast to integer
+
+### Examples
+
+```javascript
+a.byte(Infinity); // 127
+a.short(Infinity); // 327677
+a.int(Infinity); // 2147483647
+a.long(Infinity); // MAX_SAFE_INTEGER
+a.int(42.5); // 42
+a.int('42.5'); // 42
+a.int('abc'); // 0
+a.int(NaN); // 0
+a.int(Symbol.for('42.5')); // 42
+a.byte(new Date('1970-01-01T00:00:00.999Z')); // 127
+a.int(new Date(NaN)); // 0
+```
+
 ## string
 
 cast to string
