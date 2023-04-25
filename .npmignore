@@ -9,6 +9,7 @@ src
 .eslintrc.yml
 babel.config.js
 _build.sh
+_lint.sh
 _test.sh
 jest.config.ts
 tsconfig.commonjs.json
