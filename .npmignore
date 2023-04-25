@@ -8,9 +8,9 @@ src
 .eslintignore
 .eslintrc.yml
 babel.config.js
-build.sh
+_build.sh
+_test.sh
 jest.config.ts
-test.sh
 tsconfig.commonjs.json
 tsconfig.es.json
 tsconfig.json
