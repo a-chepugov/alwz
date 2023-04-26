@@ -1,27 +1,27 @@
 {
-	"compileOnSave": true,
-	"compilerOptions": {
-		"outDir": "build",
-		"target": "es2015",
-		"moduleResolution" : "node",
-		"declaration": true,
-		"strict": true,
-		"alwaysStrict": true,
-		"noImplicitAny": true,
-		"allowJs": false,
-		"checkJs": false,
-		"stripInternal": true,
-		"sourceMap": true,
-		"noErrorTruncation": true,
-		"pretty": true
-	},
-	"exclude": [
-		"./*.js",
-		"./*.ts",
-		"lib",
-		"build",
-		"docs",
-		"./node_modules/**/*.ts",
-		"**/*.test.ts"
-	]
+  "compileOnSave": true,
+  "compilerOptions": {
+    "outDir": "build/es",
+    "target": "es2015",
+    "moduleResolution" : "node",
+    "declaration": true,
+    "strict": true,
+    "alwaysStrict": true,
+    "noImplicitAny": true,
+    "allowJs": false,
+    "checkJs": false,
+    "stripInternal": true,
+    "sourceMap": true,
+    "noErrorTruncation": true,
+    "pretty": true
+  },
+  "exclude": [
+    "./*.js",
+    "./*.ts",
+    "lib",
+    "build",
+    "docs",
+    "./node_modules/**/*.ts",
+    "**/*.test.ts"
+  ]
 }
