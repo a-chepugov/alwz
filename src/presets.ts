@@ -29,7 +29,11 @@ export const [
 	byte,
 	short,
 	int,
-	long
+	long,
+	ubyte,
+	ushort,
+	uint,
+	ulong
 ] = [
 	[-128, 127],
 	[-32768, 32767],
