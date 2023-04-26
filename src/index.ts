@@ -62,6 +62,23 @@ export const int = presets.int.convert;
 export const long = presets.long.convert;
 
 /**
+ * @description cast to unsigned integer
+ * @example
+ * a.ubyte(Infinity); // 255
+ * a.ushort(Infinity); // 65535
+ * a.uint(Infinity); // 4294967295
+ * a.ulong(Infinity); // MAX_SAFE_INTEGER
+ * a.ubite(-1); // 0
+ * a.ushort(-1); // 0
+ * a.uint(-1); // 0
+ * a.ulong(-1); // 0
+ */
+export const ubyte = presets.ubyte.convert;
+export const ushort = presets.ushort.convert;
+export const uint = presets.uint.convert;
+export const ulong = presets.ulong.convert;
+
+/**
  * @description cast to string
  * @example
  * a.string(); // ''
@@ -173,6 +190,10 @@ export const aggregator = new Aggregator()
 	.register('short', presets.short)
 	.register('int', presets.int)
 	.register('long', presets.long)
+	.register('ubyte', presets.ubyte)
+	.register('ushort', presets.ushort)
+	.register('uint', presets.uint)
+	.register('ulong', presets.ulong)
 	.register('string', presets.string)
 	.register('symbol', presets.symbol)
 	.register('fn', presets.fn)
