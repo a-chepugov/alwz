@@ -1,13 +1,5 @@
 import EV from './Error';
 
-// eslint-disable-next-line
-export class InvalidCheckFunction extends EV {};
-// eslint-disable-next-line
-export class InvalidFallbackFunction extends EV {};
-// eslint-disable-next-line
-export class InvalidConvertFunction extends EV {};
-// eslint-disable-next-line
-export class InvalidConverter extends EV {};
 
 type Convert<INPUT, OUTPUT> = (input: INPUT) => OUTPUT;
 type IS<T> = (input: any) => input is T;
@@ -16,6 +8,10 @@ type IS<T> = (input: any) => input is T;
  * @description Converts input data to specific type
  */
 export class Converter<T> {
+	static InvalidCheckFunction = class extends EV {};
+	static InvalidFallbackFunction = class extends EV {};
+	static InvalidConvertFunction = class extends EV {};
+	static InvalidConverter = class extends EV {};
 	is: IS<T>;
 	fallback: () => T;
 
@@ -30,13 +26,13 @@ export class Converter<T> {
 		if (typeof is === 'function') {
 			this.is = is;
 		} else {
-			throw new InvalidCheckFunction('first argument must be a function', is);
+			throw new Converter.InvalidCheckFunction('first argument must be a function', is);
 		}
 
 		if (typeof fallback  === 'function') {
 			this.fallback = fallback;
 		} else {
-			throw new InvalidFallbackFunction('second argument must be a function', fallback);
+			throw new Converter.InvalidFallbackFunction('second argument must be a function', fallback);
 		}
 
 		this._types = {};
@@ -82,10 +78,10 @@ export class Converter<T> {
 	 */
 	register<INPUT>(is: IS<INPUT>, convert: Convert<INPUT, T>) {
 		if (typeof is !== 'function') {
-			throw new InvalidCheckFunction('first argument must be a function', is);
+			throw new Converter.InvalidCheckFunction('first argument must be a function', is);
 		}
 		if (typeof convert !== 'function') {
-			throw new InvalidConvertFunction('second argument must be a function', convert);
+			throw new Converter.InvalidConvertFunction('second argument must be a function', convert);
 		}
 
 		this._converters.set(is, convert);
@@ -153,7 +149,7 @@ export class Converter<T> {
 		if (instance instanceof Converter) {
 			return true;
 		} else {
-			throw new InvalidConverter('Is not an instance of Converter', instance);
+			throw new Converter.InvalidConverter('Is not an instance of Converter', instance);
 		}
 	}
 }

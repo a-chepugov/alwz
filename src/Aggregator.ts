@@ -1,17 +1,15 @@
 import Converter from './Converter';
 import EV from './Error';
 
-// eslint-disable-next-line
-export class DuplicateConvertor extends EV {};
-// eslint-disable-next-line
-export class InvalidConverter extends EV {};
-// eslint-disable-next-line
-export class AbsentConverter extends EV {};
-
 /**
  * @description Aggregates converters
  */
 export class Aggregator {
+
+	static DuplicateConvertor = class extends EV {};
+	static InvalidConverter = class extends EV {};
+	static AbsentConverter = class extends EV {};
+
 	protected _converters: Map<string, Converter<any>>;
 
 	constructor() {
@@ -28,12 +26,12 @@ export class Aggregator {
 	 */
 	register(name: string, converter: Converter<any>) {
 		if (this._converters.has(name)) {
-			throw new DuplicateConvertor('converter has already been registered', name);
+			throw new Aggregator.DuplicateConvertor('converter has already been registered', name);
 		} else {
 			if (converter instanceof Converter) {
 				this._converters.set(name, converter);
 			} else {
-				throw new InvalidConverter('must be an instance of Converter', converter);
+				throw new Aggregator.InvalidConverter('must be an instance of Converter', converter);
 			}
 		}
 		return this;
@@ -54,7 +52,7 @@ export class Aggregator {
 		if (this._converters.has(name)) {
 			return this._converters.get(name) as Converter<any>;
 		} else {
-			throw new AbsentConverter('converter has not been registered', name);
+			throw new Aggregator.AbsentConverter('converter has not been registered', name);
 		}
 	}
 
