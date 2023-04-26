@@ -17,6 +17,9 @@ export { default as Aggregator } from './Aggregator';
  * a.boolean('abc'); // true
  * a.boolean([false, true]); // false
  * a.boolean(Symbol.for('')); // false
+ * a.boolean([]); // false
+ * a.boolean([0]); // false
+ * a.boolean([123]); // true
  */
 export const boolean = presets.boolean.convert;
 
@@ -29,6 +32,8 @@ export const boolean = presets.boolean.convert;
  * a.number(Symbol.for('42')); // 42
  * a.number(new Date('1970-01-01T00:00:00.042Z')); // 42
  * a.number(['42']); // 42
+ * a.number([ [ [ 42 ] ] ]); // 42
+ * a.number(new Date('1970-01-01T00:00:00.999Z')); // 999
  */
 export const number = presets.number.convert;
 
@@ -40,6 +45,7 @@ export const number = presets.number.convert;
  * a.byte(-Infinity); // -128
  * a.short(Infinity); // 327677
  * a.int(Infinity); // 2147483647
+ * a.int(-Infinity); // -2147483648
  * a.long(Infinity); // MAX_SAFE_INTEGER
  * a.int(42.5); // 42
  * a.int('42.5'); // 42
@@ -106,6 +112,7 @@ export const date = presets.date.convert;
  * a.array(123); // [123]
  * a.array('1,2,3'); // ['1,2,3']
  * a.array(new Set([1, 2, 3])); // [1, 2, 3]
+ * a.array(new Map([[1, 2], [3, 4], [5, 6]])); // [[1, 2], [3, 4], [5, 6]]
  */
 export const array = presets.array.convert;
 
