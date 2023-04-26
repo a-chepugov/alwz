@@ -8,14 +8,14 @@
     "import": "./build/es/index.js"
   },
   "scripts": {
-    "prepublishOnly": "npm run test && npm run lint && npm run build",
+    "prepublishOnly": "npm run test && npm run lint && npm run build && npm run readme",
     "build": "npm run build:commonjs && npm run build:es",
     "build:commonjs": "tsc --project tsconfig.commonjs.json",
     "build:es": "tsc --project tsconfig.es.json",
     "build:development": "tsc --watch",
     "clean": "rm -rf ./build",
     "build:clear": "npm run clean && npm run build",
-    "readme": "documentation readme build/es/index.js --section=Usage",
+    "readme": "documentation readme build/es/index.js --markdown-toc=false --section=Usage",
     "preversion": "npm run test",
     "version:major": "npm version major",
     "version:minor": "npm version minor",
