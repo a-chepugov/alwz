@@ -10,6 +10,10 @@
   "scripts": {
     "prepublishOnly": "npm run test && npm run lint && npm run build && npm run readme",
     "build": "npm run build:commonjs && npm run build:es",
+    "esbuild:": "esbuild --bundle --outdir=./build --platform=node --target=node16 --packages=external --tree-shaking=true",
+    "esbuild-micro": "npm run esbuild: --minify ./source/index.ts",
+    "esbuild-mini:": "npm run esbuild: --minify-syntax --minify-identifiers --minify-whitespace",
+    "esbuild-mini": "npm run esbuild-mini: ./source/index.ts",
     "build:commonjs": "tsc --project tsconfig.commonjs.json",
     "build:es": "tsc --project tsconfig.base.json",
     "build:development": "tsc --watch",
@@ -49,6 +53,7 @@
     "@typescript-eslint/parser": "^5.3.0",
     "babel-jest": "^27.1.0",
     "documentation": "^13.2.5",
+    "esbuild": "^0.17.18",
     "eslint": "^7.32.0",
     "jest": "^27.1.0",
     "ts-node": "^10.2.1",
