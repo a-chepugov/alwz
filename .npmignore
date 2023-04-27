@@ -12,6 +12,5 @@ _build.sh
 _lint.sh
 _test.sh
 jest.config.ts
+tsconfig.base,json
 tsconfig.commonjs.json
-tsconfig.es.json
-tsconfig.json

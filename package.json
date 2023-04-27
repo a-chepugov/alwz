@@ -11,7 +11,7 @@
     "prepublishOnly": "npm run test && npm run lint && npm run build && npm run readme",
     "build": "npm run build:commonjs && npm run build:es",
     "build:commonjs": "tsc --project tsconfig.commonjs.json",
-    "build:es": "tsc --project tsconfig.json",
+    "build:es": "tsc --project tsconfig.base.json",
     "build:development": "tsc --watch",
     "clean": "rm -rf ./build",
     "build:clear": "npm run clean && npm run build",
