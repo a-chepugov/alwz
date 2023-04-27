@@ -1,7 +1,7 @@
 import assert from 'assert';
 import Converter from './Converter';
 
-describe('Converter', () => {
+describe.only('Converter', () => {
 
 	const converter = new Converter((input) => typeof input === 'number' && input > 0, () => 1);
 	converter
@@ -31,9 +31,9 @@ describe('Converter', () => {
 		});
 
 		odd.convert(1);
-		assert.deepEqual(count, 0);
+		assert.strictEqual(count, 0);
 		odd.convert(2);
-		assert.deepEqual(count, 1);
+		assert.strictEqual(count, 1);
 	});
 
 	test(`fallback is called when all attempts of conversions had failed`, () => {
@@ -47,13 +47,39 @@ describe('Converter', () => {
 			.register(Array.isArray, () => 5)
 		;
 
-		assert.deepEqual(count, 0);
+		assert.strictEqual(count, 0);
 		odd.convert(1);
+		assert.strictEqual(count, 0);
 		odd.convert('2');
+		assert.strictEqual(count, 0);
 		odd.convert();
+		assert.strictEqual(count, 0);
 		odd.convert([]);
+		assert.strictEqual(count, 0);
 		odd.convert(2);
-		assert.deepEqual(count, 1);
+		assert.strictEqual(count, 1);
+	});
+
+	test(`implement conversion fail`, () => {
+		const c = new Converter((i) => typeof i === 'number', () => {
+			throw new TypeError();
+		})
+			.undefined(() => 0)
+			.string(Number)
+		;
+
+		assert.strictEqual(c.convert(), 0);
+		assert.strictEqual(c.convert('1'), 1);
+		assert.throws(() => c.convert([2]));
+	});
+
+
+	test(`clone`, () => {
+		const converter = new Converter((i) => typeof i === 'number', () => 0).undefined(() => 1);
+		const clone = converter.clone().undefined(() => 2);
+
+		assert.strictEqual(converter.convert(), 1);
+		assert.strictEqual(clone.convert(), 2);
 	});
 
 });
