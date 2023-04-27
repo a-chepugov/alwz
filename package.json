@@ -16,7 +16,7 @@
     "esbuild-mini": "npm run esbuild-mini: ./source/index.ts",
     "build:commonjs": "tsc --project tsconfig.commonjs.json",
     "build:es": "tsc --project tsconfig.base.json",
-    "build:development": "tsc --watch",
+    "build:development": "tsc --project tsconfig.base.json --watch",
     "clean": "rm -rf ./build",
     "build:clear": "npm run clean && npm run build",
     "readme": "documentation readme build/es/index.js --markdown-toc=false --section=Usage",
