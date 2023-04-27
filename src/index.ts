@@ -62,7 +62,8 @@ export const int = presets.int.convert;
 export const long = presets.long.convert;
 
 /**
- * @description cast to unsigned integer
+ * @name unsigned integers
+ * @description cast to ubyte, ushort (2 bytes), uint (4 bytes) or ulong (8 bytes)
  * @example
  * a.ubyte(Infinity); // 255
  * a.ushort(Infinity); // 65535
