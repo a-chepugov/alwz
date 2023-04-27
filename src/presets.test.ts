@@ -3,7 +3,6 @@ import * as a from './index';
 
 const isNaN = (o: any) => o !== o;
 
-const MaxBigIntFromDbl = 179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368n;
 const BI = BigInt;
 
 const BMin = -(2 ** 7);
@@ -23,8 +22,6 @@ const NumMin = -Number.MAX_VALUE;
 const NumMax = Number.MAX_VALUE;
 const NumMaxStr = String(NumMax);
 const NumMinStr = String(NumMin);
-const IntMin = Number.MIN_SAFE_INTEGER;
-const IntMax = Number.MAX_SAFE_INTEGER;
 const BIMaxDbl = BigInt(Number.MAX_VALUE);
 const BIMaxDbl2 = BIMaxDbl * 2n;
 const BIMaxDbl2S = String(BIMaxDbl2);
@@ -35,51 +32,51 @@ describe('presets', () => {
 	describe('trivial ', () => {
 
 		const sets = [
-			[ '-------'             , [ 'boolean', 'number' , 'byte', 'short', 'int', 'long', 'ubyte', 'ushort', 'uint', 'ulong', 'string'                  , 'symbol'                              , ] ],
-			[ undefined             , [ false    , NaN      , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , ''                        , Symbol.for('')                        , ] ],
-			[ null                  , [ false    , 0        , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , ''                        , Symbol.for('')                        , ] ],
-			[ false                 , [ false    , 0        , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , ''                        , Symbol.for('')                        , ] ],
-			[ true                  , [ true     , 1        , 1     , 1      , 1    , 1     , 1      , 1       , 1     , 1      , ' '                       , Symbol.for(' ')                       , ] ],
-			[ NaN                   , [ false    , NaN      , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , ''                        , Symbol.for('')                        , ] ],
-			[ 0                     , [ false    , 0        , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , '0'                       , Symbol.for('0')                       , ] ],
-			[ -2                    , [ true     , -2       , -2    , -2     , -2   , -2    , 0      , 0       , 0     , 0      , '-2'                      , Symbol.for('-2')                      , ] ],
-			[ 2                     , [ true     , 2        , 2     , 2      , 2    , 2     , 2      , 2       , 2     , 2      , '2'                       , Symbol.for('2')                       , ] ],
-			[ 2.5                   , [ true     , 2.5      , 2     , 2      , 2    , 2     , 2      , 2       , 2     , 2      , '2.5'                     , Symbol.for('2.5')                     , ] ],
-			[ NumMin                , [ true     , NumMin   , BMin  , SMin   , IMin , LMin  , 0      , 0       , 0     , 0      , NumMinStr                 , Symbol.for(NumMinStr)                 , ] ],
-			[ NumMax                , [ true     , NumMax   , BMax  , SMax   , IMax , LMax  , UBMax  , USMax   , UIMax , LMax   , NumMaxStr                 , Symbol.for(NumMaxStr)                 , ] ],
-			[ -Infinity             , [ true     , -Infinity, BMin  , SMin   , IMin , LMin  , 0      , 0       , 0     , 0      , '-Infinity'               , Symbol.for('-Infinity')               , ] ],
-			[ Infinity              , [ true     , Infinity , BMax  , SMax   , IMax , LMax  , UBMax  , USMax   , UIMax , LMax   , 'Infinity'                , Symbol.for('Infinity')                , ] ],
-			[ 0n                    , [ false    , 0        , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , '0'                       , Symbol.for('0')                       , ] ],
-			[ 3n                    , [ true     , 3        , 3     , 3      , 3    , 3     , 3      , 3       , 3     , 3      , '3'                       , Symbol.for('3')                       , ] ],
-			[ -3n                   , [ true     , -3       , -3    , -3     , -3   , -3    , 0      , 0       , 0     , 0      , '-3'                      , Symbol.for('-3')                      , ] ],
-			[ BIMaxDbl2             , [ true     , Infinity , BMax  , SMax   , IMax , LMax  , UBMax  , USMax   , UIMax , ULMax  , BIMaxDbl2S                , Symbol.for(BIMaxDbl2S )               , ] ],
-			[ ''                    , [ false    , 0        , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , ''                        , Symbol.for('')                        , ] ],
-			[ ' '                   , [ true     , 0        , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , ' '                       , Symbol.for(' ')                       , ] ],
-			[ 'undefined'           , [ true     , NaN      , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , 'undefined'               , Symbol.for('undefined')               , ] ],
-			[ 'NaN'                 , [ true     , NaN      , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , 'NaN'                     , Symbol.for('NaN')                     , ] ],
-			[ '0'                   , [ true     , 0        , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , '0'                       , Symbol.for('0')                       , ] ],
-			[ '3'                   , [ true     , 3        , 3     , 3      , 3    , 3     , 3      , 3       , 3     , 3      , '3'                       , Symbol.for('3')                       , ] ],
-			[ '3.5'                 , [ true     , 3.5      , 3     , 3      , 3    , 3     , 3      , 3       , 3     , 3      , '3.5'                     , Symbol.for('3.5')                     , ] ],
-			[ '-Infinity'           , [ true     , -Infinity, BMin  , SMin   , IMin , LMin  , 0      , 0       , 0     , 0      , '-Infinity'               , Symbol.for('-Infinity')               , ] ],
-			[ 'abc'                 , [ true     , NaN      , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , 'abc'                     , Symbol.for('abc')                     , ] ],
-			[ Symbol.for('')        , [ false    , 0        , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , ''                        , Symbol.for('')                        , ] ],
-			[ Symbol.for('123')     , [ true     , 123      , 123   , 123    , 123  , 123   , 123    , 123     , 123   , 123    , '123'                     , Symbol.for('123')                     , ] ],
-			[ Symbol.for('NaN')     , [ true     , NaN      , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , 'NaN'                     , Symbol.for('NaN')                     , ] ],
-			[ Symbol.for('Infinity'), [ true     , Infinity , BMax  , SMax   , IMax , LMax  , UBMax  , USMax   , UIMax , LMax   , 'Infinity'                , Symbol.for('Infinity')                , ] ],
-			[ { 6: 6 }              , [ true     , NaN      , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , '[object Object]'         , Symbol.for('[object Object]')         , ] ],
-			[ ['5.5']               , [ true     , 5.5      , 5     , 5      , 5    , 5     , 5      , 5       , 5     , 5      , '5.5'                     , Symbol.for('5.5')                     , ] ],
-			[ [[[['5.5']]]]         , [ true     , 5.5      , 5     , 5      , 5    , 5     , 5      , 5       , 5     , 5      , '5.5'                     , Symbol.for('5.5')                     , ] ],
-			[ [1.5, 2, 3]           , [ true     , 1.5      , 1     , 1      , 1    , 1     , 1      , 1       , 1     , 1      , '1.5'                     , Symbol.for('1.5')                     , ] ],
-			[ () => 7               , [ true     , NaN      , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , '() => 7'                 , Symbol.for('() => 7')                 , ] ],
-			[ new Date(NaN)         , [ false    , NaN      , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , ''                        , Symbol.for('')                        , ] ],
-			[ new Date(0)           , [ false    , 0        , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , '1970-01-01T00:00:00.000Z', Symbol.for('1970-01-01T00:00:00.000Z'), ] ],
-			[ new Date(99)          , [ true     , 99       , 99    , 99     , 99   , 99    , 99     , 99      , 99    , 99     , '1970-01-01T00:00:00.099Z', Symbol.for('1970-01-01T00:00:00.099Z'), ] ],
-			[ new Date(_2p46)       , [ true     , _2p46    , BMax  , SMax   , IMax , _2p46 , UBMax  , USMax   , UIMax , _2p46  , '4199-11-24T01:22:57.664Z', Symbol.for('4199-11-24T01:22:57.664Z'), ] ],
-			[ new Map()             , [ true     , NaN      , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , '[object Map]'            , Symbol.for('[object Map]')            , ] ],
-			[ new WeakMap()         , [ true     , NaN      , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , '[object WeakMap]'        , Symbol.for('[object WeakMap]')        , ] ],
-			[ new Set()             , [ true     , NaN      , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , '[object Set]'            , Symbol.for('[object Set]')            , ] ],
-			[ new WeakSet()         , [ true     , NaN      , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , '[object WeakSet]'        , Symbol.for('[object WeakSet]')        , ] ],
-			[ Promise.resolve()     , [ true     , NaN      , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , '[object Promise]'        , Symbol.for('[object Promise]')        , ] ],
+			[ '-------'             , [ 'boolean', 'number' , 'byte', 'short', 'int', 'long', 'ubyte', 'ushort', 'uint', 'ulong', 'double', 'bigint' , 'string'                  , 'symbol'                              , ] ],
+			[ undefined             , [ false    , NaN      , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , 0       , 0n       , ''                        , Symbol.for('')                        , ] ],
+			[ null                  , [ false    , 0        , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , 0       , 0n       , ''                        , Symbol.for('')                        , ] ],
+			[ false                 , [ false    , 0        , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , 0       , 0n       , ''                        , Symbol.for('')                        , ] ],
+			[ true                  , [ true     , 1        , 1     , 1      , 1    , 1     , 1      , 1       , 1     , 1      , 1       , 1n       , ' '                       , Symbol.for(' ')                       , ] ],
+			[ NaN                   , [ false    , NaN      , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , 0       , 0n       , ''                        , Symbol.for('')                        , ] ],
+			[ 0                     , [ false    , 0        , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , 0       , 0n       , '0'                       , Symbol.for('0')                       , ] ],
+			[ -2                    , [ true     , -2       , -2    , -2     , -2   , -2    , 0      , 0       , 0     , 0      , -2      , -2n      , '-2'                      , Symbol.for('-2')                      , ] ],
+			[ 2                     , [ true     , 2        , 2     , 2      , 2    , 2     , 2      , 2       , 2     , 2      , 2       , 2n       , '2'                       , Symbol.for('2')                       , ] ],
+			[ 2.5                   , [ true     , 2.5      , 2     , 2      , 2    , 2     , 2      , 2       , 2     , 2      , 2.5     , 2n       , '2.5'                     , Symbol.for('2.5')                     , ] ],
+			[ NumMin                , [ true     , NumMin   , BMin  , SMin   , IMin , LMin  , 0      , 0       , 0     , 0      , NumMin  , -BIMaxDbl, NumMinStr                 , Symbol.for(NumMinStr)                 , ] ],
+			[ NumMax                , [ true     , NumMax   , BMax  , SMax   , IMax , LMax  , UBMax  , USMax   , UIMax , LMax   , NumMax  , BIMaxDbl , NumMaxStr                 , Symbol.for(NumMaxStr)                 , ] ],
+			[ -Infinity             , [ true     , -Infinity, BMin  , SMin   , IMin , LMin  , 0      , 0       , 0     , 0      , NumMin  , -BIMaxDbl, '-Infinity'               , Symbol.for('-Infinity')               , ] ],
+			[ Infinity              , [ true     , Infinity , BMax  , SMax   , IMax , LMax  , UBMax  , USMax   , UIMax , LMax   , NumMax  , BIMaxDbl , 'Infinity'                , Symbol.for('Infinity')                , ] ],
+			[ 0n                    , [ false    , 0        , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , 0       , 0n       , '0'                       , Symbol.for('0')                       , ] ],
+			[ 3n                    , [ true     , 3        , 3     , 3      , 3    , 3     , 3      , 3       , 3     , 3      , 3       , 3n       , '3'                       , Symbol.for('3')                       , ] ],
+			[ -3n                   , [ true     , -3       , -3    , -3     , -3   , -3    , 0      , 0       , 0     , 0      , -3      , -3n      , '-3'                      , Symbol.for('-3')                      , ] ],
+			[ BIMaxDbl2             , [ true     , Infinity , BMax  , SMax   , IMax , LMax  , UBMax  , USMax   , UIMax , ULMax  , NumMax  , BIMaxDbl2, BIMaxDbl2S                , Symbol.for(BIMaxDbl2S )               , ] ],
+			[ ''                    , [ false    , 0        , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , 0       , 0n       , ''                        , Symbol.for('')                        , ] ],
+			[ ' '                   , [ true     , 0        , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , 0       , 0n       , ' '                       , Symbol.for(' ')                       , ] ],
+			[ 'undefined'           , [ true     , NaN      , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , 0       , 0n       , 'undefined'               , Symbol.for('undefined')               , ] ],
+			[ 'NaN'                 , [ true     , NaN      , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , 0       , 0n       , 'NaN'                     , Symbol.for('NaN')                     , ] ],
+			[ '0'                   , [ true     , 0        , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , 0       , 0n       , '0'                       , Symbol.for('0')                       , ] ],
+			[ '3'                   , [ true     , 3        , 3     , 3      , 3    , 3     , 3      , 3       , 3     , 3      , 3       , 3n       , '3'                       , Symbol.for('3')                       , ] ],
+			[ '3.5'                 , [ true     , 3.5      , 3     , 3      , 3    , 3     , 3      , 3       , 3     , 3      , 3.5     , 3n       , '3.5'                     , Symbol.for('3.5')                     , ] ],
+			[ '-Infinity'           , [ true     , -Infinity, BMin  , SMin   , IMin , LMin  , 0      , 0       , 0     , 0      , NumMin  , -BIMaxDbl, '-Infinity'               , Symbol.for('-Infinity')               , ] ],
+			[ 'abc'                 , [ true     , NaN      , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , 0       , 0n       , 'abc'                     , Symbol.for('abc')                     , ] ],
+			[ Symbol.for('')        , [ false    , 0        , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , 0       , 0n       , ''                        , Symbol.for('')                        , ] ],
+			[ Symbol.for('123')     , [ true     , 123      , 123   , 123    , 123  , 123   , 123    , 123     , 123   , 123    , 123     , 123n     , '123'                     , Symbol.for('123')                     , ] ],
+			[ Symbol.for('NaN')     , [ true     , NaN      , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , 0       , 0n       , 'NaN'                     , Symbol.for('NaN')                     , ] ],
+			[ Symbol.for('Infinity'), [ true     , Infinity , BMax  , SMax   , IMax , LMax  , UBMax  , USMax   , UIMax , LMax   , NumMax  , BIMaxDbl , 'Infinity'                , Symbol.for('Infinity')                , ] ],
+			[ { 6: 6 }              , [ true     , NaN      , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , 0       , 0n       , '[object Object]'         , Symbol.for('[object Object]')         , ] ],
+			[ ['5.5']               , [ true     , 5.5      , 5     , 5      , 5    , 5     , 5      , 5       , 5     , 5      , 5.5     , 5n       , '5.5'                     , Symbol.for('5.5')                     , ] ],
+			[ [[[['5.5']]]]         , [ true     , 5.5      , 5     , 5      , 5    , 5     , 5      , 5       , 5     , 5      , 5.5     , 5n       , '5.5'                     , Symbol.for('5.5')                     , ] ],
+			[ [1.5, 2, 3]           , [ true     , 1.5      , 1     , 1      , 1    , 1     , 1      , 1       , 1     , 1      , 1.5     , 1n       , '1.5'                     , Symbol.for('1.5')                     , ] ],
+			[ () => 7               , [ true     , NaN      , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , 0       , 0n       , '() => 7'                 , Symbol.for('() => 7')                 , ] ],
+			[ new Date(NaN)         , [ false    , NaN      , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , 0       , 0n       , ''                        , Symbol.for('')                        , ] ],
+			[ new Date(0)           , [ false    , 0        , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , 0       , 0n       , '1970-01-01T00:00:00.000Z', Symbol.for('1970-01-01T00:00:00.000Z'), ] ],
+			[ new Date(99)          , [ true     , 99       , 99    , 99     , 99   , 99    , 99     , 99      , 99    , 99     , 99      , 99n      , '1970-01-01T00:00:00.099Z', Symbol.for('1970-01-01T00:00:00.099Z'), ] ],
+			[ new Date(_2p46)       , [ true     , _2p46    , BMax  , SMax   , IMax , _2p46 , UBMax  , USMax   , UIMax , _2p46  , _2p46   , BI(_2p46), '4199-11-24T01:22:57.664Z', Symbol.for('4199-11-24T01:22:57.664Z'), ] ],
+			[ new Map()             , [ true     , NaN      , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , 0       , 0n       , '[object Map]'            , Symbol.for('[object Map]')            , ] ],
+			[ new WeakMap()         , [ true     , NaN      , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , 0       , 0n       , '[object WeakMap]'        , Symbol.for('[object WeakMap]')        , ] ],
+			[ new Set()             , [ true     , NaN      , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , 0       , 0n       , '[object Set]'            , Symbol.for('[object Set]')            , ] ],
+			[ new WeakSet()         , [ true     , NaN      , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , 0       , 0n       , '[object WeakSet]'        , Symbol.for('[object WeakSet]')        , ] ],
+			[ Promise.resolve()     , [ true     , NaN      , 0     , 0      , 0    , 0     , 0      , 0       , 0     , 0      , 0       , 0n       , '[object Promise]'        , Symbol.for('[object Promise]')        , ] ],
 		];
 		// eslint-disable-next-line
 		const [[ _, names ], ...datas ] = sets;
