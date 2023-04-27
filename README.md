@@ -14,215 +14,243 @@ import * as a from 'alwz';
 const a = require('alwz');
 ```
 
-## boolean
+## to
 
-cast to boolean
+converter selector (based on predefined converters)
 
 ### Examples
 
 ```javascript
-a.boolean('abc'); // true
+a.to('int')('24.5'); // 24
+a.to('byte')(Infinity); // 127
+a.to('bigint')('42.5'); // 42n
+```
+
+## converters
+
+predefined converters registry
+
+### Examples
+
+```javascript
+a.converters.converter('number'); // Converter<number>
+a.converters.converter('date'); // Converter<Date>
+a.converters.converter('123'); // Error
+```
+
+## conversions
+
+converters registry
+
+### Examples
+
+```javascript
 a.boolean([false, true]); // false
-a.boolean(Symbol.for('')); // false
-a.boolean([]); // false
-a.boolean([0]); // false
-a.boolean([123]); // true
+a.ubyte(Infinity); // 255
+a.long(NaN); // 0
+a.array('123'); // ['123']
 ```
 
-## number
+## presets
 
-cast to number
+### boolean
 
-### Examples
+#### Examples
 
 ```javascript
-a.number(Infinity); // Infinity
-a.number('42'); // 42
-a.number('abc'); // NaN
-a.number(Symbol.for('42')); // 42
-a.number(new Date('1970-01-01T00:00:00.042Z')); // 42
-a.number(['42']); // 42
-a.number([ [ [ 42 ] ] ]); // 42
-a.number(new Date('1970-01-01T00:00:00.999Z')); // 999
+boolean.convert('abc'); // true
+boolean.convert(Symbol.for('')); // false
+boolean.convert([]); // false
+boolean.convert([0]); // false
+boolean.convert([false, true]); // false
+boolean.convert([123]); // true
 ```
 
-## integers
+### number
+
+#### Examples
+
+```javascript
+number.convert(Infinity); // Infinity
+number.convert('42'); // 42
+number.convert('abc'); // NaN
+number.convert(Symbol.for('42')); // 42
+number.convert(new Date('1970-01-01T00:00:00.042Z')); // 42
+number.convert(['42']); // 42
+number.convert([ [ [ 42 ] ] ]); // 42
+number.convert(new Date('1970-01-01T00:00:00.999Z')); // 999
+```
+
+### integers
 
 cast to byte, short (2 bytes), int (4 bytes) or long (8 bytes)
 
-### Examples
+#### Examples
 
 ```javascript
-a.byte(Infinity); // 127
-a.byte(-Infinity); // -128
-a.short(Infinity); // 327677
-a.int(Infinity); // 2147483647
-a.int(-Infinity); // -2147483648
-a.long(Infinity); // MAX_SAFE_INTEGER
-a.int(42.5); // 42
-a.int('42.5'); // 42
-a.int(['42.5']); // 42
-a.int(Symbol.for('42.5')); // 42
-a.int(new Date('1970-01-01T00:00:00.042Z')); // 42
-a.int('abc'); // 0
-a.int(NaN); // 0
-a.int(new Date(NaN)); // 0
+byte.convert(Infinity); // 127
+byte.convert(-Infinity); // -128
+short.convert(Infinity); // 327677
+int.convert(Infinity); // 2147483647
+int.convert(-Infinity); // -2147483648
+long.convert(Infinity); // MAX_SAFE_INTEGER
+int.convert(42.5); // 42
+int.convert('42.5'); // 42
+int.convert(['42.5']); // 42
+int.convert(Symbol.for('42.5')); // 42
+int.convert(new Date('1970-01-01T00:00:00.042Z')); // 42
+int.convert('abc'); // 0
+int.convert(NaN); // 0
+int.convert(new Date(NaN)); // 0
 ```
 
-## unsigned
+### unsigned
 
 cast to ubyte, ushort (2 bytes), uint (4 bytes) or ulong (8 bytes)
 
-### Examples
+#### Examples
 
 ```javascript
-a.ubyte(Infinity); // 255
-a.ushort(Infinity); // 65535
-a.uint(Infinity); // 4294967295
-a.ulong(Infinity); // MAX_SAFE_INTEGER
-a.ubite(-1); // 0
-a.ushort(-1); // 0
-a.uint(-1); // 0
-a.ulong(-1); // 0
+ubyte.convert(Infinity); // 255
+ushort.convert(Infinity); // 65535
+uint.convert(Infinity); // 4294967295
+ulong.convert(Infinity); // MAX_SAFE_INTEGER
+ubite.convert(-1); // 0
+ushort.convert(-1); // 0
+uint.convert(-1); // 0
+ulong.convert(-1); // 0
 ```
 
-## double
+### double
 
-cast to double
-
-### Examples
+#### Examples
 
 ```javascript
-a.double('42.5'); // 42.5
-a.double(Infinity); // Number.MAX_VALUE
-a.double(NaN); // 0
+double.convert('42.5'); // 42.5
+double.convert(Infinity); // Number.MAX_VALUE
+double.convert(NaN); // 0
 ```
 
-## bigint
+### bigint
 
-cast to bigint
-
-### Examples
+#### Examples
 
 ```javascript
-a.bigint(42.5); // 42n
-a.bigint('42'); // 42n
-a.bigint('42.5'); // 0n
-a.bigint(Symbol.for('42')); // 42n
-a.bigint(new Date('1970-01-01T00:00:00.999Z')); // 999n
+bigint.convert(42.5); // 42n
+bigint.convert('42'); // 42n
+bigint.convert('42.5'); // 0n
+bigint.convert(Symbol.for('42')); // 42n
+bigint.convert(new Date('1970-01-01T00:00:00.999Z')); // 999n
 ```
 
-## string
+### string
 
-cast to string
-
-### Examples
+#### Examples
 
 ```javascript
-a.string(); // ''
-a.string(null); // ''
-a.string(false); // ''
-a.string(true); // ' '
-a.string(42.5); // '42.5'
-a.string([1, 2, 3]); // '1'
-a.string(Symbol.for('42')); // '42'
-a.string(new Date('1970-01-01T00:00:00.999Z')); // '1970-01-01T00:00:00.999Z'
+string.convert(); // ''
+string.convert(null); // ''
+string.convert(false); // ''
+string.convert(true); // ' '
+string.convert(42.5); // '42.5'
+string.convert([1, 2, 3]); // '1'
+string.convert(Symbol.for('42')); // '42'
+string.convert(new Date('1970-01-01T00:00:00.999Z')); // '1970-01-01T00:00:00.999Z'
 ```
 
-## symbol
+### symbol
 
-cast to symbol
-
-### Examples
+#### Examples
 
 ```javascript
-a.symbol(false); // Symbol('')
-a.symbol(42.5); // Symbol('42.5')
-a.symbol('42.5'); // Symbol('42.5')
-a.symbol([1.5, 2, 3]); Symbol('1.5')
-a.symbol(new Date('1970-01-01T00:00:00.999Z')); // Symbol('1970-01-01T00:00:00.999Z')
+symbol.convert(false); // Symbol('')
+symbol.convert(42.5); // Symbol('42.5')
+symbol.convert('42.5'); // Symbol('42.5')
+symbol.convert([1.5, 2, 3]); Symbol('1.5')
+symbol.convert(new Date('1970-01-01T00:00:00.999Z')); // Symbol('1970-01-01T00:00:00.999Z')
 ```
 
-## fn
+### array
 
-cast to function
-
-### Examples
+#### Examples
 
 ```javascript
-a.fn((a, b) => a + b); // (a, b) => a + b
-a.fn(123); // () => 123
+array.convert(); // []
+array.convert(null); // []
+array.convert(false); // [false]
+array.convert(123); // [123]
+array.convert('1,2,3'); // ['1,2,3']
+array.convert(new Set([1, 2, 3])); // [1, 2, 3]
+array.convert(new Map([[1, 2], [3, 4], [5, 6]])); // [[1, 2], [3, 4], [5, 6]]
 ```
 
-## date
+### fn
 
-cast to date
-
-### Examples
+#### Examples
 
 ```javascript
-a.date(111); // Date('1970-01-01T00:00:00.111Z')
-a.date([222, 333]); // Date('1970-01-01T00:00:00.222Z')
-a.date('abc'); // Date(NaN)
+fn.convert((a, b) => a + b); // (a, b) => a + b
+fn.convert(123); // () => 123
 ```
 
-## array
+### date
 
-cast to array
-
-### Examples
+#### Examples
 
 ```javascript
-a.array(); // []
-a.array(null); // []
-a.array(false); // [false]
-a.array(123); // [123]
-a.array('1,2,3'); // ['1,2,3']
-a.array(new Set([1, 2, 3])); // [1, 2, 3]
-a.array(new Map([[1, 2], [3, 4], [5, 6]])); // [[1, 2], [3, 4], [5, 6]]
+date.convert(111); // Date('1970-01-01T00:00:00.111Z')
+date.convert([222, 333]); // Date('1970-01-01T00:00:00.222Z')
+date.convert('abc'); // Date(NaN)
 ```
 
-## map
+### map
 
-cast to map
+### weakmap
 
-## weakmap
+### set
 
-cast to weakmap
-
-## set
-
-cast to set
-
-### Examples
+#### Examples
 
 ```javascript
-a.set([1, '2', 3]); // Set {1, "2", 3}
+set.convert([1, '2', 3]); // Set {1, "2", 3}
 ```
 
-## weakset
+### weakset
 
 cast to weakset
 
-## promise
+### promise
 
-cast to promise
-
-### Examples
+#### Examples
 
 ```javascript
-a.promise(Promise.resolve(1)); // Promise { 1 }
-a.promise(42); // Promise { 42 }
+promise.convert(Promise.resolve(1)); // Promise { 1 }
+promise.convert(42); // Promise { 42 }
 ```
 
 ## Converter
 
-### Examples
+converts input data to specific type
+
+### Parameters
+
+*   `is` **IS** input data type checker
+*   `fallback`  
+
+### convert
+
+converts data according to saved rules
+
+#### Parameters
+
+*   `input`  
+
+#### Examples
 
 converter creation
 
 ```javascript
-const abs = new a.Converter((input) => typeof input === 'number' && input > 0, () => 1);
+const abs = new Converter((input) => typeof input === 'number' && input > 0, () => 1);
 abs
 	.undefined(() => 1)
 	.number((i) => {
@@ -239,20 +267,10 @@ abs.convert('3'); // 3
 abs.convert(-4); // 1
 ```
 
-converter cloning
-
-```javascript
-const converter = new Converter((i) => typeof i === 'number', () => 0).undefined(() => 1);
-const clone = converter.clone().undefined(() => 2)
-
-converter.convert(); // 1
-clone.convert(); // 2
-```
-
 converter with conversion error
 
 ```javascript
-const converter = new a.Converter((input) => typeof input === 'number', (i) => {
+const converter = new Converter((input) => typeof input === 'number', (i) => {
   throw new Error('Invalid source data: ' + i);
 })
  .string((i) => converter.convert(Number(i)))
@@ -260,16 +278,8 @@ const converter = new a.Converter((input) => typeof input === 'number', (i) => {
 
 converter.convert(1); // 1
 converter.convert('2'); // 2
-converter.convert(3n); // Error
+converter.convert(3n); // Error	 * @param {*} input - input data
 ```
-
-### convert
-
-converts data according to saved rules
-
-#### Parameters
-
-*   `input` **any** input data
 
 ### register
 
@@ -337,102 +347,13 @@ conversion rule for `symbol`
 
 *   `convert`  
 
-## Aggregator
-
-### Examples
-
-```javascript
-<caption>aggregates converters<caption>
-const odd = new a.Converter((input) => typeof input === 'number' && Boolean(input % 2), () => 1);
-const even = new a.Converter((input) => typeof input === 'number' && !(input % 2), () => 2);
-a.aggregator.register('odd', odd);
-a.aggregator.register('even', even);
-
-a.to('odd')(3); // 3
-a.to('odd')(4); // 1
-a.to('even')(4); // 4
-a.to('even')(5); // 2
-```
-
-### converter
-
-seek converter by name
-
-#### Parameters
-
-*   `name`  
-
-### to
-
-generate simple function to convert data
-
-#### Parameters
-
-*   `name`  
-
-### register
-
-add converter
-
-#### Parameters
-
-*   `name`  
-*   `converter`  
-
-### unregister
-
-del converter
-
-#### Parameters
-
-*   `name`  
-
-## to
-
-### Examples
-
-```javascript
-a.to('int')('24.5'); // 24
-a.to('bigint')('42.5'); // 42n
-```
-
-## constructors
-
-## Aggregator
-
-Aggregates converters
-
-## Converter
-
-Converts input data to specific type
-
-### Parameters
-
-*   `is` **IS** input data type checker
-*   `fallback`  
-
-## utilities
-
-### array
+### clone
 
 #### Examples
 
 ```javascript
-const numArray = array(Number);
-numArray(); // []
-numArray([]); // []
-numArray([true, 2, "3", {}]); // [1, 2, 3, NaN]
-```
-
-### tuple
-
-#### Examples
-
-```javascript
-const tplNSB = tuple(Number, String, Boolean);
-tplNSB(); // [NaN, 'undefined', false]
-tplNSB(null); // [NaN, 'undefined', false]
-tplNSB([]); // [NaN, '', false]
-tplNSB('5'); // [5, 'undefined', false]
-tplNSB(['1', '2', '3']); // [1, '2', true]
+const converter = new Converter((i) => typeof i === 'number', () => 0).undefined(() => 1);
+const clone = converter.clone().undefined(() => 2)
+converter.convert(); // 1
+clone.convert(); // 2
 ```
