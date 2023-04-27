@@ -33,6 +33,7 @@ export const converters = new Aggregator()
 	.register('weakset', presets.weakset)
 	.register('promise', presets.promise);
 
+
 /**
  * @description converter selector (based on predefined converters)
  * @example
@@ -50,6 +51,7 @@ export const to = converters.to;
  * a.converters.get('date'); // Converter<Date>
  * a.converters.get('123'); // Error
  */
+export default converters;
 
 // @ignore
 export const boolean = presets.boolean.convert;
