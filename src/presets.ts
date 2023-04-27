@@ -82,6 +82,42 @@ export const [
 	})
 ;
 
+export const double = new Convertor<number>(
+	(i): i is number => typeof i === 'number' && Number.isFinite(i) && -Number.MAX_VALUE <= i && i <= Number.MAX_VALUE,
+	() => 0
+);
+double
+	.undefined(double.fallback)
+	.boolean(Number)
+	.number((i) => {
+		if (i === Infinity) {
+			return Number.MAX_VALUE;
+		} else if (i === -Infinity) {
+			return -Number.MAX_VALUE;
+		} else {
+			return 0;
+		}
+	})
+	.bigint((i) => double.convert(Number(i)))
+	.string((i) => double.convert(Number(i)))
+	.symbol((i) => double.convert(string.convert(i)))
+	.register((i: any): i is null => i === null, double.fallback)
+	.register((i: any): i is Date => i instanceof Date, (i) => double.convert(i.getTime()))
+	.register(Array.isArray, (i) => double.convert(i[0]))
+;
+
+export const bigint = new Convertor<bigint>((i): i is bigint => typeof i === 'bigint', () => BigInt(0));
+bigint
+	.undefined(bigint.fallback)
+	.boolean((i) => BigInt(i))
+	.number((i) => BigInt(Math.trunc(double.convert(i))))
+	.string((i) => bigint.convert(Number(i)))
+	.symbol((i) => bigint.convert(string.convert(i)))
+	.register((i): i is null => i === null, bigint.fallback)
+	.register((i): i is Date => i instanceof Date, (i) => bigint.convert(i.getTime()))
+	.register(Array.isArray, (i) => bigint.convert(i[0]))
+;
+
 export const string = new Convertor<string>((i): i is string => typeof i === 'string', () => '');
 string
 	.undefined(string.fallback)

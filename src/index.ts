@@ -79,6 +79,26 @@ export const uint = presets.uint.convert;
 export const ulong = presets.ulong.convert;
 
 /**
+ * @description cast to double
+ * @example
+ * a.double('42.5'); // 42.5
+ * a.double(Infinity); // Number.MAX_VALUE
+ * a.double(NaN); // 0
+ */
+export const double = presets.double.convert;
+
+/**
+ * @description cast to bigint
+ * @example
+ * a.bigint(42.5); // 42n
+ * a.bigint('42'); // 42n
+ * a.bigint('42.5'); // 0n
+ * a.bigint(Symbol.for('42')); // 42n
+ * a.bigint(new Date('1970-01-01T00:00:00.999Z')); // 999n
+ */
+export const bigint = presets.bigint.convert;
+
+/**
  * @description cast to string
  * @example
  * a.string(); // ''
@@ -194,6 +214,8 @@ export const aggregator = new Aggregator()
 	.register('ushort', presets.ushort)
 	.register('uint', presets.uint)
 	.register('ulong', presets.ulong)
+	.register('bigint', presets.bigint)
+	.register('double', presets.double)
 	.register('string', presets.string)
 	.register('symbol', presets.symbol)
 	.register('fn', presets.fn)
