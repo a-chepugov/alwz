@@ -2,7 +2,18 @@ import Converter from './Converter';
 import EV from './Error';
 
 /**
- * @description Aggregates converters
+ * @ignore
+ * @example
+ * const odd = new Converter((input) => typeof input === 'number' && Boolean(input % 2), () => 1);
+ * const even = new Converter((input) => typeof input === 'number' && !(input % 2), () => 2);
+ * const Aggregator = new Aggregator();
+ * aggregator.register('odd', odd);
+ * aggregator.register('even', even);
+
+ * aggregator.to('odd')(3); // 3
+ * aggregator.to('odd')(4); // 1
+ * aggregator.to('even')(4); // 4
+ * aggregator.to('even')(5); // 2
  */
 export class Aggregator {
 
@@ -21,9 +32,6 @@ export class Aggregator {
 		return Array.from(this._converters);
 	}
 
-	/**
-	 * @description add converter
-	 */
 	register(name: string, converter: Converter<any>) {
 		if (this._converters.has(name)) {
 			throw new Aggregator.DuplicateConvertor('converter has already been registered', name);
@@ -37,17 +45,11 @@ export class Aggregator {
 		return this;
 	}
 
-	/**
-	 * @description del converter
-	 */
 	unregister(name: string) {
 		this._converters.delete(name);
 		return this;
 	}
 
-	/**
-	 * @description seek converter by name
-	 */
 	converter = (name: string): Converter<any> => {
 		if (this._converters.has(name)) {
 			return this._converters.get(name) as Converter<any>;
@@ -56,10 +58,7 @@ export class Aggregator {
 		}
 	}
 
-	/**
-	 * @description generate simple function to convert data
-	 */
-	to = (name: any) => this.converter(name).convert
+	to = (name: any) => this.converter(name).convert;
 
 	get size() {
 		return this._converters.size;
