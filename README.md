@@ -69,9 +69,9 @@ a.int(NaN); // 0
 a.int(new Date(NaN)); // 0
 ```
 
-## unsigned integers
+## unsigned
 
-cast to unsigned integer
+cast to ubyte, ushort (2 bytes), uint (4 bytes) or ulong (8 bytes)
 
 ### Examples
 
@@ -84,6 +84,32 @@ a.ubite(-1); // 0
 a.ushort(-1); // 0
 a.uint(-1); // 0
 a.ulong(-1); // 0
+```
+
+## double
+
+cast to double
+
+### Examples
+
+```javascript
+a.double('42.5'); // 42.5
+a.double(Infinity); // Number.MAX_VALUE
+a.double(NaN); // 0
+```
+
+## bigint
+
+cast to bigint
+
+### Examples
+
+```javascript
+a.bigint(42.5); // 42n
+a.bigint('42'); // 42n
+a.bigint('42.5'); // 0n
+a.bigint(Symbol.for('42')); // 42n
+a.bigint(new Date('1970-01-01T00:00:00.999Z')); // 999n
 ```
 
 ## string
@@ -189,85 +215,53 @@ a.promise(Promise.resolve(1)); // Promise { 1 }
 a.promise(42); // Promise { 42 }
 ```
 
-## aggregator
-
-aggregates converters
+## Converter
 
 ### Examples
 
+converter creation
+
 ```javascript
-const converter = new a.Converter((input) => typeof input === 'number' && input > 0, () => 1);
-converter
+const abs = new a.Converter((input) => typeof input === 'number' && input > 0, () => 1);
+abs
 	.undefined(() => 1)
 	.number((i) => {
 		const result = Math.abs(i);
-		return result > 0 ? result : converter.fallback();
+		return result > 0 ? result : abs.fallback();
 	})
-	.bigint((i) => converter.convert(Number(i)))
-	.string((i) => converter.convert(Number(i)))
-	.symbol((i) => converter.convert(Symbol.keyFor(i)))
-	.register((i) => i instanceof Number, (i: any) => converter.convert(+i));
+	.bigint((i) => abs.convert(Number(i)))
+	.string((i) => abs.convert(Number(i)))
+	.symbol((i) => abs.convert(Symbol.keyFor(i)))
 
-a.aggregator.register('positive', converter);
-
-a.to('positive')('-7'); // 7
-a.to('positive')('abc'); // 1
+abs.convert(1); // 1
+abs.convert(2n); // 2
+abs.convert('3'); // 3
+abs.convert(-4); // 1
 ```
 
-## to
-
-### Examples
+converter cloning
 
 ```javascript
-a.to('int')('24.5'); // 24
-a.to('bigint')('42.5'); // 42n
+const converter = new Converter((i) => typeof i === 'number', () => 0).undefined(() => 1);
+const clone = converter.clone().undefined(() => 2)
+
+converter.convert(); // 1
+clone.convert(); // 2
 ```
 
-## Aggregator
+converter with conversion error
 
-Aggregates converters
+```javascript
+const converter = new a.Converter((input) => typeof input === 'number', (i) => {
+  throw new Error('Invalid source data: ' + i);
+})
+ .string((i) => converter.convert(Number(i)))
+;
 
-### converter
-
-seek converter by name
-
-#### Parameters
-
-*   `name`
-
-### to
-
-generate simple function to convert data
-
-#### Parameters
-
-*   `name`
-
-### register
-
-add converter
-
-#### Parameters
-
-*   `name`
-*   `converter`
-
-### unregister
-
-del converter
-
-#### Parameters
-
-*   `name`
-
-## Converter
-
-Converts input data to specific type
-
-### Parameters
-
-*   `is` **IS** input data type checker
-*   `fallback`
+converter.convert(1); // 1
+converter.convert('2'); // 2
+converter.convert(3n); // Error
+```
 
 ### convert
 
@@ -275,7 +269,7 @@ converts data according to saved rules
 
 #### Parameters
 
-*   `i` **any** input data
+*   `input` **any** input data
 
 ### register
 
@@ -284,7 +278,7 @@ add `type checker` & `conversion rule` pair into conversions set
 #### Parameters
 
 *   `is` **IS** input data type checker
-*   `convert`
+*   `convert`  
 *   `converter` **[Converter](#converter)\<any, T>** conversion rule
 
 ### unregister
@@ -301,7 +295,7 @@ conversion rule for `undefined`
 
 #### Parameters
 
-*   `convert`
+*   `convert`  
 
 ### boolean
 
@@ -309,7 +303,7 @@ conversion rule for `boolean`
 
 #### Parameters
 
-*   `convert`
+*   `convert`  
 
 ### number
 
@@ -317,7 +311,7 @@ conversion rule for `number`
 
 #### Parameters
 
-*   `convert`
+*   `convert`  
 
 ### bigint
 
@@ -325,7 +319,7 @@ conversion rule for `bigint`
 
 #### Parameters
 
-*   `convert`
+*   `convert`  
 
 ### string
 
@@ -333,7 +327,7 @@ conversion rule for `string`
 
 #### Parameters
 
-*   `convert`
+*   `convert`  
 
 ### symbol
 
@@ -341,4 +335,104 @@ conversion rule for `symbol`
 
 #### Parameters
 
-*   `convert`
+*   `convert`  
+
+## Aggregator
+
+### Examples
+
+```javascript
+<caption>aggregates converters<caption>
+const odd = new a.Converter((input) => typeof input === 'number' && Boolean(input % 2), () => 1);
+const even = new a.Converter((input) => typeof input === 'number' && !(input % 2), () => 2);
+a.aggregator.register('odd', odd);
+a.aggregator.register('even', even);
+
+a.to('odd')(3); // 3
+a.to('odd')(4); // 1
+a.to('even')(4); // 4
+a.to('even')(5); // 2
+```
+
+### converter
+
+seek converter by name
+
+#### Parameters
+
+*   `name`  
+
+### to
+
+generate simple function to convert data
+
+#### Parameters
+
+*   `name`  
+
+### register
+
+add converter
+
+#### Parameters
+
+*   `name`  
+*   `converter`  
+
+### unregister
+
+del converter
+
+#### Parameters
+
+*   `name`  
+
+## to
+
+### Examples
+
+```javascript
+a.to('int')('24.5'); // 24
+a.to('bigint')('42.5'); // 42n
+```
+
+## constructors
+
+## Aggregator
+
+Aggregates converters
+
+## Converter
+
+Converts input data to specific type
+
+### Parameters
+
+*   `is` **IS** input data type checker
+*   `fallback`  
+
+## utilities
+
+### array
+
+#### Examples
+
+```javascript
+const numArray = array(Number);
+numArray(); // []
+numArray([]); // []
+numArray([true, 2, "3", {}]); // [1, 2, 3, NaN]
+```
+
+### tuple
+
+#### Examples
+
+```javascript
+const tplNSB = tuple(Number, String, Boolean);
+tplNSB(); // [NaN, 'undefined', false]
+tplNSB(null); // [NaN, 'undefined', false]
+tplNSB([]); // [NaN, '', false]
+tplNSB('5'); // [5, 'undefined', false]
+tplNSB(['1', '2', '3']); // [1, '2', true]
+```
