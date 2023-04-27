@@ -113,6 +113,3 @@ export { default as Converter } from './Converter';
 // @ignore
 export { default as Aggregator } from './Aggregator';
 
-// @ignore
-export * as utils from './utilities';
-
