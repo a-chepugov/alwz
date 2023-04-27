@@ -107,9 +107,11 @@ export const promise = presets.promise.convert;
  * a.array('123'); // ['123']
  */
 
+
 // @ignore
 export { default as Converter } from './Converter';
 
 // @ignore
 export { default as Aggregator } from './Aggregator';
 
+export * as utils from './utils';

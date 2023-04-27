@@ -357,3 +357,31 @@ const clone = converter.clone().undefined(() => 2)
 converter.convert(); // 1
 clone.convert(); // 2
 ```
+
+## utils
+
+extra utils functions
+
+### array
+
+#### Examples
+
+```javascript
+const numArray = array(Number);
+numArray(); // []
+numArray([]); // []
+numArray([true, 2, "3", {}]); // [1, 2, 3, NaN]
+```
+
+### tuple
+
+#### Examples
+
+```javascript
+const tplNSB = tuple(Number, String, Boolean);
+tplNSB(); // [NaN, 'undefined', false]
+tplNSB(null); // [NaN, 'undefined', false]
+tplNSB([]); // [NaN, '', false]
+tplNSB('5'); // [5, 'undefined', false]
+tplNSB(['1', '2', '3']); // [1, '2', true]
+```
