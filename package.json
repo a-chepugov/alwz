@@ -30,7 +30,9 @@
     "test": "jest"
   },
   "keywords": [
-    "casting"
+    "cast",
+    "typing",
+    "convert"
   ],
   "repository": {
     "type": "git",

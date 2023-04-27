@@ -1,7 +1,7 @@
 import assert from 'assert';
 import Converter from './Converter';
 
-describe.only('Converter', () => {
+describe('Converter', () => {
 
 	const converter = new Converter((input) => typeof input === 'number' && input > 0, () => 1);
 	converter

@@ -50,7 +50,7 @@ export class Aggregator {
 		return this;
 	}
 
-	converter = (name: string): Converter<any> => {
+	get = (name: string): Converter<any> => {
 		if (this._converters.has(name)) {
 			return this._converters.get(name) as Converter<any>;
 		} else {
@@ -58,7 +58,7 @@ export class Aggregator {
 		}
 	}
 
-	to = (name: any) => this.converter(name).convert;
+	to = (name: any) => this.get(name).convert;
 
 	get size() {
 		return this._converters.size;
