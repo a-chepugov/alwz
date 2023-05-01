@@ -288,6 +288,8 @@ date
 
 /**
  * @memberof presets
+ * @example
+ * map.convert([ [true, 1], 2, '3']); // Map { [true, 1] }
  */
 export const map = new Converter<Map<any, any>>((i): i is Map<any, any> => i instanceof Map, () => new Map())
 	.register(isIterable, (i) => {
@@ -304,6 +306,8 @@ export const map = new Converter<Map<any, any>>((i): i is Map<any, any> => i ins
 
 /**
  * @memberof presets
+ * @example
+ * weakmap.convert([ [Boolean, 'bool'], [Number, 'num'], [String, 'str'], [true, 1], 2, '3']); // WeakMap { [Boolean, 'bool'], [Number, 'num'], [String, 'str'] }
  */
 export const weakmap = new Converter<WeakMap<any, any>>((i): i is WeakMap<any, any> => i instanceof WeakMap, () => new WeakMap())
 	.register(isIterable, (i) => {
@@ -333,7 +337,8 @@ export const set = new Converter<Set<any>>((i): i is Set<any> => i instanceof Se
 
 /**
  * @memberof presets
- * @description cast to weakset
+ * @example
+ * weakset.convert([Boolean, Number, String, true, 2, '3']); // WeakSet { Boolean, Number, String }
  */
 export const weakset = new Converter<WeakSet<any>>((i): i is WeakSet<any> => i instanceof WeakSet, () => new WeakSet())
 	.register(isIterable, (i) => {
