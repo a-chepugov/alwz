@@ -9,6 +9,19 @@ import * as presets from './presets';
  * const a = require('alwz');
  */
 
+
+/**
+ * Predefined conversion functions
+ * @name predefined
+ * @see {@link presets presets}
+ * @example
+ * a.boolean([false, true]); // false
+ * a.ubyte(Infinity); // 255
+ * a.long(NaN); // 0
+ * a.array('123'); // ['123']
+ */
+
+
 export const converters = new Aggregator()
 	.register('boolean', presets.boolean)
 	.register('number', presets.number)
@@ -47,9 +60,14 @@ export const to = converters.to;
  * @name converters
  * @description predefined converters registry
  * @example
+ * // retrieving with existence check
  * a.default.converter('number'); // Converter<number>
  * a.default.converter('date'); // Converter<Date>
  * a.default.converter('123'); // Error
+ *
+ * // direct retrieving
+ * const array = a.default.get('array'); // Converter<Array>
+ * const unknown = a.default.get('123'); // undefined
  */
 export default converters;
 
@@ -98,17 +116,6 @@ export const weakset = presets.weakset.convert;
 // @ignore
 export const promise = presets.promise.convert;
 
-/**
- * @name conversions
- * @description alias for calling the `convert` method of predefined converters
- * @description converters registry
- * @example
- * a.boolean([false, true]); // false
- * a.ubyte(Infinity); // 255
- * a.long(NaN); // 0
- * a.array('123'); // ['123']
- */
-
 
 // @ignore
 export { default as Converter } from './Converter';
@@ -117,3 +124,16 @@ export { default as Converter } from './Converter';
 export { default as Aggregator } from './Aggregator';
 
 export * as utils from './utils';
+
+/**
+ * ### Tips
+ * @example <caption>Parse colon-separated string</caption>
+ * const DSV2Nums = a.utils.array(
+ *   a.number,
+ *   a.default.get('array')
+ *     .clone()
+ *     .string((i) => i.split(':'))
+ *     .convert
+ * );
+ * DSV2Nums('1:2:3:abc'); // [1, 2, 3, NaN];
+ */

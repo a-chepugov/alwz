@@ -16,10 +16,10 @@ describe('index', () => {
 		});
 
 		test('direct retrieving', () => {
-			const array = a.default.get('array');
-			const arrayFromDSV = array.clone().string((i) => i.split(':')).convert;
-			const result = arrayFromDSV('1:2:3').map(Number);
-			assert.deepStrictEqual(result, [1, 2, 3]);
+			const c1 = a.default.get('array');
+			assert.strictEqual(c1 instanceof a.Converter, true);
+			const c2 = a.default.get('123');
+			assert.strictEqual(c2 === undefined, true);
 		});
 
 	});
@@ -41,6 +41,22 @@ describe('index', () => {
 			assert.deepStrictEqual(a.ubyte(Infinity), 255);
 			assert.deepStrictEqual(a.long(NaN), 0);
 			assert.deepStrictEqual(a.array('123'), ['123']);
+		});
+
+	});
+
+	describe('mix', () => {
+
+		test('check', () => {
+			const DSV2Nums = a.utils.array(
+				a.number,
+				a.default.get('array')
+				.clone()
+				.string((i) => i.split(':'))
+				.convert
+			);
+
+			assert.deepStrictEqual(DSV2Nums("1:2:3:abc"), [1, 2, 3, NaN]);
 		});
 
 	});
