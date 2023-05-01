@@ -80,7 +80,9 @@ export class Converter<T> {
 	 *
 	 * converter.convert(1); // 1
 	 * converter.convert('2'); // 2
-	 * converter.convert(3n); // Error	 * @param {*} input - input data
+	 * converter.convert(3n); // Error
+	 *
+	 * @param {*} input - input data
 	 */
 	convert = (input: any): T => {
 		if (this.is(input)) return input;
@@ -127,7 +129,7 @@ export class Converter<T> {
 	}
 
 	/**
-	 * @description conversion rule for `undefined`
+	 * @description conversion rule setter for `undefined`
 	 */
 	undefined(convert: Convert<undefined, T>) {
 		this._types.undefined = convert;
@@ -135,7 +137,7 @@ export class Converter<T> {
 	}
 
 	/**
-	 * @description conversion rule for `boolean`
+	 * @description conversion rule setter for `boolean`
 	 */
 	boolean(convert: Convert<boolean, T>) {
 		this._types.boolean = convert;
@@ -143,7 +145,7 @@ export class Converter<T> {
 	}
 
 	/**
-	 * @description conversion rule for `number`
+	 * @description conversion rule setter for `number`
 	 */
 	number(convert: Convert<number, T>) {
 		this._types.number = convert;
@@ -151,7 +153,7 @@ export class Converter<T> {
 	}
 
 	/**
-	 * @description conversion rule for `bigint`
+	 * @description conversion rule setter for `bigint`
 	 */
 	bigint(convert: Convert<bigint, T>) {
 		this._types.bigint = convert;
@@ -159,7 +161,7 @@ export class Converter<T> {
 	}
 
 	/**
-	 * @description conversion rule for `string`
+	 * @description conversion rule setter for `string`
 	 */
 	string(convert: Convert<string, T>) {
 		this._types.string = convert;
@@ -167,7 +169,7 @@ export class Converter<T> {
 	}
 
 	/**
-	 * @description conversion rule for `symbol`
+	 * @description conversion rule setter for `symbol`
 	 */
 	symbol(convert: Convert<symbol, T>) {
 		this._types.symbol = convert;
@@ -175,11 +177,11 @@ export class Converter<T> {
 	}
 
 	/**
-	* @example
-	* const converter = new Converter((i) => typeof i === 'number', () => 0).undefined(() => 1);
-	* const clone = converter.clone().undefined(() => 2)
-	* converter.convert(); // 1
-	* clone.convert(); // 2
+	 * @example
+	 * const converter = new Converter((i) => typeof i === 'number', () => 0).undefined(() => 1);
+	 * const clone = converter.clone().undefined(() => 2)
+	 * converter.convert(); // 1
+	 * clone.convert(); // 2
 	*/
 	clone() {
 		const converter = new Converter(this.is, this.fallback);
