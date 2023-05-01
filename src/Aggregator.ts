@@ -1,5 +1,6 @@
 import Converter from './Converter';
 import EV from './Error';
+import Registry from './Registry';
 
 /**
  * @ignore
@@ -15,29 +16,27 @@ import EV from './Error';
  * aggregator.to('even')(4); // 4
  * aggregator.to('even')(5); // 2
  */
-export class Aggregator {
+export class Aggregator extends Registry<string, Converter<any>> {
 
 	static DuplicateConvertor = class extends EV {};
 	static InvalidConverter = class extends EV {};
 	static AbsentConverter = class extends EV {};
 
-	protected _converters: Map<string, Converter<any>>;
-
 	constructor() {
-		this._converters = new Map();
+		super();
 		Object.freeze(this);
 	}
 
 	get converters() {
-		return Array.from(this._converters);
+		return Array.from(this._items);
 	}
 
 	register(name: string, converter: Converter<any>) {
-		if (this._converters.has(name)) {
 			throw new Aggregator.DuplicateConvertor('converter has already been registered', name);
+		if (this._items.has(name)) {
 		} else {
 			if (converter instanceof Converter) {
-				this._converters.set(name, converter);
+				this._items.set(name, converter);
 			} else {
 				throw new Aggregator.InvalidConverter('must be an instance of Converter', converter);
 			}
@@ -46,23 +45,20 @@ export class Aggregator {
 	}
 
 	unregister(name: string) {
-		this._converters.delete(name);
+		this._items.delete(name);
 		return this;
 	}
 
-	get = (name: string): Converter<any> => {
-		if (this._converters.has(name)) {
-			return this._converters.get(name) as Converter<any>;
+	converter = (name: string): Converter<any> => {
+		if (this._items.has(name)) {
+			return this._items.get(name) as Converter<any>;
 		} else {
 			throw new Aggregator.AbsentConverter('converter has not been registered', name);
 		}
 	}
 
-	to = (name: any) => this.get(name).convert;
+	to = (name: any) => this.converter(name).convert;
 
-	get size() {
-		return this._converters.size;
-	}
 }
 
 export default Aggregator;

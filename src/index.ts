@@ -47,9 +47,9 @@ export const to = converters.to;
  * @name converters
  * @description predefined converters registry
  * @example
- * a.converters.get('number'); // Converter<number>
- * a.converters.get('date'); // Converter<Date>
- * a.converters.get('123'); // Error
+ * a.default.converter('number'); // Converter<number>
+ * a.default.converter('date'); // Converter<Date>
+ * a.default.converter('123'); // Error
  */
 export default converters;
 
