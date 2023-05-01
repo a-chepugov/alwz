@@ -18,7 +18,7 @@ import Registry from './Registry';
  */
 export class Aggregator extends Registry<string, Converter<any>> {
 
-	static DuplicateConvertor = class extends EV {};
+	static DuplicateConverter = class extends EV {};
 	static InvalidConverter = class extends EV {};
 	static AbsentConverter = class extends EV {};
 
@@ -32,8 +32,8 @@ export class Aggregator extends Registry<string, Converter<any>> {
 	}
 
 	register(name: string, converter: Converter<any>) {
-			throw new Aggregator.DuplicateConvertor('converter has already been registered', name);
 		if (this._items.has(name)) {
+			throw new Aggregator.DuplicateConverter('converter has already been registered', name);
 		} else {
 			if (converter instanceof Converter) {
 				this._items.set(name, converter);
