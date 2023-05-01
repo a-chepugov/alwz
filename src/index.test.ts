@@ -51,9 +51,9 @@ describe('index', () => {
 			const DSV2Nums = a.utils.array(
 				a.number,
 				a.default.get('array')
-				.clone()
-				.string((i) => i.split(':'))
-				.convert
+					.clone()
+					.string((i) => i.split(':'))
+					.convert
 			);
 
 			assert.deepStrictEqual(DSV2Nums("1:2:3:abc"), [1, 2, 3, NaN]);
