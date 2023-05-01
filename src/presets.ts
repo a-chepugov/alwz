@@ -58,20 +58,19 @@ number
  * @name integers
  * @description cast to byte, short (2 bytes), int (4 bytes) or long (8 bytes)
  * @example
+ * byte.convert(42.5); // 42
+ * byte.convert('42.5'); // 42
+ * byte.convert(['42.5']); // 42
+ * byte.convert(Symbol.for('42.5')); // 42
+ * byte.convert(new Date('1970-01-01T00:00:00.042Z')); // 42
+ * byte.convert('abc'); // 0
+ * byte.convert(NaN); // 0
+ * byte.convert(new Date(NaN)); // 0
  * byte.convert(Infinity); // 127
  * byte.convert(-Infinity); // -128
  * short.convert(Infinity); // 327677
  * int.convert(Infinity); // 2147483647
- * int.convert(-Infinity); // -2147483648
  * long.convert(Infinity); // MAX_SAFE_INTEGER
- * int.convert(42.5); // 42
- * int.convert('42.5'); // 42
- * int.convert(['42.5']); // 42
- * int.convert(Symbol.for('42.5')); // 42
- * int.convert(new Date('1970-01-01T00:00:00.042Z')); // 42
- * int.convert('abc'); // 0
- * int.convert(NaN); // 0
- * int.convert(new Date(NaN)); // 0
  */
 
 /**

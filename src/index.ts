@@ -2,7 +2,7 @@ import Aggregator from './Aggregator';
 import * as presets from './presets';
 
 /**
- * @name import
+ * @name Import
  * @example
  * import * as a from 'alwz';
  * // or
@@ -11,8 +11,8 @@ import * as presets from './presets';
 
 
 /**
- * Predefined conversion functions
- * @name predefined
+ * data conversion by presetted converters
+ * @name Predefined
  * @see {@link presets presets}
  * @example
  * a.boolean([false, true]); // false
@@ -20,7 +20,6 @@ import * as presets from './presets';
  * a.long(NaN); // 0
  * a.array('123'); // ['123']
  */
-
 
 export const converters = new Aggregator()
 	.register('boolean', presets.boolean)
@@ -46,9 +45,9 @@ export const converters = new Aggregator()
 	.register('weakset', presets.weakset)
 	.register('promise', presets.promise);
 
-
 /**
- * @description converter selector (based on predefined converters)
+ * @name Selector
+ * @description dynamically select convert function (based on predefined converters)
  * @example
  * a.to('int')('24.5'); // 24
  * a.to('byte')(Infinity); // 127
@@ -57,8 +56,8 @@ export const converters = new Aggregator()
 export const to = converters.to;
 
 /**
- * @name converters
- * @description predefined converters registry
+ * @name Converters
+ * @description registry of predefined converters
  * @example
  * // retrieving with existence check
  * a.default.converter('number'); // Converter<number>
@@ -71,58 +70,32 @@ export const to = converters.to;
  */
 export default converters;
 
-// @ignore
 export const boolean = presets.boolean.convert;
-// @ignore
 export const number = presets.number.convert;
-// @ignore
 export const byte = presets.byte.convert;
-// @ignore
 export const short = presets.short.convert;
-// @ignore
 export const int = presets.int.convert;
-// @ignore
 export const long = presets.long.convert;
-// @ignore
 export const ubyte = presets.ubyte.convert;
-// @ignore
 export const ushort = presets.ushort.convert;
-// @ignore
 export const uint = presets.uint.convert;
-// @ignore
 export const ulong = presets.ulong.convert;
-// @ignore
 export const double = presets.double.convert;
-// @ignore
 export const bigint = presets.bigint.convert;
-// @ignore
 export const string = presets.string.convert;
-// @ignore
 export const symbol = presets.symbol.convert;
-// @ignore
 export const fn = presets.fn.convert;
-// @ignore
 export const date = presets.date.convert;
-// @ignore
 export const array = presets.array.convert;
-// @ignore
 export const map = presets.map.convert;
-// @ignore
 export const weakmap = presets.weakmap.convert;
-// @ignore
 export const set = presets.set.convert;
-// @ignore
 export const weakset = presets.weakset.convert;
-// @ignore
 export const promise = presets.promise.convert;
 
 
-// @ignore
 export { default as Converter } from './Converter';
-
-// @ignore
 export { default as Aggregator } from './Aggregator';
-
 export * as utils from './utils';
 
 /**
