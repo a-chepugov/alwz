@@ -95,21 +95,21 @@ export const [
 	ubyte,
 	ushort,
 	uint,
-	ulong
+	ulong,
 ] = [
 	[-128, 127],
 	[-32768, 32767],
 	[-2147483648, 2147483647],
 	[
 		Math.max(Number.MIN_SAFE_INTEGER, -(2 ** 63)),
-		Math.min(Number.MAX_SAFE_INTEGER, (2 ** 63) - 1)
+		Math.min(Number.MAX_SAFE_INTEGER, (2 ** 63) - 1),
 	],
 	[0, 255],
 	[0, 65535],
 	[0, 4294967295],
 	[
 		0,
-		Math.min(Number.MAX_SAFE_INTEGER, (2 ** 64) - 1)
+		Math.min(Number.MAX_SAFE_INTEGER, (2 ** 64) - 1),
 	],
 ]
 	.map(([min, max]) => {
