@@ -1,7 +1,7 @@
 import EV from './Error';
 
+export type IS<T> = (input: any) => input is T;
 export type Convert<INPUT, OUTPUT> = (input: INPUT) => OUTPUT;
-type IS<T> = (input: any) => input is T;
 
 type Primitives = 'undefined' | 'boolean' | 'number' | 'bigint' | 'string' | 'symbol';
 
