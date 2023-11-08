@@ -1,7 +1,39 @@
 import EV from './Error';
 
 export type IS<T> = (input: any) => input is T;
+
+export function isIS<T>(input: any): input is IS<T> {
+	return typeof input === 'function';
+}
+
+export function assertIS<T>(input: any): boolean | never {
+	if (isIS<T>(input)) return true;
+	throw new Converter.InvalidTypeCheckFunction('type checker must be a function', input);
+}
+
+// eslint-disable-next-line no-unused-vars
+export type Fallback<OUTPUT> = (input?: any) => OUTPUT | never;
+
+export function isFallback<OUTPUT>(input: any): input is Fallback<OUTPUT> {
+	return typeof input === 'function';
+}
+
+export function assertFallback<OUTPUT>(input: any): boolean | never {
+	if (isFallback<OUTPUT>(input)) return true;
+	throw new Converter.InvalidFallbackFunction('fallback must be a function', input);
+}
+
+// eslint-disable-next-line no-unused-vars
 export type Convert<INPUT, OUTPUT> = (input: INPUT) => OUTPUT;
+
+export function isConvert<INPUT, OUTPUT>(input: any): input is Convert<INPUT, OUTPUT> {
+	return typeof input === 'function';
+}
+
+export function assertConvert<INPUT, OUTPUT>(input: any): boolean | never {
+	if (isConvert<INPUT, OUTPUT>(input)) return true;
+	throw new Converter.InvalidConvertFunction('convert must be a function', input);
+}
 
 type Primitives = 'undefined' | 'boolean' | 'number' | 'bigint' | 'string' | 'symbol';
 
