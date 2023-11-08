@@ -190,12 +190,11 @@ export class Converter<T> {
 		return converter;
 	}
 
-	static assert(instance: any) {
-		if (instance instanceof Converter) {
-			return true;
-		} else {
-			throw new Converter.InvalidConverter('Is not an instance of Converter', instance);
-		}
+	static is = (input: any) => input instanceof Converter;
+
+	static assert(input: any) {
+		if (Converter.is(input)) return true;
+		throw new Converter.InvalidConverter('input is not an instance of Converter', input);
 	}
 }
 
