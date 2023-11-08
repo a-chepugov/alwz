@@ -6,15 +6,24 @@ end_of_line = lf
 indent_size = 2
 indent_style = tab
 insert_final_newline = true
-max_line_length = 100
+max_line_length = 120
 trim_trailing_whitespace = true
 
-[{*.cjs,*.js}]
-max_line_length = 120
+[*.{yaml,yml}]
+indent_size = 2
+indent_style = space
 
-[{*.ts,*.ats}]
-max_line_length = 120
+[*.json]
+indent_style = space
 
-[{*.md, *.markdown}]
-max_line_length = 120
+[*.{js,cjs,mjs,ts,ats}]
+indent_style = tab
+
+[*.{md,markdown}]
+indent_style = tab
+
+[*.sh]
+indent_style = tab
+
+[Makefile]
 indent_style = tab
