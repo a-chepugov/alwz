@@ -48,27 +48,21 @@ export class Converter<T> {
 	static InvalidConverter = class extends EV {};
 
 	is: IS<T>;
-	fallback: (input?: any) => T;
+	fallback: Fallback<T>;
 
 	protected _types: Record<string, Convert<any, T>>;
 	protected _converters: Map<IS<any>, Convert<any, T>>;
 
 	/**
-	 * @param {IS} is - input data type checker
-	 * @param {() => T} fallback- default value generator
+	 * @param {IS<T>} is - input data type checker
+	 * @param {Fallback<T>} fallback - default value generator
 	 */
-	constructor(is: IS<T>, fallback: (input?: any) => T) {
-		if (typeof is === 'function') {
-			this.is = is;
-		} else {
-			throw new Converter.InvalidCheckFunction('first argument must be a function', is);
-		}
+	constructor(is: IS<T>, fallback: Fallback<T>) {
+		assertIS(is);
+		this.is = is;
 
-		if (typeof fallback  === 'function') {
-			this.fallback = fallback;
-		} else {
-			throw new Converter.InvalidFallbackFunction('second argument must be a function', fallback);
-		}
+		assertFallback(fallback);
+		this.fallback = fallback;
 
 		this._types = {};
 		this._converters = new Map();
@@ -140,12 +134,8 @@ export class Converter<T> {
 	 * @param {Converter<any, T>} converter - conversion rule
 	 */
 	register<INPUT>(is: IS<INPUT>, convert: Convert<INPUT, T>) {
-		if (typeof is !== 'function') {
-			throw new Converter.InvalidCheckFunction('first argument must be a function', is);
-		}
-		if (typeof convert !== 'function') {
-			throw new Converter.InvalidConvertFunction('second argument must be a function', convert);
-		}
+		assertIS(is);
+		assertConvert(convert);
 
 		this._converters.set(is, convert);
 		return this;
