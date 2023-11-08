@@ -54,8 +54,8 @@ export class Converter<T> {
 	protected _converters: Map<IS<any>, Convert<any, T>>;
 
 	/**
-	 * @param {IS<T>} is - input data type checker
-	 * @param {Fallback<T>} fallback - default value generator
+	 * @param {IS<T>} is - default input type checker. checks if conversion is necessary
+	 * @param {Fallback<T>} fallback - default value generator. runs if none of the available converters are suitable
 	 */
 	constructor(is: IS<T>, fallback: Fallback<T>) {
 		assertIS(is);
@@ -130,8 +130,8 @@ export class Converter<T> {
 
 	/**
 	 * @description add `type checker` & `conversion rule` pair into conversions set
-	 * @param {IS} is - input data type checker
-	 * @param {Converter<any, T>} converter - conversion rule
+	 * @param {IS<INPUT>} is - input type checker, determines if input can be processed by `convert`
+	 * @param {Convert<INPUT, T>} convert - `INPUT` to `T` convert function
 	 */
 	register<INPUT>(is: IS<INPUT>, convert: Convert<INPUT, T>) {
 		assertIS(is);
@@ -143,7 +143,7 @@ export class Converter<T> {
 
 	/**
 	 * @description del `type checker` & `conversion rule` pair from conversions set
-	 * @param {IS} is - input data type checker
+	 * @param {IS<INPUT>} is - input type checker
 	 */
 	unregister<INPUT>(is: IS<INPUT>) {
 		this._converters.delete(is);
@@ -151,7 +151,7 @@ export class Converter<T> {
 	}
 
 	/**
-	 * @description conversion rule setter for `undefined`
+	 * @description conversion rule setter for `undefined` input
 	 */
 	undefined(convert: Convert<undefined, T>) {
 		this._types.undefined = convert;
@@ -159,7 +159,7 @@ export class Converter<T> {
 	}
 
 	/**
-	 * @description conversion rule setter for `boolean`
+	 * @description conversion rule setter for `boolean` input
 	 */
 	boolean(convert: Convert<boolean, T>) {
 		this._types.boolean = convert;
@@ -167,7 +167,7 @@ export class Converter<T> {
 	}
 
 	/**
-	 * @description conversion rule setter for `number`
+	 * @description conversion rule setter for `number` input
 	 */
 	number(convert: Convert<number, T>) {
 		this._types.number = convert;
@@ -175,7 +175,7 @@ export class Converter<T> {
 	}
 
 	/**
-	 * @description conversion rule setter for `bigint`
+	 * @description conversion rule setter for `bigint` input
 	 */
 	bigint(convert: Convert<bigint, T>) {
 		this._types.bigint = convert;
@@ -183,7 +183,7 @@ export class Converter<T> {
 	}
 
 	/**
-	 * @description conversion rule setter for `string`
+	 * @description conversion rule setter for `string` input
 	 */
 	string(convert: Convert<string, T>) {
 		this._types.string = convert;
@@ -191,7 +191,7 @@ export class Converter<T> {
 	}
 
 	/**
-	 * @description conversion rule setter for `symbol`
+	 * @description conversion rule setter for `symbol` input
 	 */
 	symbol(convert: Convert<symbol, T>) {
 		this._types.symbol = convert;

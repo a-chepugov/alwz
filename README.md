@@ -275,8 +275,8 @@ converts input data to specific type
 
 ### Parameters
 
-*   `is` **IS** input data type checker
-*   `fallback`  
+*   `is` **IS\<T>** default input type checker. checks if conversion is necessary
+*   `fallback` **Fallback\<T>** default value generator. runs if none of the available converters are suitable
 
 ### convert
 
@@ -328,9 +328,8 @@ add `type checker` & `conversion rule` pair into conversions set
 
 #### Parameters
 
-*   `is` **IS** input data type checker
-*   `convert`  
-*   `converter` **[Converter](#converter)\<any, T>** conversion rule
+*   `is` **IS\<INPUT>** input type checker, determines if input can be processed by `convert`
+*   `convert` **Convert\<INPUT, T>** `INPUT` to `T` convert function
 
 ### unregister
 
@@ -338,11 +337,11 @@ del `type checker` & `conversion rule` pair from conversions set
 
 #### Parameters
 
-*   `is` **IS** input data type checker
+*   `is` **IS\<INPUT>** input type checker
 
 ### undefined
 
-conversion rule setter for `undefined`
+conversion rule setter for `undefined` input
 
 #### Parameters
 
@@ -350,7 +349,7 @@ conversion rule setter for `undefined`
 
 ### boolean
 
-conversion rule setter for `boolean`
+conversion rule setter for `boolean` input
 
 #### Parameters
 
@@ -358,7 +357,7 @@ conversion rule setter for `boolean`
 
 ### number
 
-conversion rule setter for `number`
+conversion rule setter for `number` input
 
 #### Parameters
 
@@ -366,7 +365,7 @@ conversion rule setter for `number`
 
 ### bigint
 
-conversion rule setter for `bigint`
+conversion rule setter for `bigint` input
 
 #### Parameters
 
@@ -374,7 +373,7 @@ conversion rule setter for `bigint`
 
 ### string
 
-conversion rule setter for `string`
+conversion rule setter for `string` input
 
 #### Parameters
 
@@ -382,7 +381,7 @@ conversion rule setter for `string`
 
 ### symbol
 
-conversion rule setter for `symbol`
+conversion rule setter for `symbol` input
 
 #### Parameters
 
