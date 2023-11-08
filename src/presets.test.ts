@@ -81,7 +81,7 @@ describe('presets', () => {
 
 		/* eslint-enable */
 		];
-		// eslint-disable-next-line no-unused-vars @typescript-eslint/no-unused-vars
+		// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
 		const [[ _, names ], ...datas ] = sets;
 
 		for (let converterIndex = 0; converterIndex < names.length; converterIndex++) {
