@@ -42,7 +42,7 @@ type Primitives = 'undefined' | 'boolean' | 'number' | 'bigint' | 'string' | 'sy
  */
 export class Converter<T> {
 
-	static InvalidCheckFunction = class extends EV {};
+	static InvalidTypeCheckFunction = class extends EV {};
 	static InvalidFallbackFunction = class extends EV {};
 	static InvalidConvertFunction = class extends EV {};
 	static InvalidConverter = class extends EV {};
