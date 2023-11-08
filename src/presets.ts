@@ -265,6 +265,8 @@ export const array = new Converter<Array<any>>(Array.isArray, (i) => ([i]))
  * fn.convert((a, b) => a + b); // (a, b) => a + b
  * fn.convert(123); // () => 123
  */
+
+// eslint-disable-next-line no-unused-vars
 export const fn = new Converter<(...args: any[]) => any>((i): i is (...args: any[]) => any => typeof i === 'function', (i) => () => i);
 
 /**

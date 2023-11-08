@@ -1,4 +1,4 @@
-// eslint-disable-next-line
+// eslint-disable-next-line require-jsdoc
 export class ErrorValue extends Error {
 	value: any;
 	constructor(message: string, value: any) {
