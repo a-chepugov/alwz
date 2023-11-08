@@ -7,10 +7,11 @@ src
 .editorconfig
 .eslintignore
 .eslintrc.yml
-babel.config.js
+.gitignore
 _build.sh
 _lint.sh
 _test.sh
+babel.config.js
 jest.config.ts
 tsconfig.base.json
 tsconfig.commonjs.json
