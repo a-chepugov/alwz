@@ -291,21 +291,34 @@ converts data according to saved rules
 converter creation
 
 ```javascript
-const abs = new Converter((input) => typeof input === 'number' && input > 0, () => 1);
-abs
-	.undefined(() => 1)
-	.number((i) => {
-		const result = Math.abs(i);
-		return result > 0 ? result : abs.fallback();
-	})
-	.bigint((i) => abs.convert(Number(i)))
-	.string((i) => abs.convert(Number(i)))
-	.symbol((i) => abs.convert(Symbol.keyFor(i)))
+const positive = new Converter(
+  (input) => typeof input === 'number' && input > 0,
+  (i) => i === 0 ? 0.1 : 0.2
+);
 
-abs.convert(1); // 1
-abs.convert(2n); // 2
-abs.convert('3'); // 3
-abs.convert(-4); // 1
+positive
+  .undefined(() => 0.3)
+  .boolean((i) => i ? 1 : 0.4)
+  .number(function(i) {
+    const result = Math.abs(i)
+    return this.is(result) ? result : this.fallback(i);
+  })
+  .string((i) => positive.convert(Number(i)))
+  .symbol((i) => positive.convert(Symbol.keyFor(i)))
+  .bigint((i) => positive.convert(Number(i)))
+  .register(Array.isArray, (i) => positive.convert(i[0]))
+  .register((i) => i === null, (i) => 0.5);
+
+positive.convert(1); // 1
+positive.convert(0); // 0.1 (fallback)
+positive.convert(NaN); // 0.2 (fallback)
+positive.convert(undefined); // 0.3 (has own handler)
+positive.convert(false); // 0.4 (has own handler)
+positive.convert(null); // 0.5 (has own handler)
+positive.convert(2n); // 2
+positive.convert(-3); // 3
+positive.convert('4'); // 4
+positive.convert([5, 6]); // 5
 ```
 
 converter with conversion error
@@ -324,7 +337,7 @@ converter.convert(3n); // Error
 
 ### register
 
-add `type checker` & `conversion rule` pair into conversions set
+add transform function for `INPUT` type
 
 #### Parameters
 
@@ -333,7 +346,7 @@ add `type checker` & `conversion rule` pair into conversions set
 
 ### unregister
 
-del `type checker` & `conversion rule` pair from conversions set
+remove transform function for `INPUT` type from conversions list
 
 #### Parameters
 
