@@ -9,16 +9,93 @@ import * as presets from './presets';
  * const a = require('alwz');
  */
 
-
 /**
- * data conversion by presetted converters
  * @name Predefined
  * @see {@link presets presets}
+ * @description convert data with presetted converters
  * @example
  * a.boolean([false, true]); // false
- * a.ubyte(Infinity); // 255
+ * a.byte('3'); // 3
+ * a.short(false); // 0
+ * a.int(true); // 1
  * a.long(NaN); // 0
- * a.array('123'); // ['123']
+ * a.uint(Infinity); // 4294967295
+ * a.array('1'); // ['1']
+ * a.array(['1', '2', '3']); // ['1', '2', '3']
+ */
+
+/**
+ * @name Utils
+ * @see {@link utils utils}
+ * @description construct complex data
+ * @example <caption>ensure an array output</caption>
+ * const array = a.utils.array;
+ * const ArrayOfUByte = array(a.ubyte);
+ * ArrayOfUByte([undefined, true, 2.3, '4', Infinity]); // [0, 1, 2, 4, 255]
+ *
+ * @example <caption>simplify multidimensional arrays processing</caption>
+ * const array = a.utils.array;
+ *
+ * const Bytes3dArray = array(array(array(a.byte)));
+ *
+ * Bytes3dArray(1); // [[[1]]];
+ * Bytes3dArray([[[null, NaN, 'a'], [true, '2', 3]], [[-Infinity]]]); // [[[0, 0, 0], [1, 2, 3]], [[-128]]];
+ *
+ * @example <caption>create tuples</caption>
+ * const tuple = a.utils.tuple;
+ * const Pair = tuple([a.uint, a.uint]);
+ * Pair(['abc', 35, 100]); // [0, 35]
+ *
+ * const NativePair = tuple([Number, Number]);
+ * NativePair(['abc', 35, 100]); // [NaN, 35]
+ *
+ * @example <caption>parse colon-separated number/string mixed records</caption>
+ * const PathArray = a.default.get('array')
+ *   .clone()
+ *   .string((i) => [...i.matchAll(/\/(\w+)/g)].map((i) => i[1]))
+ *   .convert;
+ *
+ * const DSV2Tuple = a.utils.tuple(
+ *   [String, String, Number, Number, String, PathArray, PathArray],
+ *   a.default.get('array')
+ *     .clone()
+ *     .string((i) => i.split(':'))
+ *     .convert
+ * );
+ *
+ * const input = 'user:12345:1000:1000:ordinar user:/home/user:/bin/sh';
+ * const result = DSV2Tuple(input);
+ * const expected = ['user', '12345', 1000, 1000, 'ordinar user', ['home', 'user'], ['bin', 'sh']];
+ * assert.deepStrictEqual(result, expected);
+ */
+
+/**
+ * @name Transform
+ * @see {@link Converter Converter}
+ * @description create custom converters
+ * @example
+ * const even = new a.Converter(
+ *   (input) => typeof input === 'number' && input % 2 === 0,
+ *   (input) => Number(input) % 2 === 0 ? Number(input) : 0
+ * );
+ *
+ * even
+ *   .undefined(() => -2)
+ *   .boolean((input) => input ? -4 : -6)
+ *   .number(function(input) {
+ *     const result = Math.trunc(Math.abs(input || 0) / 2) * 2;
+ *     return this.is(result) ? result : this.fallback(input);
+ *   })
+ *   .string((input) => even.convert(Number(input)))
+ *   .register(Array.isArray, (input) => even.convert(input[0]));
+ *
+ * even.convert(8); // 8
+ * even.convert(undefined); // -2
+ * even.convert(false); // -6
+ * even.convert(NaN); // 0
+ * even.convert(9); // 8
+ * even.convert('11'); // 10
+ * even.convert([17, 18, 19]); // 16
  */
 
 export const converters = new Aggregator()
@@ -60,13 +137,13 @@ export const to = converters.to;
  * @description registry of predefined converters
  * @example
  * // retrieving with existence check
- * a.default.converter('number'); // Converter<number>
- * a.default.converter('date'); // Converter<Date>
+ * const Num = a.default.converter('number'); // Converter<number>
+ * const Str = a.default.converter('string'); // Converter<string>
  * a.default.converter('123'); // Error
  *
  * // direct retrieving
- * const array = a.default.get('array'); // Converter<Array>
- * const unknown = a.default.get('123'); // undefined
+ * const Arr = a.default.get('array'); // Converter<Array>
+ * const Unknown = a.default.get('123'); // undefined
  */
 export default converters;
 
@@ -97,16 +174,3 @@ export const promise = presets.promise.convert;
 export { default as Converter } from './Converter';
 export { default as Aggregator } from './Aggregator';
 export * as utils from './utils';
-
-/**
- * ### Tips
- * @example <caption>Parse colon-separated string</caption>
- * const DSV2Nums = a.utils.array(
- *   a.number,
- *   a.default.get('array')
- *     .clone()
- *     .string((i) => i.split(':'))
- *     .convert
- * );
- * DSV2Nums('1:2:3:abc'); // [1, 2, 3, NaN];
- */
