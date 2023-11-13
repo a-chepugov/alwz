@@ -56,21 +56,49 @@ number
 /**
  * @memberof presets
  * @name integers
+ * @description
+ * ```
+ * | type   |              min |              max |
+ * |--------|------------------|------------------|
+ * | byte   |             -128 |              127 |
+ * | short  |           -32768 |            32767 |
+ * | int    |      -2147483648 |       2147483647 |
+ * | long   | MIN_SAFE_INTEGER | MAX_SAFE_INTEGER |
+ * |--------|------------------|------------------|
+ * | ubyte  |                0 |              255 |
+ * | ushort |                0 |            65535 |
+ * | uint   |                0 |       4294967295 |
+ * | ulong  |                0 | MAX_SAFE_INTEGER |
+ * |--------|------------------|------------------|
+ * ```
+ * @example
+ * int.convert(undefined); // 0
+ * int.convert(null); // 0
+ * int.convert(NaN); // 0
+ * int.convert('abc'); // 0
+ * int.convert(true); // 1
+ * int.convert(42.5); // 42
+ * int.convert('42.5'); // 42
+ * int.convert(['42.5']); // 42
+ * int.convert(Symbol.for('42.5')); // 42
+ * int.convert(new Date('1970-01-01T00:00:00.042Z')); // 42
+ * int.convert(new Date(NaN)); // 0
+*/
+
+/**
+ * @memberof presets
+ * @name signed
  * @description cast to byte, short (2 bytes), int (4 bytes) or long (8 bytes)
  * @example
- * byte.convert(42.5); // 42
- * byte.convert('42.5'); // 42
- * byte.convert(['42.5']); // 42
- * byte.convert(NaN); // 0
- * byte.convert('abc'); // 0
- * byte.convert(Symbol.for('42.5')); // 42
- * byte.convert(new Date('1970-01-01T00:00:00.042Z')); // 42
- * byte.convert(new Date(NaN)); // 0
+ * byte.convert(128); // 127
  * byte.convert(Infinity); // 127
  * byte.convert(-Infinity); // -128
- * short.convert(Infinity); // 327677
+ * short.convert(Infinity); // 32767
+ * short.convert(-Infinity); // -32768
  * int.convert(Infinity); // 2147483647
+ * int.convert(-Infinity); // -2147483648
  * long.convert(Infinity); // MAX_SAFE_INTEGER
+ * long.convert(-Infinity); // MIN_SAFE_INTEGER
  */
 
 /**
@@ -78,14 +106,16 @@ number
  * @name unsigned
  * @description cast to ubyte, ushort (2 bytes), uint (4 bytes) or ulong (8 bytes)
  * @example
+ * ubyte.convert(-7); // 0
+ * ubyte.convert('a'); // 0
  * ubyte.convert(Infinity); // 255
+ * ubyte.convert(-Infinity); // 0
  * ushort.convert(Infinity); // 65535
+ * ushort.convert(-Infinity); // 0
  * uint.convert(Infinity); // 4294967295
+ * uint.convert(-Infinity); // 0
  * ulong.convert(Infinity); // MAX_SAFE_INTEGER
- * ubite.convert(-1); // 0
- * ushort.convert(-1); // 0
- * uint.convert(-1); // 0
- * ulong.convert(-1); // 0
+ * ulong.convert(-Infinity); // 0
  */
 export const [
 	byte,
