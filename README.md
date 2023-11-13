@@ -18,15 +18,112 @@ const a = require('alwz');
 
 *   **See**: [presets](#presets)
 
-data conversion by presetted converters
+convert data with presetted converters
 
 ### Examples
 
 ```javascript
 a.boolean([false, true]); // false
-a.ubyte(Infinity); // 255
+a.byte('3'); // 3
+a.short(false); // 0
+a.int(true); // 1
 a.long(NaN); // 0
-a.array('123'); // ['123']
+a.uint(Infinity); // 4294967295
+a.array('1'); // ['1']
+a.array(['1', '2', '3']); // ['1', '2', '3']
+```
+
+## Utils
+
+*   **See**: [utils](#utils)
+
+construct complex data
+
+### Examples
+
+ensure an array output
+
+```javascript
+const array = a.utils.array;
+const ArrayOfUByte = array(a.ubyte);
+ArrayOfUByte([undefined, true, 2.3, '4', Infinity]); // [0, 1, 2, 4, 255]
+```
+
+simplify multidimensional arrays processing
+
+```javascript
+const array = a.utils.array;
+
+const Bytes3dArray = array(array(array(a.byte)));
+
+Bytes3dArray(1); // [[[1]]];
+Bytes3dArray([[[null, NaN, 'a'], [true, '2', 3]], [[-Infinity]]]); // [[[0, 0, 0], [1, 2, 3]], [[-128]]];
+```
+
+create tuples
+
+```javascript
+const tuple = a.utils.tuple;
+const Pair = tuple([a.uint, a.uint]);
+Pair(['abc', 35, 100]); // [0, 35]
+
+const NativePair = tuple([Number, Number]);
+NativePair(['abc', 35, 100]); // [NaN, 35]
+```
+
+parse colon-separated number/string mixed records
+
+```javascript
+const PathArray = a.default.get('array')
+  .clone()
+  .string((i) => [...i.matchAll(/\/(\w+)/g)].map((i) => i[1]))
+  .convert;
+
+const DSV2Tuple = a.utils.tuple(
+  [String, String, Number, Number, String, PathArray, PathArray],
+  a.default.get('array')
+    .clone()
+    .string((i) => i.split(':'))
+    .convert
+);
+
+const input = 'user:12345:1000:1000:ordinar user:/home/user:/bin/sh';
+const result = DSV2Tuple(input);
+const expected = ['user', '12345', 1000, 1000, 'ordinar user', ['home', 'user'], ['bin', 'sh']];
+assert.deepStrictEqual(result, expected);
+```
+
+## Transform
+
+*   **See**: [Converter](#converter)
+
+create custom converters
+
+### Examples
+
+```javascript
+const even = new a.Converter(
+  (input) => typeof input === 'number' && input % 2 === 0,
+  (input) => Number(input) % 2 === 0 ? Number(input) : 0
+);
+
+even
+  .undefined(() => -2)
+  .boolean((input) => input ? -4 : -6)
+  .number(function(input) {
+    const result = Math.trunc(Math.abs(input || 0) / 2) * 2;
+    return this.is(result) ? result : this.fallback(input);
+  })
+  .string((input) => even.convert(Number(input)))
+  .register(Array.isArray, (input) => even.convert(input[0]));
+
+even.convert(8); // 8
+even.convert(undefined); // -2
+even.convert(false); // -6
+even.convert(NaN); // 0
+even.convert(9); // 8
+even.convert('11'); // 10
+even.convert([17, 18, 19]); // 16
 ```
 
 ## Selector
@@ -49,32 +146,13 @@ registry of predefined converters
 
 ```javascript
 // retrieving with existence check
-a.default.converter('number'); // Converter<number>
-a.default.converter('date'); // Converter<Date>
+const Num = a.default.converter('number'); // Converter<number>
+const Str = a.default.converter('string'); // Converter<string>
 a.default.converter('123'); // Error
 
 // direct retrieving
-const array = a.default.get('array'); // Converter<Array>
-const unknown = a.default.get('123'); // undefined
-```
-
-##
-
-### Tips
-
-### Examples
-
-Parse colon-separated string
-
-```javascript
-const DSV2Nums = a.utils.array(
-  a.number,
-  a.default.get('array')
-    .clone()
-    .string((i) => i.split(':'))
-    .convert
-);
-DSV2Nums('1:2:3:abc'); // [1, 2, 3, NaN];
+const Arr = a.default.get('array'); // Converter<Array>
+const Unknown = a.default.get('123'); // undefined
 ```
 
 ## presets
@@ -109,24 +187,51 @@ number.convert(new Date('1970-01-01T00:00:00.999Z')); // 999
 
 ### integers
 
+    | type   |              min |              max |
+    |--------|------------------|------------------|
+    | byte   |             -128 |              127 |
+    | short  |           -32768 |            32767 |
+    | int    |      -2147483648 |       2147483647 |
+    | long   | MIN_SAFE_INTEGER | MAX_SAFE_INTEGER |
+    |--------|------------------|------------------|
+    | ubyte  |                0 |              255 |
+    | ushort |                0 |            65535 |
+    | uint   |                0 |       4294967295 |
+    | ulong  |                0 | MAX_SAFE_INTEGER |
+    |--------|------------------|------------------|
+
+#### Examples
+
+```javascript
+int.convert(undefined); // 0
+int.convert(null); // 0
+int.convert(NaN); // 0
+int.convert('abc'); // 0
+int.convert(true); // 1
+int.convert(42.5); // 42
+int.convert('42.5'); // 42
+int.convert(['42.5']); // 42
+int.convert(Symbol.for('42.5')); // 42
+int.convert(new Date('1970-01-01T00:00:00.042Z')); // 42
+int.convert(new Date(NaN)); // 0
+```
+
+### signed
+
 cast to byte, short (2 bytes), int (4 bytes) or long (8 bytes)
 
 #### Examples
 
 ```javascript
-byte.convert(42.5); // 42
-byte.convert('42.5'); // 42
-byte.convert(['42.5']); // 42
-byte.convert(NaN); // 0
-byte.convert('abc'); // 0
-byte.convert(Symbol.for('42.5')); // 42
-byte.convert(new Date('1970-01-01T00:00:00.042Z')); // 42
-byte.convert(new Date(NaN)); // 0
+byte.convert(128); // 127
 byte.convert(Infinity); // 127
 byte.convert(-Infinity); // -128
-short.convert(Infinity); // 327677
+short.convert(Infinity); // 32767
+short.convert(-Infinity); // -32768
 int.convert(Infinity); // 2147483647
+int.convert(-Infinity); // -2147483648
 long.convert(Infinity); // MAX_SAFE_INTEGER
+long.convert(-Infinity); // MIN_SAFE_INTEGER
 ```
 
 ### unsigned
@@ -136,14 +241,16 @@ cast to ubyte, ushort (2 bytes), uint (4 bytes) or ulong (8 bytes)
 #### Examples
 
 ```javascript
+ubyte.convert(-7); // 0
+ubyte.convert('a'); // 0
 ubyte.convert(Infinity); // 255
+ubyte.convert(-Infinity); // 0
 ushort.convert(Infinity); // 65535
+ushort.convert(-Infinity); // 0
 uint.convert(Infinity); // 4294967295
+uint.convert(-Infinity); // 0
 ulong.convert(Infinity); // MAX_SAFE_INTEGER
-ubite.convert(-1); // 0
-ushort.convert(-1); // 0
-uint.convert(-1); // 0
-ulong.convert(-1); // 0
+ulong.convert(-Infinity); // 0
 ```
 
 ### double
