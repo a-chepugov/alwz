@@ -94,6 +94,24 @@ describe('Converter', () => {
 		assert.strictEqual(count, 1);
 	});
 
+	test(`'is' property can be changed`, () => {
+		const conv = new Converter((i) => typeof i === 'number', () => 1);
+
+		assert.strictEqual(conv.convert('a'), 1);
+
+		conv.is = () => true;
+		assert.strictEqual(conv.convert('a'), 'a');
+	});
+
+	test(`'fallback' property can be changed`, () => {
+		const conv = new Converter((i) => typeof i === 'number', () => 1);
+
+		assert.strictEqual(conv.convert('a'), 1);
+
+		conv.fallback = () => 2;
+		assert.strictEqual(conv.convert('a'), 2);
+	});
+
 	test('register method first argument must be a function', () => {
 		const converter = new Converter(Number.isFinite, () => 0);
 		assert.throws(() => converter.register(null, () => 1));
