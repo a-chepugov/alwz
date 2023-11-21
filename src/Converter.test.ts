@@ -140,6 +140,18 @@ describe('Converter', () => {
 		assert.strictEqual(converter.convert([1]), 1);
 	});
 
+	test(`'types' getter returns object with types handlers`, () => {
+		const num = (i) => Number(i);
+
+		const conv = new Converter(() => false, () => 0);
+
+		assert.strictEqual(Object.keys(conv.types).length, 0);
+		assert.strictEqual(conv.types.number, undefined);
+
+		conv.number(num);
+		assert.strictEqual(Object.keys(conv.types).length, 1);
+		assert.strictEqual(conv.types.number, num);
+	});
 
 	test('unregister method removes converter from internal register', () => {
 		const converter = new Converter(Number.isFinite, () => 0);
