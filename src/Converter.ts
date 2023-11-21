@@ -128,11 +128,13 @@ export class Converter<T> {
 	 * positive.convert([5, 6]); // 5
 	 *
 	 * @example <caption>converter with conversion error</caption>
-	 * const converter = new Converter((input) => typeof input === 'number', (i) => {
-	 *   throw new Error('Invalid source data: ' + i);
-	 * })
-	 *  .string((i) => converter.convert(Number(i)))
-	 * ;
+	 * const converter = new Converter(
+	 *   (input) => typeof input === 'number',
+	 *   (i) => {
+	 *     throw new Error('Invalid source data: ' + i);
+	 *   }
+	 * )
+	 *  .string((i) => converter.convert(Number(i)));
 	 *
 	 * converter.convert(1); // 1
 	 * converter.convert('2'); // 2
@@ -236,8 +238,16 @@ export class Converter<T> {
 
 	/**
 	 * @example
-	 * const converter = new Converter((i) => typeof i === 'number', () => 0).undefined(() => 1);
-	 * const clone = converter.clone().undefined(() => 2)
+	 * const converter = new Converter(
+	 *   (i) => typeof i === 'number',
+	 *   () => 0
+	 * )
+	 *   .undefined(() => 1);
+	 *
+	 * const clone = converter
+	 *   .clone()
+	 *   .undefined(() => 2);
+	 *
 	 * converter.convert(); // 1
 	 * clone.convert(); // 2
 	*/
