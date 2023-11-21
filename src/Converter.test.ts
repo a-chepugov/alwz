@@ -112,6 +112,16 @@ describe('Converter', () => {
 		assert.strictEqual(conv.convert('a'), 2);
 	});
 
+	test(`type converter register metods throw on invalid input`, () => {
+		const conv = new Converter((i: any): i is number => typeof i === 'number', () => 1);
+		assert.throws(() => conv.undefined(undefined));
+		assert.throws(() => conv.boolead(false));
+		assert.throws(() => conv.number(1));
+		assert.throws(() => conv.string('string'));
+		assert.throws(() => conv.symbol(Symbol('symbol')));
+		assert.throws(() => conv.bigint(1n));
+	});
+
 	test('register method first argument must be a function', () => {
 		const converter = new Converter(Number.isFinite, () => 0);
 		assert.throws(() => converter.register(null, () => 1));
