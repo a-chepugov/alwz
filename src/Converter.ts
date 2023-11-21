@@ -245,7 +245,7 @@ export class Converter<T> {
 		const converter = new Converter(this.is, this.fallback);
 		const types = Object.entries(this._types) as Array<[Primitives, Convert<any, T>]>;
 		types.forEach(([name, convert]: [Primitives, Convert<any, T>]) => converter[name](convert));
-		this.converters.forEach(([is, convert]: [IS<T>, Convert<any, T>]) => converter.register(is, convert));
+		this._converters.forEach((convert: Convert<any, T>, is: IS<T>) => converter.register(is, convert));
 		return converter;
 	}
 
