@@ -153,6 +153,18 @@ describe('Converter', () => {
 		assert.strictEqual(conv.types.number, num);
 	});
 
+	test(`'converters' getter returns handlers list`, () => {
+		const converter = new Converter((i): i is number => typeof i === 'number', () => 0);
+
+		const first = (i) => i[0];
+
+		assert.strictEqual(converter.converters.length, 0);
+		converter.register(Array.isArray, first);
+		assert.strictEqual(converter.converters.length, 1);
+		assert.strictEqual(converter.converters[0][0], Array.isArray);
+		assert.strictEqual(converter.converters[0][1], first);
+	});
+
 	test('unregister method removes converter from internal register', () => {
 		const converter = new Converter(Number.isFinite, () => 0);
 
