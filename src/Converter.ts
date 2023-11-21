@@ -47,8 +47,10 @@ export class Converter<T> {
 	static InvalidConvertFunction = class extends EV {};
 	static InvalidConverter = class extends EV {};
 
-	is: IS<T>;
-	fallback: Fallback<T>;
+	// @ts-ignore
+	_is: IS<T>;
+	// @ts-ignore
+	_fallback: Fallback<T>;
 
 	protected _types: Record<string, Convert<any, T>>;
 	protected _converters: Map<IS<any>, Convert<any, T>>;
@@ -58,16 +60,31 @@ export class Converter<T> {
 	 * @param {Fallback<T>} fallback - default value generator. runs if none of the available converters are suitable
 	 */
 	constructor(is: IS<T>, fallback: Fallback<T>) {
-		assertIS(is);
 		this.is = is;
-
-		assertFallback(fallback);
 		this.fallback = fallback;
 
 		this._types = {};
 		this._converters = new Map();
 
-		Object.freeze(this);
+		Object.seal(this);
+	}
+
+	get is() {
+		return this._is;
+	}
+
+	set is(is: IS<T>) {
+		assertIS(is);
+		this._is = is;
+	}
+
+	get fallback() {
+		return this._fallback;
+	}
+
+	set fallback(fallback: Fallback<T>) {
+		assertFallback(fallback);
+		this._fallback = fallback;
 	}
 
 	get types() {
@@ -124,7 +141,7 @@ export class Converter<T> {
 	 * @param {*} input - input data
 	 */
 	convert = (input: any): T => {
-		if (this.is(input)) return input;
+		if (this._is(input)) return input;
 
 		const type = typeof input;
 		if (type in this._types) {
@@ -138,7 +155,7 @@ export class Converter<T> {
 				}
 			}
 		}
-		return this.fallback(input);
+		return this._fallback(input);
 	}
 
 	/**
