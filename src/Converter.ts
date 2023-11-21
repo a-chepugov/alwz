@@ -184,6 +184,7 @@ export class Converter<T> {
 	 * @description conversion rule setter for `undefined` input
 	 */
 	undefined(convert: Convert<undefined, T>) {
+		assertConvert(convert);
 		this._types.undefined = convert;
 		return this;
 	}
@@ -192,6 +193,7 @@ export class Converter<T> {
 	 * @description conversion rule setter for `boolean` input
 	 */
 	boolean(convert: Convert<boolean, T>) {
+		assertConvert(convert);
 		this._types.boolean = convert;
 		return this;
 	}
@@ -200,6 +202,7 @@ export class Converter<T> {
 	 * @description conversion rule setter for `number` input
 	 */
 	number(convert: Convert<number, T>) {
+		assertConvert(convert);
 		this._types.number = convert;
 		return this;
 	}
@@ -208,6 +211,7 @@ export class Converter<T> {
 	 * @description conversion rule setter for `bigint` input
 	 */
 	bigint(convert: Convert<bigint, T>) {
+		assertConvert(convert);
 		this._types.bigint = convert;
 		return this;
 	}
@@ -216,6 +220,7 @@ export class Converter<T> {
 	 * @description conversion rule setter for `string` input
 	 */
 	string(convert: Convert<string, T>) {
+		assertConvert(convert);
 		this._types.string = convert;
 		return this;
 	}
@@ -224,6 +229,7 @@ export class Converter<T> {
 	 * @description conversion rule setter for `symbol` input
 	 */
 	symbol(convert: Convert<symbol, T>) {
+		assertConvert(convert);
 		this._types.symbol = convert;
 		return this;
 	}
