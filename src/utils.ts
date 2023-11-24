@@ -4,11 +4,13 @@ import * as presets from './presets';
 /**
  * @namespace utils
  * @description extra utils functions
+ * @example
+ * const { array, tuple } = a.utils;
  */
 
 /**
- * @name array
  * @memberof utils
+ * @description constrain data to an array elements of a given type
  * @example
  * const numArray = array(Number);
  * numArray(); // []
@@ -33,8 +35,8 @@ export const array = <T>(fn: Convert<any, T>, initiator: Convert<any, Array<any>
 };
 
 /**
- * @name tuple
  * @memberof utils
+ * @description constrain data to a tuple with given types
  * @example
  * const tplNSB = tuple(Number, String, Boolean);
  * tplNSB(); // [NaN, 'undefined', false]
