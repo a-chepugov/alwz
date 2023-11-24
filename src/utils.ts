@@ -1,19 +1,10 @@
 import { Convert } from './Converter';
 import * as presets from './presets';
-import EV from './Error';
 
 /**
  * @namespace utils
  * @description extra utils functions
  */
-
-// eslint-disable-next-line
-export class InvalidConvert extends EV {
-}
-
-// eslint-disable-next-line
-export class InvalidInitiator extends EV {
-}
 
 /**
  * @name array
@@ -30,7 +21,7 @@ export const array = <T>(fn: Convert<any, T>, initiator = presets.array.convert)
 	}
 
 	if (typeof initiator !== 'function') {
-		throw new InvalidInitiator('initiator must be a function', initiator);
+		throw new Converter.InvalidConvertFunction('initiator must be a function', initiator);
 	}
 
 	return (input: any) => {
@@ -51,17 +42,17 @@ export const array = <T>(fn: Convert<any, T>, initiator = presets.array.convert)
  */
 export const tuple = (fns: Array<Convert<any, any>>, initiator = presets.array.convert) => {
 	if (!Array.isArray(fns)) {
-		throw new InvalidConvert('first argument must be an array', fns);
+		throw new Converter.InvalidConvertFunction('first argument must be an array', fns);
 	}
 
 	fns.forEach((fn, index) => {
 		if (typeof fn !== 'function') {
-			throw new InvalidConvert('convert ' + index + ' must be a function', [index, fn]);
+			throw new Converter.InvalidConvertFunction('convert ' + index + ' must be a function', [index, fn]);
 		}
 	});
 
 	if (typeof initiator !== 'function') {
-		throw new InvalidInitiator('initiator must be a function', initiator);
+		throw new Converter.InvalidConvertFunction('initiator must be a function', initiator);
 	}
 
 	return (input: any) => {
