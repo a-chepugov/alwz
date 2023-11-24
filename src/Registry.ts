@@ -26,6 +26,10 @@ export class Registry<K, V> {
 		return this._items.has(key);
 	}
 
+	keys() {
+		return this._items.keys();
+	}
+
 	values() {
 		return this._items.values();
 	}
