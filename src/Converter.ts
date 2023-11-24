@@ -35,7 +35,7 @@ export function assertConvert<INPUT, OUTPUT>(input: any): boolean | never {
 	throw new Converter.InvalidConvertFunction('convert must be a function', input);
 }
 
-type Primitives = 'undefined' | 'boolean' | 'number' | 'bigint' | 'string' | 'symbol';
+type Types = 'undefined' | 'boolean' | 'number' | 'bigint' | 'string' | 'symbol';
 
 /**
  * @description converts input data to specific type
@@ -52,7 +52,7 @@ export class Converter<T> {
 	// @ts-ignore
 	_fallback: Fallback<T>;
 
-	protected _types: Record<string, Convert<any, T>>;
+	protected _types: Partial<Record<Types, Convert<any, T>>>;
 	protected _converters: Map<IS<any>, Convert<any, T>>;
 
 	/**
@@ -63,7 +63,7 @@ export class Converter<T> {
 		this.is = is;
 		this.fallback = fallback;
 
-		this._types = {};
+		this._types = {} as Partial<Record<Types, Convert<any, T>>>;
 		this._converters = new Map();
 
 		Object.seal(this);
@@ -87,7 +87,7 @@ export class Converter<T> {
 		this._fallback = fallback;
 	}
 
-	get types() {
+	get types(): Partial<Record<Types, Convert<any, T>>> {
 		return Object.assign({}, this._types);
 	}
 
@@ -145,7 +145,7 @@ export class Converter<T> {
 	convert = (input: any): T => {
 		if (this._is(input)) return input;
 
-		const type = typeof input;
+		const type = typeof input as Types;
 		if (type in this._types) {
 			const convert = this._types[type] as Convert<any, T>;
 			return convert.call(this, input);
@@ -253,8 +253,8 @@ export class Converter<T> {
 	*/
 	clone() {
 		const converter = new Converter(this.is, this.fallback);
-		const types = Object.entries(this._types) as Array<[Primitives, Convert<any, T>]>;
-		types.forEach(([name, convert]: [Primitives, Convert<any, T>]) => converter[name](convert));
+		const types = Object.entries(this._types) as Array<[Types, Convert<any, T>]>;
+		types.forEach(([name, convert]: [Types, Convert<any, T>]) => converter[name](convert));
 		this._converters.forEach((convert: Convert<any, T>, is: IS<T>) => converter.register(is, convert));
 		return converter;
 	}
