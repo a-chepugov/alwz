@@ -31,8 +31,12 @@
   },
   "keywords": [
     "cast",
+    "casting",
+    "constrain",
+    "convert",
+    "types",
     "typing",
-    "convert"
+    "utils"
   ],
   "repository": {
     "type": "git",

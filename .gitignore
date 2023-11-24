@@ -1,6 +1,7 @@
 .git
 .idea
 coverage
+ignore
 node_modules
 doc
 build
