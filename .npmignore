@@ -2,6 +2,7 @@
 .idea
 coverage
 docs
+ignore
 node_modules
 src
 .editorconfig
