@@ -155,6 +155,9 @@ export const to = converters.to;
  * @name Converters
  * @description registry of predefined converters
  * @example
+ * // get list of predefined converters
+ * Array.from(a.default.keys()); // ['boolean', 'byte', 'int', 'long', 'double', 'string', ...];
+ *
  * // retrieving with existence check
  * const Num = a.default.converter('number'); // Converter<number>
  * const Str = a.default.converter('string'); // Converter<string>
