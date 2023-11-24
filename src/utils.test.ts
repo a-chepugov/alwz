@@ -7,6 +7,14 @@ describe('utils', () => {
 
 		const array = utils.array;
 
+		test('throw on invalid convert', () => {
+			assert.throws(() => array(null));
+		});
+
+		test('throw on invalid initiator', () => {
+			assert.throws(() => array(Number, null));
+		});
+
 		const numArray = array(Number);
 
 		const sets = [
@@ -29,6 +37,18 @@ describe('utils', () => {
 	describe('tuple', () => {
 
 		const tuple = utils.tuple;
+
+		test('throw on invalid converts', () => {
+			assert.throws(() => tuple(null));
+		});
+
+		test('throw on invalid convert', () => {
+			assert.throws(() => tuple([null]));
+		});
+
+		test('throw on invalid initiator', () => {
+			assert.throws(() => tuple([Number, String], null));
+		});
 
 		const tplNSB = tuple([Number, String, Boolean]);
 

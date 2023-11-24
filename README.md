@@ -522,7 +522,20 @@ clone.convert(); // 2
 
 extra utils functions
 
+### Examples
+
+```javascript
+const { array, tuple } = a.utils;
+```
+
 ### array
+
+constrain data to an array elements of a given type
+
+#### Parameters
+
+*   `fn` **Convert\<any, T>** 
+*   `initiator` **Convert\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<any>>**  (optional, default `presets.array.convert`)
 
 #### Examples
 
@@ -533,7 +546,16 @@ numArray([]); // []
 numArray([true, 2, "3", {}]); // [1, 2, 3, NaN]
 ```
 
+Returns **Convert\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<T>>** 
+
 ### tuple
+
+constrain data to a tuple with given types
+
+#### Parameters
+
+*   `fns` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Convert\<any, any>>** 
+*   `initiator` **Convert\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<any>>**  (optional, default `presets.array.convert`)
 
 #### Examples
 
@@ -545,3 +567,5 @@ tplNSB([]); // [NaN, '', false]
 tplNSB('5'); // [5, 'undefined', false]
 tplNSB(['1', '2', '3']); // [1, '2', true]
 ```
+
+Returns **Convert\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<any>>** 
