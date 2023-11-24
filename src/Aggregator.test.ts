@@ -2,10 +2,10 @@ import assert from 'assert';
 import Aggregator from './Aggregator';
 import Converter from './Converter';
 
-describe('Registry', () => {
+describe('Aggregator', () => {
 	const even = new Converter((input: any) => !(input % 2), () => 2);
 
-	test(`register adds items`, () => {
+	test(`'register' adds items`, () => {
 
 		const a = new Aggregator();
 		assert.strictEqual(a.converters.length, 0);
