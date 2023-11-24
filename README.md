@@ -29,8 +29,8 @@ a.short(false); // 0
 a.int(true); // 1
 a.long(NaN); // 0
 a.uint(Infinity); // 4294967295
-a.array('1'); // ['1']
-a.array(['1', '2', '3']); // ['1', '2', '3']
+a.array('abc'); // ['abc']
+a.array(['abc', 'def', 'ghi']); // ['abc', 'def', 'ghi']
 ```
 
 ## Utils
@@ -88,9 +88,7 @@ const DSV2Tuple = a.utils.tuple(
 );
 
 const input = 'user:12345:1000:1000:ordinar user:/home/user:/bin/sh';
-const result = DSV2Tuple(input);
-const expected = ['user', '12345', 1000, 1000, 'ordinar user', ['home', 'user'], ['bin', 'sh']];
-assert.deepStrictEqual(result, expected);
+DSV2Tuple(input); // ['user', '12345', 1000, 1000, 'ordinar user', ['home', 'user'], ['bin', 'sh']];
 ```
 
 ## Transform
@@ -100,6 +98,30 @@ assert.deepStrictEqual(result, expected);
 create custom converters
 
 ### Examples
+
+extend an existing converter
+
+```javascript
+// make boolean smarter
+const bool = a.default.get('boolean')
+  .clone()
+  .string(function(v) {
+    if (v === 'true' || v === 'yes') {
+      return true;
+    } else if (v === 'false' || v === 'no') {
+      return false;
+    } else {
+      return this.types.number(Number(v));
+    }
+  })
+  .convert;
+
+bool('yes'); // true
+bool('no'); // false
+bool('false'); // false
+```
+
+create specific converters
 
 ```javascript
 const even = new a.Converter(
@@ -115,14 +137,15 @@ even
     return this.is(result) ? result : this.fallback(input);
   })
   .string((input) => even.convert(Number(input)))
-  .register(Array.isArray, (input) => even.convert(input[0]));
+  .register(Array.isArray, (input) => even.convert(input[0])); // take first and try again
 
 even.convert(8); // 8
 even.convert(undefined); // -2
+even.convert(true); // -4
 even.convert(false); // -6
 even.convert(NaN); // 0
-even.convert(9); // 8
-even.convert('11'); // 10
+even.convert(11); // 10
+even.convert('15'); // 14
 even.convert([17, 18, 19]); // 16
 ```
 
