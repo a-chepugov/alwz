@@ -1,36 +1,32 @@
-import { Convert } from './Converter';
+import Converter, { Convert, isConvert, assertConvert } from './Converter';
 import * as presets from './presets';
-import EV from './Error';
 
 /**
  * @namespace utils
  * @description extra utils functions
+ * @example
+ * const { array, tuple } = a.utils;
  */
 
-// eslint-disable-next-line
-export class InvalidConvert extends EV {
-}
-
-// eslint-disable-next-line
-export class InvalidInitiator extends EV {
-}
-
 /**
- * @name array
  * @memberof utils
+ * @description constrain data to an array elements of a given type
  * @example
  * const numArray = array(Number);
  * numArray(); // []
  * numArray([]); // []
  * numArray([true, 2, "3", {}]); // [1, 2, 3, NaN]
+ *
+ * @param {Convert<any, T>} fn
+ * @param {Convert<any, Array<any>>} initiator
+ * @return {(input?: any) => Array<T>}
+ * @returns {Convert<any, Array<T>>}
  */
-export const array = <T>(fn: Convert<any, T>, initiator = presets.array.convert) => {
-	if (typeof fn !== 'function') {
-		throw new InvalidConvert('convert must be a function', fn);
-	}
+export const array = <T>(fn: Convert<any, T>, initiator: Convert<any, Array<any>> = presets.array.convert): Convert<any, Array<T>> => {
+	assertConvert(fn);
 
-	if (typeof initiator !== 'function') {
-		throw new InvalidInitiator('initiator must be a function', initiator);
+	if (!isConvert(initiator)) {
+		throw new Converter.InvalidConvertFunction('initiator must be a function', initiator);
 	}
 
 	return (input: any) => {
@@ -39,8 +35,8 @@ export const array = <T>(fn: Convert<any, T>, initiator = presets.array.convert)
 };
 
 /**
- * @name tuple
  * @memberof utils
+ * @description constrain data to a tuple with given types
  * @example
  * const tplNSB = tuple(Number, String, Boolean);
  * tplNSB(); // [NaN, 'undefined', false]
@@ -48,20 +44,24 @@ export const array = <T>(fn: Convert<any, T>, initiator = presets.array.convert)
  * tplNSB([]); // [NaN, '', false]
  * tplNSB('5'); // [5, 'undefined', false]
  * tplNSB(['1', '2', '3']); // [1, '2', true]
+ *
+ * @param {Array<Convert<any, any>>} fns
+ * @param {Convert<any, Array<any>>} initiator
+ * @returns {Convert<any, Array<any>>}
  */
-export const tuple = (fns: Array<Convert<any, any>>, initiator = presets.array.convert) => {
+export const tuple = (fns: Array<Convert<any, any>>, initiator: Convert<any, Array<any>> = presets.array.convert): Convert<any, Array<any>> => {
 	if (!Array.isArray(fns)) {
-		throw new InvalidConvert('first argument must be an array', fns);
+		throw new Converter.InvalidConvertFunction('first argument must be an array', fns);
 	}
 
 	fns.forEach((fn, index) => {
-		if (typeof fn !== 'function') {
-			throw new InvalidConvert('convert ' + index + ' must be a function', [index, fn]);
+		if (!isConvert(fn)) {
+			throw new Converter.InvalidConvertFunction('convert ' + index + ' must be a function', [index, fn]);
 		}
 	});
 
-	if (typeof initiator !== 'function') {
-		throw new InvalidInitiator('initiator must be a function', initiator);
+	if (!isConvert(initiator)) {
+		throw new Converter.InvalidConvertFunction('initiator must be a function', initiator);
 	}
 
 	return (input: any) => {

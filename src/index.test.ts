@@ -12,8 +12,8 @@ describe('index', () => {
 			assert.deepStrictEqual(a.int(true), 1);
 			assert.deepStrictEqual(a.long(NaN), 0);
 			assert.deepStrictEqual(a.uint(Infinity), 4294967295);
-			assert.deepStrictEqual(a.array('1'), ['1']);
-			assert.deepStrictEqual(a.array(['1', '2', '3']), ['1', '2', '3']);
+			assert.deepStrictEqual(a.array('abc'), ['abc']);
+			assert.deepStrictEqual(a.array(['abc', 'def', 'ghi']), ['abc', 'def', 'ghi']);
 		});
 
 	});
@@ -88,6 +88,28 @@ describe('index', () => {
 
 	describe('Transform', () => {
 
+		const bool = a.default.get('boolean')
+			.clone()
+			.string(function(v) {
+				if (v === 'true' || v === 'yes') {
+					return true;
+				} else if (v === 'false' || v === 'no') {
+					return false;
+				} else {
+					return this.types.number(Number(v));
+				}
+			})
+			.convert;
+
+		test('extend an existing converter', () => {
+			assert.deepStrictEqual(bool('yes'), true);
+			assert.deepStrictEqual(bool('no'), false);
+			assert.deepStrictEqual(bool('false'), false);
+			assert.deepStrictEqual(bool(0), false);
+			assert.deepStrictEqual(bool(true), true);
+			assert.deepStrictEqual(bool(false), false);
+		});
+
 		const even = new a.Converter(
 			(input) => typeof input === 'number' && input % 2 === 0,
 			(input) => Number(input) % 2 === 0 ? Number(input) : 0
@@ -103,7 +125,7 @@ describe('index', () => {
 			.string((input) => even.convert(Number(input)))
 			.register(Array.isArray, (input) => even.convert(input[0]));
 
-		test('create custom converters', () => {
+		test('create specific converters', () => {
 			assert.deepStrictEqual(even.convert(8), 8);
 			assert.deepStrictEqual(even.convert(undefined), -2);
 			assert.deepStrictEqual(even.convert(true), -4);
@@ -127,6 +149,14 @@ describe('index', () => {
 	});
 
 	describe('Converters', () => {
+
+		test('get prodefined list', () => {
+			const list = Array.from(a.default.keys());
+			const predifined = ['boolean', 'byte', 'int', 'long', 'double', 'string'];
+			for (const item of predifined) {
+				assert.strictEqual(list.includes(item), true, `absent item - ${item}`);
+			}
+		});
 
 		test('retrieving with existence check', () => {
 			const c1 = a.default.converter('number');

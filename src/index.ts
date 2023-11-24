@@ -20,8 +20,8 @@ import * as presets from './presets';
  * a.int(true); // 1
  * a.long(NaN); // 0
  * a.uint(Infinity); // 4294967295
- * a.array('1'); // ['1']
- * a.array(['1', '2', '3']); // ['1', '2', '3']
+ * a.array('abc'); // ['abc']
+ * a.array(['abc', 'def', 'ghi']); // ['abc', 'def', 'ghi']
  */
 
 /**
@@ -64,16 +64,34 @@ import * as presets from './presets';
  * );
  *
  * const input = 'user:12345:1000:1000:ordinar user:/home/user:/bin/sh';
- * const result = DSV2Tuple(input);
- * const expected = ['user', '12345', 1000, 1000, 'ordinar user', ['home', 'user'], ['bin', 'sh']];
- * assert.deepStrictEqual(result, expected);
+ * DSV2Tuple(input); // ['user', '12345', 1000, 1000, 'ordinar user', ['home', 'user'], ['bin', 'sh']];
  */
 
 /**
  * @name Transform
  * @see {@link Converter Converter}
  * @description create custom converters
- * @example
+ *
+ * @example <caption>extend an existing converter</caption>
+ * // make boolean smarter
+ * const bool = a.default.get('boolean')
+ *   .clone()
+ *   .string(function(v) {
+ *     if (v === 'true' || v === 'yes') {
+ *       return true;
+ *     } else if (v === 'false' || v === 'no') {
+ *       return false;
+ *     } else {
+ *       return this.types.number(Number(v));
+ *     }
+ *   })
+ *   .convert;
+ *
+ * bool('yes'); // true
+ * bool('no'); // false
+ * bool('false'); // false
+ *
+ * @example <caption>create specific converters</caption>
  * const even = new a.Converter(
  *   (input) => typeof input === 'number' && input % 2 === 0,
  *   (input) => Number(input) % 2 === 0 ? Number(input) : 0
@@ -87,14 +105,15 @@ import * as presets from './presets';
  *     return this.is(result) ? result : this.fallback(input);
  *   })
  *   .string((input) => even.convert(Number(input)))
- *   .register(Array.isArray, (input) => even.convert(input[0]));
+ *   .register(Array.isArray, (input) => even.convert(input[0])); // take first and try again
  *
  * even.convert(8); // 8
  * even.convert(undefined); // -2
+ * even.convert(true); // -4
  * even.convert(false); // -6
  * even.convert(NaN); // 0
- * even.convert(9); // 8
- * even.convert('11'); // 10
+ * even.convert(11); // 10
+ * even.convert('15'); // 14
  * even.convert([17, 18, 19]); // 16
  */
 
@@ -136,6 +155,9 @@ export const to = converters.to;
  * @name Converters
  * @description registry of predefined converters
  * @example
+ * // get list of predefined converters
+ * Array.from(a.default.keys()); // ['boolean', 'byte', 'int', 'long', 'double', 'string', ...];
+ *
  * // retrieving with existence check
  * const Num = a.default.converter('number'); // Converter<number>
  * const Str = a.default.converter('string'); // Converter<string>
