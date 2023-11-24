@@ -150,6 +150,14 @@ describe('index', () => {
 
 	describe('Converters', () => {
 
+		test('get prodefined list', () => {
+			const list = Array.from(a.default.keys());
+			const predifined = ['boolean', 'byte', 'int', 'long', 'double', 'string'];
+			for (const item of predifined) {
+				assert.strictEqual(list.includes(item), true, `absent item - ${item}`);
+			}
+		});
+
 		test('retrieving with existence check', () => {
 			const c1 = a.default.converter('number');
 			assert.strictEqual(c1 instanceof a.Converter, true);
