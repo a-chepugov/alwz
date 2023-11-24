@@ -14,8 +14,13 @@ import * as presets from './presets';
  * numArray(); // []
  * numArray([]); // []
  * numArray([true, 2, "3", {}]); // [1, 2, 3, NaN]
+ *
+ * @param {Convert<any, T>} fn
+ * @param {Convert<any, Array<any>>} initiator
+ * @return {(input?: any) => Array<T>}
+ * @returns {Convert<any, Array<T>>}
  */
-export const array = <T>(fn: Convert<any, T>, initiator = presets.array.convert) => {
+export const array = <T>(fn: Convert<any, T>, initiator: Convert<any, Array<any>> = presets.array.convert): Convert<any, Array<T>> => {
 	assertConvert(fn);
 
 	if (!isConvert(initiator)) {
@@ -37,8 +42,12 @@ export const array = <T>(fn: Convert<any, T>, initiator = presets.array.convert)
  * tplNSB([]); // [NaN, '', false]
  * tplNSB('5'); // [5, 'undefined', false]
  * tplNSB(['1', '2', '3']); // [1, '2', true]
+ *
+ * @param {Array<Convert<any, any>>} fns
+ * @param {Convert<any, Array<any>>} initiator
+ * @returns {Convert<any, Array<any>>}
  */
-export const tuple = (fns: Array<Convert<any, any>>, initiator = presets.array.convert) => {
+export const tuple = (fns: Array<Convert<any, any>>, initiator: Convert<any, Array<any>> = presets.array.convert): Convert<any, Array<any>> => {
 	if (!Array.isArray(fns)) {
 		throw new Converter.InvalidConvertFunction('first argument must be an array', fns);
 	}
