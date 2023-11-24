@@ -1,4 +1,4 @@
-import { Convert } from './Converter';
+import Converter, { Convert, isConvert, assertConvert } from './Converter';
 import * as presets from './presets';
 
 /**
@@ -16,11 +16,9 @@ import * as presets from './presets';
  * numArray([true, 2, "3", {}]); // [1, 2, 3, NaN]
  */
 export const array = <T>(fn: Convert<any, T>, initiator = presets.array.convert) => {
-	if (typeof fn !== 'function') {
-		throw new InvalidConvert('convert must be a function', fn);
-	}
+	assertConvert(fn);
 
-	if (typeof initiator !== 'function') {
+	if (!isConvert(initiator)) {
 		throw new Converter.InvalidConvertFunction('initiator must be a function', initiator);
 	}
 
@@ -46,12 +44,12 @@ export const tuple = (fns: Array<Convert<any, any>>, initiator = presets.array.c
 	}
 
 	fns.forEach((fn, index) => {
-		if (typeof fn !== 'function') {
+		if (!isConvert(fn)) {
 			throw new Converter.InvalidConvertFunction('convert ' + index + ' must be a function', [index, fn]);
 		}
 	});
 
-	if (typeof initiator !== 'function') {
+	if (!isConvert(initiator)) {
 		throw new Converter.InvalidConvertFunction('initiator must be a function', initiator);
 	}
 
