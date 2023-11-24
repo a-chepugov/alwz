@@ -14,6 +14,15 @@ describe('Registry', () => {
 		assert.strictEqual(a.converters.length, 1);
 	});
 
+	test(`'unregister' removes an element`, () => {
+		const a = new Aggregator();
+		a.register('even', even);
+		assert.strictEqual(a.to('even')(1), 2);
+
+		a.unregister('even');
+		assert.strictEqual(a.converters.length, 0);
+	});
+
 	test(`registering duplicates causes an error`, () => {
 		const a = new Aggregator();
 		a.register('even', even);
