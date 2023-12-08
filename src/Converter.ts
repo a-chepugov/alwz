@@ -102,7 +102,7 @@ export class Converter<T> {
 	 * @example <caption>converter creation</caption>
 	 * const positive = new Converter(
 	 *   (input) => typeof input === 'number' && input > 0,
-	 *   (i) => i === 0 ? 0.1 : 0.2
+	 *   (input) => input === 0 ? 0.1 : 0.2
 	 * );
 	 *
 	 * positive
@@ -147,7 +147,7 @@ export class Converter<T> {
 	 * converter.convert([4]); // 4
 	 * converter.convert(Promise.resolve(5)); // Error
 	 *
-	 * @param {*} input - input data
+	 * @param {any} input - input data
 	 */
 	convert = (input?: any): T => {
 		if (this._is(input)) return input;
