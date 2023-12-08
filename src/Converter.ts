@@ -54,7 +54,7 @@ export class Converter<T> {
 	protected _conversions: Map<IS<any>, Conversion<any, T>>;
 
 	/**
-	 * @param {IS<T>} is - default input type checker. checks if conversion is necessary
+	 * @param {IS<T>} is - initial input type checker. determines if any conversion is necessary
 	 * @param {Fallback<T>} fallback - default value generator. runs if none of the available conversions are suitable
 	 */
 	constructor(is: IS<T>, fallback: Fallback<T>) {
@@ -128,8 +128,8 @@ export class Converter<T> {
 	 * @example <caption>converter with conversion error</caption>
 	 * const converter = new Converter(
 	 *   (input) => typeof input === 'number',
-	 *   (i) => {
-	 *     throw new Error('Invalid source data: ' + i);
+	 *   (input) => {
+	 *     throw new Error('Invalid source data: ' + input);
 	 *   }
 	 * )
 	 *  .string((i) => converter.convert(Number(i)));

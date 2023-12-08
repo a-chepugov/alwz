@@ -408,7 +408,7 @@ converts input data to specific type
 
 ### Parameters
 
-*   `is` **IS\<T>** default input type checker. checks if conversion is necessary
+*   `is` **IS\<T>** initial input type checker. determines if any conversion is necessary
 *   `fallback` **Fallback\<T>** default value generator. runs if none of the available conversions are suitable
 
 ### convert
