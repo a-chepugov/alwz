@@ -11,7 +11,6 @@ export function assertIS<T>(input: any): boolean | never {
 	throw new Converter.InvalidTypeCheckFunction('type checker must be a function', input);
 }
 
-// eslint-disable-next-line no-unused-vars
 export type Fallback<OUTPUT> = (input?: any) => OUTPUT | never;
 
 export function isFallback<OUTPUT>(input: any): input is Fallback<OUTPUT> {
@@ -23,7 +22,6 @@ export function assertFallback<OUTPUT>(input: any): boolean | never {
 	throw new Converter.InvalidFallbackFunction('fallback must be a function', input);
 }
 
-// eslint-disable-next-line no-unused-vars
 export type Conversion<INPUT, OUTPUT> = (input: INPUT) => OUTPUT;
 
 export function isConversion<INPUT, OUTPUT>(input: any): input is Conversion<INPUT, OUTPUT> {
