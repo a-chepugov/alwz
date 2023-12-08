@@ -2,35 +2,35 @@ import EV from './Error';
 
 export type IS<T> = (input: any) => input is T;
 
-export function isIS<T>(input: any): input is IS<T> {
-	return typeof input === 'function';
+export function isIS<T>(instance: any): instance is IS<T> {
+	return typeof instance === 'function';
 }
 
-export function assertIS<T>(input: any): boolean | never {
-	if (isIS<T>(input)) return true;
-	throw new Converter.InvalidTypeCheckFunction('type checker must be a function', input);
+export function assertIS<T>(instance: any): boolean | never {
+	if (isIS<T>(instance)) return true;
+	throw new Converter.InvalidTypeCheckFunction('type check must be a function', instance);
 }
 
 export type Fallback<OUTPUT> = (input?: any) => OUTPUT | never;
 
-export function isFallback<OUTPUT>(input: any): input is Fallback<OUTPUT> {
-	return typeof input === 'function';
+export function isFallback<OUTPUT>(instance: any): instance is Fallback<OUTPUT> {
+	return typeof instance === 'function';
 }
 
-export function assertFallback<OUTPUT>(input: any): boolean | never {
-	if (isFallback<OUTPUT>(input)) return true;
-	throw new Converter.InvalidFallbackFunction('fallback must be a function', input);
+export function assertFallback<OUTPUT>(instance: any): boolean | never {
+	if (isFallback<OUTPUT>(instance)) return true;
+	throw new Converter.InvalidFallbackFunction('fallback must be a function', instance);
 }
 
 export type Conversion<INPUT, OUTPUT> = (input: INPUT) => OUTPUT;
 
-export function isConversion<INPUT, OUTPUT>(input: any): input is Conversion<INPUT, OUTPUT> {
-	return typeof input === 'function';
+export function isConversion<INPUT, OUTPUT>(instance: any): instance is Conversion<INPUT, OUTPUT> {
+	return typeof instance === 'function';
 }
 
-export function assertConversion<INPUT, OUTPUT>(input: any): boolean | never {
-	if (isConversion<INPUT, OUTPUT>(input)) return true;
-	throw new Converter.InvalidConversionFunction('conversion must be a function', input);
+export function assertConversion<INPUT, OUTPUT>(instance: any): boolean | never {
+	if (isConversion<INPUT, OUTPUT>(instance)) return true;
+	throw new Converter.InvalidConversionFunction('conversion must be a function', instance);
 }
 
 type Types = 'undefined' | 'boolean' | 'number' | 'bigint' | 'string' | 'symbol';
