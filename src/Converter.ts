@@ -37,6 +37,10 @@ type Types = 'undefined' | 'boolean' | 'number' | 'bigint' | 'string' | 'symbol'
 
 /**
  * @description converts input data to specific type
+ * - at first checks if conversion is necessary
+ * - then attempts conversion based on the input data type
+ * - searches among registered conversions if no matching type is found
+ * - generates a fallback value if no suitable conversion can be found
  */
 export class Converter<T> {
 

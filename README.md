@@ -406,6 +406,11 @@ promise.convert(42); // Promise { 42 }
 
 converts input data to specific type
 
+*   at first checks if conversion is necessary
+*   then attempts conversion based on the input data type
+*   searches among registered conversions if no matching type is found
+*   generates a fallback value if no suitable conversion can be found
+
 ### Parameters
 
 *   `is` **IS\<T>** initial input type checker. determines if any conversion is necessary
