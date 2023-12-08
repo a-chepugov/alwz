@@ -106,8 +106,8 @@ export class Converter<T> {
 	protected _conversions: Map<IS<any>, Conversion<any, T>>;
 
 	/**
-	 * @param {IS<T>} is - initial input type checker. determines if any conversion is necessary
-	 * @param {Fallback<T>} fallback - default value generator. runs if none of the available conversions are suitable
+	 * @param {IS<T>} is - initial input data type checker. determines if any conversion is necessary
+	 * @param {Fallback<T>} fallback - fallback value generator. runs if none of the available conversions are suitable
 	 */
 	constructor(is: IS<T>, fallback: Fallback<T>) {
 		this.is = is;
@@ -168,25 +168,23 @@ export class Converter<T> {
 	}
 
 	/**
-	 * @description add transform function for `INPUT` type
-	 * @param {IS<INPUT>} is - input type checker, determines if input can be processed by `conversion`
+	 * @description adds conversion function for `INPUT` type
+	 * @param {IS<INPUT>} is - input data type checker, determines if input can be processed by `conversion`
 	 * @param {Conversion<INPUT, T>} conversion - `INPUT` to `T` conversion function
 	 */
 	register<INPUT>(is: IS<INPUT>, conversion: Conversion<INPUT, T>) {
 		assertIS(is);
 		assertConversion(conversion);
-
 		this._conversions.set(is, conversion);
 		return this;
 	}
 
 	/**
-	 * @description remove transform function for `INPUT` type from conversions list
+	 * @description removes conversion for `INPUT` type
 	 * @param {IS<INPUT>} is - input type checker
 	 */
 	unregister<INPUT>(is: IS<INPUT>) {
 		assertIS(is);
-
 		this._conversions.delete(is);
 		return this;
 	}

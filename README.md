@@ -217,6 +217,7 @@ number.convert(new Date('1970-01-01T00:00:00.999Z')); // 999
 
 ### integers
 
+    |--------|------------------|------------------|
     | type   |              min |              max |
     |--------|------------------|------------------|
     | byte   |             -128 |              127 |
@@ -417,8 +418,8 @@ converts input data to specific type
 
 ### Parameters
 
-*   `is` **IS\<T>** initial input type checker. determines if any conversion is necessary
-*   `fallback` **Fallback\<T>** default value generator. runs if none of the available conversions are suitable
+*   `is` **IS\<T>** initial input data type checker. determines if any conversion is necessary
+*   `fallback` **Fallback\<T>** fallback value generator. runs if none of the available conversions are suitable
 
 ### Examples
 
@@ -486,16 +487,16 @@ converts data according to saved conversion rules
 
 ### register
 
-add transform function for `INPUT` type
+adds conversion function for `INPUT` type
 
 #### Parameters
 
-*   `is` **IS\<INPUT>** input type checker, determines if input can be processed by `conversion`
+*   `is` **IS\<INPUT>** input data type checker, determines if input can be processed by `conversion`
 *   `conversion` **Conversion\<INPUT, T>** `INPUT` to `T` conversion function
 
 ### unregister
 
-remove transform function for `INPUT` type from conversions list
+removes conversion for `INPUT` type
 
 #### Parameters
 
