@@ -89,7 +89,7 @@ export class Converter<T> {
 		return Object.assign({}, this._types);
 	}
 
-	get conversions() {
+	get conversions(): Array<[IS<any>, Conversion<any, T>]> {
 		return Array.from(this._conversions);
 	}
 
@@ -140,7 +140,7 @@ export class Converter<T> {
 	 *
 	 * @param {*} input - input data
 	 */
-	convert = (input: any): T => {
+	convert = (input?: any): T => {
 		if (this._is(input)) return input;
 
 		const type = typeof input as Types;
