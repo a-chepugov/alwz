@@ -175,7 +175,6 @@ export class Converter<T> {
 	register<INPUT>(is: IS<INPUT>, conversion: Conversion<INPUT, T>) {
 		assertIS(is);
 		assertConversion(conversion);
-
 		this._conversions.set(is, conversion);
 		return this;
 	}
@@ -186,7 +185,6 @@ export class Converter<T> {
 	 */
 	unregister<INPUT>(is: IS<INPUT>) {
 		assertIS(is);
-
 		this._conversions.delete(is);
 		return this;
 	}
