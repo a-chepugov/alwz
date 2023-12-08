@@ -35,7 +35,7 @@ export function assertConvert<INPUT, OUTPUT>(input: any): boolean | never {
 	throw new Converter.InvalidConvertFunction('convert must be a function', input);
 }
 
-type Primitives = 'undefined' | 'boolean' | 'number' | 'bigint' | 'string' | 'symbol';
+type Types = 'undefined' | 'boolean' | 'number' | 'bigint' | 'string' | 'symbol';
 
 /**
  * @description converts input data to specific type
@@ -47,10 +47,12 @@ export class Converter<T> {
 	static InvalidConvertFunction = class extends EV {};
 	static InvalidConverter = class extends EV {};
 
-	is: IS<T>;
-	fallback: Fallback<T>;
+	// @ts-ignore
+	_is: IS<T>;
+	// @ts-ignore
+	_fallback: Fallback<T>;
 
-	protected _types: Record<string, Convert<any, T>>;
+	protected _types: Partial<Record<Types, Convert<any, T>>>;
 	protected _converters: Map<IS<any>, Convert<any, T>>;
 
 	/**
@@ -58,20 +60,35 @@ export class Converter<T> {
 	 * @param {Fallback<T>} fallback - default value generator. runs if none of the available converters are suitable
 	 */
 	constructor(is: IS<T>, fallback: Fallback<T>) {
-		assertIS(is);
 		this.is = is;
-
-		assertFallback(fallback);
 		this.fallback = fallback;
 
-		this._types = {};
+		this._types = {} as Partial<Record<Types, Convert<any, T>>>;
 		this._converters = new Map();
 
-		Object.freeze(this);
+		Object.seal(this);
 	}
 
-	get types() {
-		return Object.entries(this._types) as Array<[Primitives, Convert<any, T>]>;
+	get is() {
+		return this._is;
+	}
+
+	set is(is: IS<T>) {
+		assertIS(is);
+		this._is = is;
+	}
+
+	get fallback() {
+		return this._fallback;
+	}
+
+	set fallback(fallback: Fallback<T>) {
+		assertFallback(fallback);
+		this._fallback = fallback;
+	}
+
+	get types(): Partial<Record<Types, Convert<any, T>>> {
+		return Object.assign({}, this._types);
 	}
 
 	get converters() {
@@ -111,11 +128,13 @@ export class Converter<T> {
 	 * positive.convert([5, 6]); // 5
 	 *
 	 * @example <caption>converter with conversion error</caption>
-	 * const converter = new Converter((input) => typeof input === 'number', (i) => {
-	 *   throw new Error('Invalid source data: ' + i);
-	 * })
-	 *  .string((i) => converter.convert(Number(i)))
-	 * ;
+	 * const converter = new Converter(
+	 *   (input) => typeof input === 'number',
+	 *   (i) => {
+	 *     throw new Error('Invalid source data: ' + i);
+	 *   }
+	 * )
+	 *  .string((i) => converter.convert(Number(i)));
 	 *
 	 * converter.convert(1); // 1
 	 * converter.convert('2'); // 2
@@ -124,9 +143,9 @@ export class Converter<T> {
 	 * @param {*} input - input data
 	 */
 	convert = (input: any): T => {
-		if (this.is(input)) return input;
+		if (this._is(input)) return input;
 
-		const type = typeof input;
+		const type = typeof input as Types;
 		if (type in this._types) {
 			const convert = this._types[type] as Convert<any, T>;
 			return convert.call(this, input);
@@ -138,7 +157,7 @@ export class Converter<T> {
 				}
 			}
 		}
-		return this.fallback(input);
+		return this._fallback(input);
 	}
 
 	/**
@@ -167,6 +186,7 @@ export class Converter<T> {
 	 * @description conversion rule setter for `undefined` input
 	 */
 	undefined(convert: Convert<undefined, T>) {
+		assertConvert(convert);
 		this._types.undefined = convert;
 		return this;
 	}
@@ -175,6 +195,7 @@ export class Converter<T> {
 	 * @description conversion rule setter for `boolean` input
 	 */
 	boolean(convert: Convert<boolean, T>) {
+		assertConvert(convert);
 		this._types.boolean = convert;
 		return this;
 	}
@@ -183,6 +204,7 @@ export class Converter<T> {
 	 * @description conversion rule setter for `number` input
 	 */
 	number(convert: Convert<number, T>) {
+		assertConvert(convert);
 		this._types.number = convert;
 		return this;
 	}
@@ -191,6 +213,7 @@ export class Converter<T> {
 	 * @description conversion rule setter for `bigint` input
 	 */
 	bigint(convert: Convert<bigint, T>) {
+		assertConvert(convert);
 		this._types.bigint = convert;
 		return this;
 	}
@@ -199,6 +222,7 @@ export class Converter<T> {
 	 * @description conversion rule setter for `string` input
 	 */
 	string(convert: Convert<string, T>) {
+		assertConvert(convert);
 		this._types.string = convert;
 		return this;
 	}
@@ -207,21 +231,31 @@ export class Converter<T> {
 	 * @description conversion rule setter for `symbol` input
 	 */
 	symbol(convert: Convert<symbol, T>) {
+		assertConvert(convert);
 		this._types.symbol = convert;
 		return this;
 	}
 
 	/**
 	 * @example
-	 * const converter = new Converter((i) => typeof i === 'number', () => 0).undefined(() => 1);
-	 * const clone = converter.clone().undefined(() => 2)
+	 * const converter = new Converter(
+	 *   (i) => typeof i === 'number',
+	 *   () => 0
+	 * )
+	 *   .undefined(() => 1);
+	 *
+	 * const clone = converter
+	 *   .clone()
+	 *   .undefined(() => 2);
+	 *
 	 * converter.convert(); // 1
 	 * clone.convert(); // 2
 	*/
 	clone() {
 		const converter = new Converter(this.is, this.fallback);
-		this.types.forEach(([name, convert]: [Primitives, Convert<any, T>]) => converter[name](convert));
-		this.converters.forEach(([is, convert]: [IS<T>, Convert<any, T>]) => converter.register(is, convert));
+		const types = Object.entries(this._types) as Array<[Types, Convert<any, T>]>;
+		types.forEach(([name, convert]: [Types, Convert<any, T>]) => converter[name](convert));
+		this._converters.forEach((convert: Convert<any, T>, is: IS<T>) => converter.register(is, convert));
 		return converter;
 	}
 
