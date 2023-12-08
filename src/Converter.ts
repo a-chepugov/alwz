@@ -129,18 +129,23 @@ export class Converter<T> {
 	 * positive.convert('4'); // 4
 	 * positive.convert([5, 6]); // 5
 	 *
-	 * @example <caption>converter with conversion error</caption>
+	 * @example <caption>conversion with prohibited input types</caption>
 	 * const converter = new Converter(
 	 *   (input) => typeof input === 'number',
 	 *   (input) => {
-	 *     throw new Error('Invalid source data: ' + input);
-	 *   }
-	 * )
-	 *  .string((i) => converter.convert(Number(i)));
+	 *     throw new Error('unknown input data type:' + input);
+	 *   })
+	 *   .string((i) => {
+	 *     throw new Error('string input is forbidden:' + i);
+	 *   })
+	 *   .boolean(Number)
+	 *   .register(Array.isArray, (i) => converter.convert(i[0]));
 	 *
-	 * converter.convert(1); // 1
-	 * converter.convert('2'); // 2
-	 * converter.convert(3n); // Error
+	 * converter.convert(true); // 1
+	 * converter.convert(2); // 2
+	 * converter.convert('3'); // Error
+	 * converter.convert([4]); // 4
+	 * converter.convert(Promise.resolve(5)); // Error
 	 *
 	 * @param {*} input - input data
 	 */
