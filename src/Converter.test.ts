@@ -7,7 +7,7 @@ describe('Converter', () => {
 
 		const positive = new Converter(
 			(input): input is unknown => typeof input === 'number' && input > 0,
-			(i) => i === 0 ? 0.1 : 0.2
+			(input) => input === 0 ? 0.1 : 0.2
 		);
 
 		positive
@@ -112,7 +112,7 @@ describe('Converter', () => {
 		assert.strictEqual(conv.convert('a'), 2);
 	});
 
-	test(`type converter register metods throw on invalid input`, () => {
+	test(`conversion register methods for types throws on invalid input`, () => {
 		const conv = new Converter((i: any): i is number => typeof i === 'number', () => 1);
 		assert.throws(() => conv.undefined(undefined));
 		assert.throws(() => conv.boolead(false));
@@ -132,7 +132,7 @@ describe('Converter', () => {
 		assert.throws(() => converter.register(Array.isArray, null));
 	});
 
-	test('register method add converter into internal register', () => {
+	test('register method add conversion into internal register', () => {
 		const converter = new Converter(Number.isFinite, () => 0);
 		assert.strictEqual(converter.convert([1]), 0);
 
@@ -140,7 +140,7 @@ describe('Converter', () => {
 		assert.strictEqual(converter.convert([1]), 1);
 	});
 
-	test(`'types' getter returns object with types handlers`, () => {
+	test(`'types' getter returns object with conversion rules tor types`, () => {
 		const num = (i) => Number(i);
 
 		const conv = new Converter(() => false, () => 0);
@@ -153,19 +153,19 @@ describe('Converter', () => {
 		assert.strictEqual(conv.types.number, num);
 	});
 
-	test(`'converters' getter returns handlers list`, () => {
+	test(`'conversions' getter returns conversion rules list`, () => {
 		const converter = new Converter((i): i is number => typeof i === 'number', () => 0);
 
 		const first = (i) => i[0];
 
-		assert.strictEqual(converter.converters.length, 0);
+		assert.strictEqual(converter.conversions.length, 0);
 		converter.register(Array.isArray, first);
-		assert.strictEqual(converter.converters.length, 1);
-		assert.strictEqual(converter.converters[0][0], Array.isArray);
-		assert.strictEqual(converter.converters[0][1], first);
+		assert.strictEqual(converter.conversions.length, 1);
+		assert.strictEqual(converter.conversions[0][0], Array.isArray);
+		assert.strictEqual(converter.conversions[0][1], first);
 	});
 
-	test('unregister method removes converter from internal register', () => {
+	test('unregister method removes conversion from internal register', () => {
 		const converter = new Converter(Number.isFinite, () => 0);
 
 		converter.register(Array.isArray, (i) => converter.convert(i[0]));

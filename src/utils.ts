@@ -1,4 +1,4 @@
-import Converter, { Convert, isConvert, assertConvert } from './Converter';
+import Converter, { Conversion, isConversion, assertConversion } from './Converter';
 import * as presets from './presets';
 
 /**
@@ -17,16 +17,16 @@ import * as presets from './presets';
  * numArray([]); // []
  * numArray([true, 2, "3", {}]); // [1, 2, 3, NaN]
  *
- * @param {Convert<any, T>} fn
- * @param {Convert<any, Array<any>>} initiator
+ * @param {Conversion<any, T>} fn
+ * @param {Conversion<any, Array<any>>} initiator
  * @return {(input?: any) => Array<T>}
- * @returns {Convert<any, Array<T>>}
+ * @returns {Conversion<any, Array<T>>}
  */
-export const array = <T>(fn: Convert<any, T>, initiator: Convert<any, Array<any>> = presets.array.convert): Convert<any, Array<T>> => {
-	assertConvert(fn);
+export const array = <T>(fn: Conversion<any, T>, initiator: Conversion<any, Array<any>> = presets.array.convert): Conversion<any, Array<T>> => {
+	assertConversion(fn);
 
-	if (!isConvert(initiator)) {
-		throw new Converter.InvalidConvertFunction('initiator must be a function', initiator);
+	if (!isConversion(initiator)) {
+		throw new Converter.InvalidConversionFunction('initiator must be a function', initiator);
 	}
 
 	return (input: any) => {
@@ -45,23 +45,23 @@ export const array = <T>(fn: Convert<any, T>, initiator: Convert<any, Array<any>
  * tplNSB('5'); // [5, 'undefined', false]
  * tplNSB(['1', '2', '3']); // [1, '2', true]
  *
- * @param {Array<Convert<any, any>>} fns
- * @param {Convert<any, Array<any>>} initiator
- * @returns {Convert<any, Array<any>>}
+ * @param {Array<Conversion<any, any>>} fns
+ * @param {Conversion<any, Array<any>>} initiator
+ * @returns {Conversion<any, Array<any>>}
  */
-export const tuple = (fns: Array<Convert<any, any>>, initiator: Convert<any, Array<any>> = presets.array.convert): Convert<any, Array<any>> => {
+export const tuple = (fns: Array<Conversion<any, any>>, initiator: Conversion<any, Array<any>> = presets.array.convert): Conversion<any, Array<any>> => {
 	if (!Array.isArray(fns)) {
-		throw new Converter.InvalidConvertFunction('first argument must be an array', fns);
+		throw new Converter.InvalidConversionFunction('first argument must be an array', fns);
 	}
 
 	fns.forEach((fn, index) => {
-		if (!isConvert(fn)) {
-			throw new Converter.InvalidConvertFunction('convert ' + index + ' must be a function', [index, fn]);
+		if (!isConversion(fn)) {
+			throw new Converter.InvalidConversionFunction('conversion ' + index + ' must be a function', [index, fn]);
 		}
 	});
 
-	if (!isConvert(initiator)) {
-		throw new Converter.InvalidConvertFunction('initiator must be a function', initiator);
+	if (!isConversion(initiator)) {
+		throw new Converter.InvalidConversionFunction('initiator must be a function', initiator);
 	}
 
 	return (input: any) => {

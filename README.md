@@ -409,11 +409,11 @@ converts input data to specific type
 ### Parameters
 
 *   `is` **IS\<T>** default input type checker. checks if conversion is necessary
-*   `fallback` **Fallback\<T>** default value generator. runs if none of the available converters are suitable
+*   `fallback` **Fallback\<T>** default value generator. runs if none of the available conversions are suitable
 
 ### convert
 
-converts data according to saved rules
+converts data according to saved conversion rules
 
 #### Parameters
 
@@ -459,8 +459,8 @@ converter with conversion error
 ```javascript
 const converter = new Converter(
   (input) => typeof input === 'number',
-  (i) => {
-    throw new Error('Invalid source data: ' + i);
+  (input) => {
+    throw new Error('Invalid source data: ' + input);
   }
 )
  .string((i) => converter.convert(Number(i)));
@@ -476,8 +476,8 @@ add transform function for `INPUT` type
 
 #### Parameters
 
-*   `is` **IS\<INPUT>** input type checker, determines if input can be processed by `convert`
-*   `convert` **Convert\<INPUT, T>** `INPUT` to `T` convert function
+*   `is` **IS\<INPUT>** input type checker, determines if input can be processed by `conversion`
+*   `conversion` **Conversion\<INPUT, T>** `INPUT` to `T` conversion function
 
 ### unregister
 
@@ -493,7 +493,7 @@ conversion rule setter for `undefined` input
 
 #### Parameters
 
-*   `convert`  
+*   `conversion`  
 
 ### boolean
 
@@ -501,7 +501,7 @@ conversion rule setter for `boolean` input
 
 #### Parameters
 
-*   `convert`  
+*   `conversion`  
 
 ### number
 
@@ -509,7 +509,7 @@ conversion rule setter for `number` input
 
 #### Parameters
 
-*   `convert`  
+*   `conversion`  
 
 ### bigint
 
@@ -517,7 +517,7 @@ conversion rule setter for `bigint` input
 
 #### Parameters
 
-*   `convert`  
+*   `conversion`  
 
 ### string
 
@@ -525,7 +525,7 @@ conversion rule setter for `string` input
 
 #### Parameters
 
-*   `convert`  
+*   `conversion`  
 
 ### symbol
 
@@ -533,7 +533,7 @@ conversion rule setter for `symbol` input
 
 #### Parameters
 
-*   `convert`  
+*   `conversion`  
 
 ### clone
 
@@ -570,8 +570,8 @@ constrain data to an array elements of a given type
 
 #### Parameters
 
-*   `fn` **Convert\<any, T>** 
-*   `initiator` **Convert\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<any>>**  (optional, default `presets.array.convert`)
+*   `fn` **Conversion\<any, T>** 
+*   `initiator` **Conversion\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<any>>**  (optional, default `presets.array.convert`)
 
 #### Examples
 
@@ -582,7 +582,7 @@ numArray([]); // []
 numArray([true, 2, "3", {}]); // [1, 2, 3, NaN]
 ```
 
-Returns **Convert\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<T>>** 
+Returns **Conversion\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<T>>** 
 
 ### tuple
 
@@ -590,8 +590,8 @@ constrain data to a tuple with given types
 
 #### Parameters
 
-*   `fns` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Convert\<any, any>>** 
-*   `initiator` **Convert\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<any>>**  (optional, default `presets.array.convert`)
+*   `fns` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Conversion\<any, any>>** 
+*   `initiator` **Conversion\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<any>>**  (optional, default `presets.array.convert`)
 
 #### Examples
 
@@ -604,4 +604,4 @@ tplNSB('5'); // [5, 'undefined', false]
 tplNSB(['1', '2', '3']); // [1, '2', true]
 ```
 
-Returns **Convert\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<any>>** 
+Returns **Conversion\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<any>>** 
