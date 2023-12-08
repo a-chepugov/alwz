@@ -420,15 +420,7 @@ converts input data to specific type
 *   `is` **IS\<T>** initial input type checker. determines if any conversion is necessary
 *   `fallback` **Fallback\<T>** default value generator. runs if none of the available conversions are suitable
 
-### convert
-
-converts data according to saved conversion rules
-
-#### Parameters
-
-*   `input` **any** input data
-
-#### Examples
+### Examples
 
 converter creation
 
@@ -483,6 +475,14 @@ converter.convert('3'); // Error
 converter.convert([4]); // 4
 converter.convert(Promise.resolve(5)); // Error
 ```
+
+### convert
+
+converts data according to saved conversion rules
+
+#### Parameters
+
+*   `input` **any** input data
 
 ### register
 
