@@ -41,8 +41,8 @@ describe('index', () => {
 			}
 
 			{
-				const result = Bytes3dArray([[[null, NaN, 'a'], [true, '2', 3]], [[-Infinity]]]);
-				const expected = [[[0, 0, 0], [1, 2, 3]], [[-128]]];
+				const result = Bytes3dArray([[[null, NaN, 'a'], [true, '2', 3]], [[Infinity]]]);
+				const expected = [[[0, 0, 0], [1, 2, 3]], [[127]]];
 				assert.deepStrictEqual(result, expected);
 			}
 		});
@@ -51,37 +51,17 @@ describe('index', () => {
 			const tuple = a.utils.tuple;
 			{
 				const Pair = tuple([a.uint, a.uint]);
-				const result = Pair(['abc', 35, 100]);
-				const expected = [0, 35];
+				const result = Pair(['abc', 3.5, 100]);
+				const expected = [0, 3];
 				assert.deepStrictEqual(result, expected);
 			}
 
 			{
-				const NativePair = tuple([Number, Number]);
-				const result = NativePair(['abc', 35, 100]);
-				const expected = [NaN, 35];
+				const NumbersPair = tuple([Number, Number]);
+				const result = NumbersPair(['abc', 3.5, 100]);
+				const expected = [NaN, 3.5];
 				assert.deepStrictEqual(result, expected);
 			}
-		});
-
-		test('parse colon-separated number/string mixed records', () => {
-			const PathArray = a.default.get('array')
-				.clone()
-				.string((i) => [...i.matchAll(/\/(\w+)/g)].map((i) => i[1]))
-				.convert;
-
-			const DSV2Tuple = a.utils.tuple(
-				[String, String, Number, Number, String, PathArray, PathArray],
-				a.default.get('array')
-					.clone()
-					.string((i) => i.split(':'))
-					.convert
-			);
-
-			const input = 'user:12345:1000:1000:ordinar user:/home/user:/bin/sh';
-			const result = DSV2Tuple(input);
-			const expected = ['user', '12345', 1000, 1000, 'ordinar user', ['home', 'user'], ['bin', 'sh']];
-			assert.deepStrictEqual(result, expected);
 		});
 
 	});
@@ -90,7 +70,7 @@ describe('index', () => {
 
 		const bool = a.default.get('boolean')
 			.clone()
-			.string(function(v) {
+			.string(function(v) { // string input processing
 				if (v === 'true' || v === 'yes') {
 					return true;
 				} else if (v === 'false' || v === 'no') {
@@ -111,8 +91,8 @@ describe('index', () => {
 		});
 
 		const even = new a.Converter(
-			(input) => typeof input === 'number' && input % 2 === 0,
-			(input) => Number(input) % 2 === 0 ? Number(input) : 0
+			(input) => typeof input === 'number' && input % 2 === 0, // initial input check
+			(input) => Number(input) % 2 === 0 ? Number(input) : 0 // fallback value generator
 		);
 
 		even
@@ -134,6 +114,26 @@ describe('index', () => {
 			assert.deepStrictEqual(even.convert(11), 10);
 			assert.deepStrictEqual(even.convert('15'), 14);
 			assert.deepStrictEqual(even.convert([17, 18, 19]), 16);
+		});
+
+		test('parse colon-separated number/string records', () => {
+			const PathArray = a.default.get('array')
+				.clone()
+				.string((i) => [...i.matchAll(/\/(\w+)/g)].map((i) => i[1]))
+				.convert;
+
+			const DSV2Tuple = a.utils.tuple(
+				[String, String, Number, Number, String, PathArray, PathArray],
+				a.default.get('array')
+					.clone()
+					.string((i) => i.split(':'))
+					.convert
+			);
+
+			const input = 'user:12345:1000:1000:ordinar user:/home/user:/bin/sh';
+			const result = DSV2Tuple(input);
+			const expected = ['user', '12345', 1000, 1000, 'ordinar user', ['home', 'user'], ['bin', 'sh']];
+			assert.deepStrictEqual(result, expected);
 		});
 
 	});

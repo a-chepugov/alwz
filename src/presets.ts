@@ -58,6 +58,7 @@ number
  * @name integers
  * @description
  * ```
+ * |--------|------------------|------------------|
  * | type   |              min |              max |
  * |--------|------------------|------------------|
  * | byte   |             -128 |              127 |
@@ -156,9 +157,8 @@ export const [
 				} else if (i >= max) {
 					return max;
 				} else {
-					const value = Math.trunc(i);
-					if (Number.isInteger(value)) {
-						return value;
+					if (Number.isFinite(i)) {
+						return Math.trunc(i);
 					} else {
 						return converter.fallback();
 					}
@@ -247,8 +247,12 @@ string
 	.symbol((i) => Symbol.keyFor(i) || '')
 	.register(isNull, () => '')
 	.register(isDate, (i) => {
-		const value = i.getTime();
-		return Number.isFinite(value) ? i.toISOString() : string.fallback();
+		const ts = i.getTime();
+		if (Number.isFinite(ts)) {
+			return i.toISOString();
+		} else {
+			return string.fallback('');
+		}
 	})
 	.register(Array.isArray, (i) => string.convert(i[0]))
 ;
