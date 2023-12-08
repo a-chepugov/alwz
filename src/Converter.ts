@@ -41,6 +41,54 @@ type Types = 'undefined' | 'boolean' | 'number' | 'bigint' | 'string' | 'symbol'
  * - then attempts conversion based on the input data type
  * - searches among registered conversions if no matching type is found
  * - generates a fallback value if no suitable conversion can be found
+ *
+ * @example <caption>converter creation</caption>
+ * const positive = new Converter(
+ *   (input) => typeof input === 'number' && input > 0,
+ *   (input) => input === 0 ? 0.1 : 0.2
+ * );
+ *
+ * positive
+ *   .undefined(() => 0.3)
+ *   .boolean((i) => i ? 1 : 0.4)
+ *   .number(function(i) {
+ *     const result = Math.abs(i)
+ *     return this.is(result) ? result : this.fallback(i);
+ *   })
+ *   .string((i) => positive.convert(Number(i)))
+ *   .symbol((i) => positive.convert(Symbol.keyFor(i)))
+ *   .bigint((i) => positive.convert(Number(i)))
+ *   .register(Array.isArray, (i) => positive.convert(i[0]))
+ *   .register((i) => i === null, (i) => 0.5);
+ *
+ * positive.convert(1); // 1
+ * positive.convert(0); // 0.1 (fallback)
+ * positive.convert(NaN); // 0.2 (fallback)
+ * positive.convert(undefined); // 0.3 (has own handler)
+ * positive.convert(false); // 0.4 (has own handler)
+ * positive.convert(null); // 0.5 (has own handler)
+ * positive.convert(2n); // 2
+ * positive.convert(-3); // 3
+ * positive.convert('4'); // 4
+ * positive.convert([5, 6]); // 5
+ *
+ * @example <caption>conversion with prohibited input types</caption>
+ * const converter = new Converter(
+ *   (input) => typeof input === 'number',
+ *   (input) => {
+ *     throw new Error('unknown input data type:' + input);
+ *   })
+ *   .string((i) => {
+ *     throw new Error('string input is forbidden:' + i);
+ *   })
+ *   .boolean(Number)
+ *   .register(Array.isArray, (i) => converter.convert(i[0]));
+ *
+ * converter.convert(true); // 1
+ * converter.convert(2); // 2
+ * converter.convert('3'); // Error
+ * converter.convert([4]); // 4
+ * converter.convert(Promise.resolve(5)); // Error
  */
 export class Converter<T> {
 
@@ -99,54 +147,6 @@ export class Converter<T> {
 
 	/**
 	 * @description converts data according to saved conversion rules
-	 * @example <caption>converter creation</caption>
-	 * const positive = new Converter(
-	 *   (input) => typeof input === 'number' && input > 0,
-	 *   (input) => input === 0 ? 0.1 : 0.2
-	 * );
-	 *
-	 * positive
-	 *   .undefined(() => 0.3)
-	 *   .boolean((i) => i ? 1 : 0.4)
-	 *   .number(function(i) {
-	 *     const result = Math.abs(i)
-	 *     return this.is(result) ? result : this.fallback(i);
-	 *   })
-	 *   .string((i) => positive.convert(Number(i)))
-	 *   .symbol((i) => positive.convert(Symbol.keyFor(i)))
-	 *   .bigint((i) => positive.convert(Number(i)))
-	 *   .register(Array.isArray, (i) => positive.convert(i[0]))
-	 *   .register((i) => i === null, (i) => 0.5);
-	 *
-	 * positive.convert(1); // 1
-	 * positive.convert(0); // 0.1 (fallback)
-	 * positive.convert(NaN); // 0.2 (fallback)
-	 * positive.convert(undefined); // 0.3 (has own handler)
-	 * positive.convert(false); // 0.4 (has own handler)
-	 * positive.convert(null); // 0.5 (has own handler)
-	 * positive.convert(2n); // 2
-	 * positive.convert(-3); // 3
-	 * positive.convert('4'); // 4
-	 * positive.convert([5, 6]); // 5
-	 *
-	 * @example <caption>conversion with prohibited input types</caption>
-	 * const converter = new Converter(
-	 *   (input) => typeof input === 'number',
-	 *   (input) => {
-	 *     throw new Error('unknown input data type:' + input);
-	 *   })
-	 *   .string((i) => {
-	 *     throw new Error('string input is forbidden:' + i);
-	 *   })
-	 *   .boolean(Number)
-	 *   .register(Array.isArray, (i) => converter.convert(i[0]));
-	 *
-	 * converter.convert(true); // 1
-	 * converter.convert(2); // 2
-	 * converter.convert('3'); // Error
-	 * converter.convert([4]); // 4
-	 * converter.convert(Promise.resolve(5)); // Error
-	 *
 	 * @param {any} input - input data
 	 */
 	convert = (input?: any): T => {
