@@ -176,6 +176,8 @@ export class Converter<T> {
 	 * @param {IS<INPUT>} is - input type checker
 	 */
 	unregister<INPUT>(is: IS<INPUT>) {
+		assertIS(is);
+
 		this._conversions.delete(is);
 		return this;
 	}
