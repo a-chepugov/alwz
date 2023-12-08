@@ -7,7 +7,7 @@ describe('Converter', () => {
 
 		const positive = new Converter(
 			(input): input is unknown => typeof input === 'number' && input > 0,
-			(i) => i === 0 ? 0.1 : 0.2
+			(input) => input === 0 ? 0.1 : 0.2
 		);
 
 		positive
