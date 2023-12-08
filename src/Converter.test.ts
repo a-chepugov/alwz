@@ -63,6 +63,41 @@ describe('Converter', () => {
 			assert.strictEqual(positive.convert([5, 6]), 5);
 		});
 
+		describe('conversion with prohibited input types', () => {
+
+			const converter = new Converter(
+				(input) => typeof input === 'number',
+				(input) => {
+					throw new Error('Unknown input data type:' + input);
+				}
+			)
+				.string((i) => {
+					throw new Error('string input is forbidden:' + i);
+				})
+				.boolean(Number)
+				.register(Array.isArray, (i) => converter.convert(i[0]));
+
+			test(`true gives 1`, () => {
+				assert.strictEqual(converter.convert(true), 1);
+			});
+
+			test(`number 2 gives 2`, () => {
+				assert.strictEqual(converter.convert(2), 2);
+			});
+
+			test(`throws on string input`, () => {
+				assert.throws(() => converter.convert('3'));
+			});
+
+			test(`[4] gives 4`, () => {
+				assert.strictEqual(converter.convert([4]), 4);
+			});
+
+			test(`throws on Promise input`, () => {
+				assert.throws(() => converter.convert(Promise.resolve(5)));
+			});
+
+		});
 	});
 
 	test(`static method 'assert' throws on invalid instance`, () => {

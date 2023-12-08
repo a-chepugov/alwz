@@ -57,7 +57,7 @@ const array = a.utils.array;
 const Bytes3dArray = array(array(array(a.byte)));
 
 Bytes3dArray(1); // [[[1]]];
-Bytes3dArray([[[null, NaN, 'a'], [true, '2', 3]], [[-Infinity]]]); // [[[0, 0, 0], [1, 2, 3]], [[-128]]];
+Bytes3dArray([[[null, NaN, 'a'], [true, '2', 3]], [[Infinity]]]); // [[[0, 0, 0], [1, 2, 3]], [[127]]];
 ```
 
 create tuples
@@ -65,30 +65,10 @@ create tuples
 ```javascript
 const tuple = a.utils.tuple;
 const Pair = tuple([a.uint, a.uint]);
-Pair(['abc', 35, 100]); // [0, 35]
+Pair(['abc', 3.5, 100]); // [0, 3]
 
-const NativePair = tuple([Number, Number]);
-NativePair(['abc', 35, 100]); // [NaN, 35]
-```
-
-parse colon-separated number/string mixed records
-
-```javascript
-const PathArray = a.default.get('array')
-  .clone()
-  .string((i) => [...i.matchAll(/\/(\w+)/g)].map((i) => i[1]))
-  .convert;
-
-const DSV2Tuple = a.utils.tuple(
-  [String, String, Number, Number, String, PathArray, PathArray],
-  a.default.get('array')
-    .clone()
-    .string((i) => i.split(':'))
-    .convert
-);
-
-const input = 'user:12345:1000:1000:ordinar user:/home/user:/bin/sh';
-DSV2Tuple(input); // ['user', '12345', 1000, 1000, 'ordinar user', ['home', 'user'], ['bin', 'sh']];
+const NumbersPair = tuple([Number, Number]);
+NumbersPair(['abc', 3.5, 100]); // [NaN, 3.5]
 ```
 
 ## Transform
@@ -105,7 +85,7 @@ extend an existing converter
 // make boolean smarter
 const bool = a.default.get('boolean')
   .clone()
-  .string(function(v) {
+  .string(function(v) { // string input processing
     if (v === 'true' || v === 'yes') {
       return true;
     } else if (v === 'false' || v === 'no') {
@@ -125,8 +105,8 @@ create specific converters
 
 ```javascript
 const even = new a.Converter(
-  (input) => typeof input === 'number' && input % 2 === 0,
-  (input) => Number(input) % 2 === 0 ? Number(input) : 0
+  (input) => typeof input === 'number' && input % 2 === 0, // initial input check
+  (input) => Number(input) % 2 === 0 ? Number(input) : 0 // fallback value generator
 );
 
 even
@@ -147,6 +127,30 @@ even.convert(NaN); // 0
 even.convert(11); // 10
 even.convert('15'); // 14
 even.convert([17, 18, 19]); // 16
+```
+
+## converters
+
+### Examples
+
+parse colon-separated number/string records
+
+```javascript
+const PathArray = a.default.get('array')
+  .clone()
+  .string((i) => [...i.matchAll(/\/(\w+)/g)].map((i) => i[1]))
+  .convert;
+
+const DSV2Tuple = a.utils.tuple(
+  [String, String, Number, Number, String, PathArray, PathArray],
+  a.default.get('array')
+    .clone()
+    .string((i) => i.split(':'))
+    .convert
+);
+
+const input = 'user:12345:1000:1000:ordinar user:/home/user:/bin/sh';
+DSV2Tuple(input); // ['user', '12345', 1000, 1000, 'ordinar user', ['home', 'user'], ['bin', 'sh']];
 ```
 
 ## Selector
@@ -406,6 +410,11 @@ promise.convert(42); // Promise { 42 }
 
 converts input data to specific type
 
+*   at first checks if conversion is necessary
+*   then attempts conversion based on the input data type
+*   searches among registered conversions if no matching type is found
+*   generates a fallback value if no suitable conversion can be found
+
 ### Parameters
 
 *   `is` **IS\<T>** initial input type checker. determines if any conversion is necessary
@@ -426,7 +435,7 @@ converter creation
 ```javascript
 const positive = new Converter(
   (input) => typeof input === 'number' && input > 0,
-  (i) => i === 0 ? 0.1 : 0.2
+  (input) => input === 0 ? 0.1 : 0.2
 );
 
 positive
@@ -454,20 +463,25 @@ positive.convert('4'); // 4
 positive.convert([5, 6]); // 5
 ```
 
-converter with conversion error
+conversion with prohibited input types
 
 ```javascript
 const converter = new Converter(
   (input) => typeof input === 'number',
   (input) => {
-    throw new Error('Invalid source data: ' + input);
-  }
-)
- .string((i) => converter.convert(Number(i)));
+    throw new Error('unknown input data type:' + input);
+  })
+  .string((i) => {
+    throw new Error('string input is forbidden:' + i);
+  })
+  .boolean(Number)
+  .register(Array.isArray, (i) => converter.convert(i[0]));
 
-converter.convert(1); // 1
-converter.convert('2'); // 2
-converter.convert(3n); // Error
+converter.convert(true); // 1
+converter.convert(2); // 2
+converter.convert('3'); // Error
+converter.convert([4]); // 4
+converter.convert(Promise.resolve(5)); // Error
 ```
 
 ### register

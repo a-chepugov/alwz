@@ -37,6 +37,10 @@ type Types = 'undefined' | 'boolean' | 'number' | 'bigint' | 'string' | 'symbol'
 
 /**
  * @description converts input data to specific type
+ * - at first checks if conversion is necessary
+ * - then attempts conversion based on the input data type
+ * - searches among registered conversions if no matching type is found
+ * - generates a fallback value if no suitable conversion can be found
  */
 export class Converter<T> {
 
@@ -98,7 +102,7 @@ export class Converter<T> {
 	 * @example <caption>converter creation</caption>
 	 * const positive = new Converter(
 	 *   (input) => typeof input === 'number' && input > 0,
-	 *   (i) => i === 0 ? 0.1 : 0.2
+	 *   (input) => input === 0 ? 0.1 : 0.2
 	 * );
 	 *
 	 * positive
@@ -125,20 +129,25 @@ export class Converter<T> {
 	 * positive.convert('4'); // 4
 	 * positive.convert([5, 6]); // 5
 	 *
-	 * @example <caption>converter with conversion error</caption>
+	 * @example <caption>conversion with prohibited input types</caption>
 	 * const converter = new Converter(
 	 *   (input) => typeof input === 'number',
 	 *   (input) => {
-	 *     throw new Error('Invalid source data: ' + input);
-	 *   }
-	 * )
-	 *  .string((i) => converter.convert(Number(i)));
+	 *     throw new Error('unknown input data type:' + input);
+	 *   })
+	 *   .string((i) => {
+	 *     throw new Error('string input is forbidden:' + i);
+	 *   })
+	 *   .boolean(Number)
+	 *   .register(Array.isArray, (i) => converter.convert(i[0]));
 	 *
-	 * converter.convert(1); // 1
-	 * converter.convert('2'); // 2
-	 * converter.convert(3n); // Error
+	 * converter.convert(true); // 1
+	 * converter.convert(2); // 2
+	 * converter.convert('3'); // Error
+	 * converter.convert([4]); // 4
+	 * converter.convert(Promise.resolve(5)); // Error
 	 *
-	 * @param {*} input - input data
+	 * @param {any} input - input data
 	 */
 	convert = (input?: any): T => {
 		if (this._is(input)) return input;
