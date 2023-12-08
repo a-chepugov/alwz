@@ -39,32 +39,15 @@ import * as presets from './presets';
  * const Bytes3dArray = array(array(array(a.byte)));
  *
  * Bytes3dArray(1); // [[[1]]];
- * Bytes3dArray([[[null, NaN, 'a'], [true, '2', 3]], [[-Infinity]]]); // [[[0, 0, 0], [1, 2, 3]], [[-128]]];
+ * Bytes3dArray([[[null, NaN, 'a'], [true, '2', 3]], [[Infinity]]]); // [[[0, 0, 0], [1, 2, 3]], [[127]]];
  *
  * @example <caption>create tuples</caption>
  * const tuple = a.utils.tuple;
  * const Pair = tuple([a.uint, a.uint]);
- * Pair(['abc', 35, 100]); // [0, 35]
+ * Pair(['abc', 3.5, 100]); // [0, 3]
  *
- * const NativePair = tuple([Number, Number]);
- * NativePair(['abc', 35, 100]); // [NaN, 35]
- *
- * @example <caption>parse colon-separated number/string mixed records</caption>
- * const PathArray = a.default.get('array')
- *   .clone()
- *   .string((i) => [...i.matchAll(/\/(\w+)/g)].map((i) => i[1]))
- *   .convert;
- *
- * const DSV2Tuple = a.utils.tuple(
- *   [String, String, Number, Number, String, PathArray, PathArray],
- *   a.default.get('array')
- *     .clone()
- *     .string((i) => i.split(':'))
- *     .convert
- * );
- *
- * const input = 'user:12345:1000:1000:ordinar user:/home/user:/bin/sh';
- * DSV2Tuple(input); // ['user', '12345', 1000, 1000, 'ordinar user', ['home', 'user'], ['bin', 'sh']];
+ * const NumbersPair = tuple([Number, Number]);
+ * NumbersPair(['abc', 3.5, 100]); // [NaN, 3.5]
  */
 
 /**
@@ -76,7 +59,7 @@ import * as presets from './presets';
  * // make boolean smarter
  * const bool = a.default.get('boolean')
  *   .clone()
- *   .string(function(v) {
+ *   .string(function(v) { // string input processing
  *     if (v === 'true' || v === 'yes') {
  *       return true;
  *     } else if (v === 'false' || v === 'no') {
@@ -93,8 +76,8 @@ import * as presets from './presets';
  *
  * @example <caption>create specific converters</caption>
  * const even = new a.Converter(
- *   (input) => typeof input === 'number' && input % 2 === 0,
- *   (input) => Number(input) % 2 === 0 ? Number(input) : 0
+ *   (input) => typeof input === 'number' && input % 2 === 0, // initial input check
+ *   (input) => Number(input) % 2 === 0 ? Number(input) : 0 // fallback value generator
  * );
  *
  * even
@@ -115,6 +98,25 @@ import * as presets from './presets';
  * even.convert(11); // 10
  * even.convert('15'); // 14
  * even.convert([17, 18, 19]); // 16
+ */
+
+/**
+ * @example <caption>parse colon-separated number/string records</caption>
+ * const PathArray = a.default.get('array')
+ *   .clone()
+ *   .string((i) => [...i.matchAll(/\/(\w+)/g)].map((i) => i[1]))
+ *   .convert;
+ *
+ * const DSV2Tuple = a.utils.tuple(
+ *   [String, String, Number, Number, String, PathArray, PathArray],
+ *   a.default.get('array')
+ *     .clone()
+ *     .string((i) => i.split(':'))
+ *     .convert
+ * );
+ *
+ * const input = 'user:12345:1000:1000:ordinar user:/home/user:/bin/sh';
+ * DSV2Tuple(input); // ['user', '12345', 1000, 1000, 'ordinar user', ['home', 'user'], ['bin', 'sh']];
  */
 
 export const converters = new Aggregator()
