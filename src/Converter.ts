@@ -2,35 +2,35 @@ import EV from './Error';
 
 export type IS<T> = (input: any) => input is T;
 
-export function isIS<T>(input: any): input is IS<T> {
-	return typeof input === 'function';
+export function isIS<T>(instance: any): instance is IS<T> {
+	return typeof instance === 'function';
 }
 
-export function assertIS<T>(input: any): boolean | never {
-	if (isIS<T>(input)) return true;
-	throw new Converter.InvalidTypeCheckFunction('type checker must be a function', input);
+export function assertIS<T>(instance: any): boolean | never {
+	if (isIS<T>(instance)) return true;
+	throw new Converter.InvalidTypeCheckFunction('type check must be a function', instance);
 }
 
 export type Fallback<OUTPUT> = (input?: any) => OUTPUT | never;
 
-export function isFallback<OUTPUT>(input: any): input is Fallback<OUTPUT> {
-	return typeof input === 'function';
+export function isFallback<OUTPUT>(instance: any): instance is Fallback<OUTPUT> {
+	return typeof instance === 'function';
 }
 
-export function assertFallback<OUTPUT>(input: any): boolean | never {
-	if (isFallback<OUTPUT>(input)) return true;
-	throw new Converter.InvalidFallbackFunction('fallback must be a function', input);
+export function assertFallback<OUTPUT>(instance: any): boolean | never {
+	if (isFallback<OUTPUT>(instance)) return true;
+	throw new Converter.InvalidFallbackFunction('fallback must be a function', instance);
 }
 
 export type Conversion<INPUT, OUTPUT> = (input: INPUT) => OUTPUT;
 
-export function isConversion<INPUT, OUTPUT>(input: any): input is Conversion<INPUT, OUTPUT> {
-	return typeof input === 'function';
+export function isConversion<INPUT, OUTPUT>(instance: any): instance is Conversion<INPUT, OUTPUT> {
+	return typeof instance === 'function';
 }
 
-export function assertConversion<INPUT, OUTPUT>(input: any): boolean | never {
-	if (isConversion<INPUT, OUTPUT>(input)) return true;
-	throw new Converter.InvalidConversionFunction('conversion must be a function', input);
+export function assertConversion<INPUT, OUTPUT>(instance: any): boolean | never {
+	if (isConversion<INPUT, OUTPUT>(instance)) return true;
+	throw new Converter.InvalidConversionFunction('conversion must be a function', instance);
 }
 
 type Types = 'undefined' | 'boolean' | 'number' | 'bigint' | 'string' | 'symbol';
@@ -54,7 +54,7 @@ export class Converter<T> {
 	protected _conversions: Map<IS<any>, Conversion<any, T>>;
 
 	/**
-	 * @param {IS<T>} is - default input type checker. checks if conversion is necessary
+	 * @param {IS<T>} is - initial input type checker. determines if any conversion is necessary
 	 * @param {Fallback<T>} fallback - default value generator. runs if none of the available conversions are suitable
 	 */
 	constructor(is: IS<T>, fallback: Fallback<T>) {
@@ -89,7 +89,7 @@ export class Converter<T> {
 		return Object.assign({}, this._types);
 	}
 
-	get conversions() {
+	get conversions(): Array<[IS<any>, Conversion<any, T>]> {
 		return Array.from(this._conversions);
 	}
 
@@ -128,8 +128,8 @@ export class Converter<T> {
 	 * @example <caption>converter with conversion error</caption>
 	 * const converter = new Converter(
 	 *   (input) => typeof input === 'number',
-	 *   (i) => {
-	 *     throw new Error('Invalid source data: ' + i);
+	 *   (input) => {
+	 *     throw new Error('Invalid source data: ' + input);
 	 *   }
 	 * )
 	 *  .string((i) => converter.convert(Number(i)));
@@ -140,7 +140,7 @@ export class Converter<T> {
 	 *
 	 * @param {*} input - input data
 	 */
-	convert = (input: any): T => {
+	convert = (input?: any): T => {
 		if (this._is(input)) return input;
 
 		const type = typeof input as Types;
@@ -176,6 +176,8 @@ export class Converter<T> {
 	 * @param {IS<INPUT>} is - input type checker
 	 */
 	unregister<INPUT>(is: IS<INPUT>) {
+		assertIS(is);
+
 		this._conversions.delete(is);
 		return this;
 	}
