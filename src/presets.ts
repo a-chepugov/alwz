@@ -244,7 +244,7 @@ export const string = new Converter<string>((i): i is string => typeof i === 'st
 		if (Number.isFinite(ts)) {
 			return i.toISOString();
 		} else {
-			return this.fallback('');
+			return new Date(0).toISOString();
 		}
 	})
 	.register(Array.isArray, function(i) { return this.convert(i[0]); })
