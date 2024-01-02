@@ -70,4 +70,58 @@ describe('utils', () => {
 
 	});
 
+	describe('variant', () => {
+
+		const variant = utils.variant;
+
+		test('throw on invalid values', () => {
+			assert.throws(() => variant(null));
+		});
+
+		test('throw on invalid fallback', () => {
+			assert.throws(() => variant([4], null));
+		});
+
+		test('throw on invalid convert', () => {
+			assert.throws(() => variant([4], () => 4, null));
+		});
+
+		const var123 = variant([1, 2, 3]);
+		const var123WithCustomFallback = variant([1, 2, 3], () => 3);
+		const varABC = variant(['a', 'b'], (i) => ['a', 'b'][i], String);
+		const var123WithPoorFallback = variant([1, 2, 3], () => 99);
+
+		const sets = [
+			{ work: var123, input: 1, output: 1 },
+			{ work: var123, input: '2', output: 2 },
+			{ work: var123, input: [3], output: 3 },
+			{ work: var123, input: 4, output: 1 },
+			{ work: var123, input: undefined, output: 1 },
+			{ work: var123, input: null, output: 1 },
+			{ work: var123, input: NaN, output: 1 },
+			{ work: var123, input: -Infinity, output: 1 },
+			{ work: var123, input: Infinity, output: 1 },
+
+			{ work: var123WithCustomFallback, input: 4, output: 3 },
+
+			{ work: varABC, input: 'a', output: 'a' },
+			{ work: varABC, input: 'b', output: 'b' },
+			{ work: varABC, input: 0, output: 'a' },
+			{ work: varABC, input: 1, output: 'b' },
+		];
+
+		for(let i = 0; i < sets.length; i++) {
+			const { work, input, output } = sets[i];
+			const name = `${i}: < ${String(input)} > gives ${String(output)}`;
+			test(name, () => {
+				assert.deepStrictEqual(work(input), output);
+			});
+		}
+
+		test('throw on invalid fallback', () => {
+			assert.throws(() => var123WithPoorFallback(4));
+		});
+
+	});
+
 });
