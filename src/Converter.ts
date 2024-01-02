@@ -22,7 +22,7 @@ export function assertFallback<OUTPUT>(instance: any): boolean | never {
 	throw new Converter.InvalidFallbackFunction('fallback must be a function', instance);
 }
 
-export type Conversion<INPUT, OUTPUT> = (input: INPUT) => OUTPUT;
+export type Conversion<INPUT, OUTPUT, THIS = any> = (this: THIS, input: INPUT) => OUTPUT;
 
 export function isConversion<INPUT, OUTPUT>(instance: any): instance is Conversion<INPUT, OUTPUT> {
 	return typeof instance === 'function';
