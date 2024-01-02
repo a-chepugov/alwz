@@ -1,5 +1,9 @@
-import Converter, { Conversion, isConversion, assertConversion } from './Converter';
+import EV from './Error';
+import Converter, { Fallback, assertFallback, Conversion, isConversion, assertConversion } from './Converter';
 import * as presets from './presets';
+
+const InvalidArgument = class extends EV {};
+const InvalidResult = class extends EV {};
 
 /**
  * @namespace utils
@@ -67,6 +71,60 @@ export const tuple = (fns: Array<Conversion<any, any>>, initiator: Conversion<an
 	return (input: any) => {
 		const array = initiator(input);
 		return fns.map((fn, index) => fn(array[index]));
+	};
+};
+/**
+ * @memberof utils
+ * @description constrain variable to given variants
+ * @example
+ * const var123 = variants([1, 2, 3]);
+ * var123(1); // 1
+ * var123(2); // 2
+ * var123(3); // 3
+ * var123(4); // 1
+ *
+ * const var123WithCustomFallback = variant([1, 2, 3], () => 3);
+ * var123WithCustomFallback(4); // 3
+ *
+ * var123WithPoorFallback([1, 2, 3], () => 99);
+ * var123WithPoorFallback(4); // throws an Error
+ *
+ * const varABC = variant(['a', 'b'], (i) => ['a', 'b'][i], String);
+ * varABC('a'); // 'a'
+ * varABC('b'); // 'b'
+ * varABC(0); // 'a'
+ * varABC(1); // 'b'
+ *
+ * @param {Array<T>} values - valid values дшые
+ * @param {Fallback<T>} fallback - fallback value generator
+ * @param {Conversion<any, T>} conversion - input data conversion
+ * @returns {Conversion<any, T>}
+ */
+export const variant = <T = number>(
+	values: Array<T> = [],
+	fallback: Fallback<T> = () => values[0] as any,
+	conversion: Conversion<any, T> = presets.double.convert as any
+): Conversion<any, T> => {
+	assertConversion(conversion);
+	assertFallback(fallback);
+
+	if (!Array.isArray(values)) {
+		throw new InvalidArgument('variant values must be an array of allowed values', values);
+	}
+	values = values.map((value) => conversion(value));
+
+	return (input?: any) => {
+		const converted = conversion(input);
+		if (values.includes(converted)) {
+			return converted;
+		}
+
+		const fallbacked = fallback(input);
+		if (values.includes(fallbacked)) {
+			return fallbacked;
+		}
+
+		throw new InvalidResult('variant calculation error', input);
 	};
 };
 
