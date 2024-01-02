@@ -322,7 +322,7 @@ export const map = new Converter<Map<any, any>>((i): i is Map<any, any> => i ins
 	.register(isIterable, (i) => {
 		const result = new Map();
 		for (const item of i) {
-			if (typeof item === 'object' && item !== null && item[Symbol.iterator]) {
+			if (isIterable(item)) {
 				const [key, value] = item;
 				result.set(key, value);
 			}
@@ -340,7 +340,7 @@ export const weakmap = new Converter<WeakMap<any, any>>((i): i is WeakMap<any, a
 	.register(isIterable, (i) => {
 		const result = new WeakMap();
 		for (const item of i) {
-			if (typeof item === 'object' && item !== null && item[Symbol.iterator]) {
+			if (isIterable(item)) {
 				const [key, value] = item;
 				if ((typeof key === 'object' && key !== null) || typeof key === 'function') {
 					result.set(key, value);
