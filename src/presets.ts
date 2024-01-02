@@ -2,7 +2,7 @@ import Converter from './Converter';
 
 const isNull = (i: any): i is null => i === null;
 const isDate = (i: any): i is Date => i instanceof Date;
-const isIterable = (i: any): i is Iterable<any> => typeof i === 'object' && i !== null && i[Symbol.iterator];
+const isIterable = (i: any): i is Iterable<any> => typeof i === 'object' && i !== null && typeof i[Symbol.iterator] === 'function';
 
 /**
  * @namespace presets
