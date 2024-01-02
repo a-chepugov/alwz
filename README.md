@@ -620,3 +620,37 @@ tplNSB(['1', '2', '3']); // [1, '2', true]
 ```
 
 Returns **Conversion\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<any>>** 
+
+### variant
+
+constrain variable to given variants
+
+#### Parameters
+
+*   `values` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<T>** valid values дшые (optional, default `[]`)
+*   `fallback` **Fallback\<T>** fallback value generator (optional, default `()=>values[0]`)
+*   `conversion` **Conversion\<any, T>** input data conversion (optional, default `presets.double.convert`)
+
+#### Examples
+
+```javascript
+const var123 = variants([1, 2, 3]);
+var123(1); // 1
+var123(2); // 2
+var123(3); // 3
+var123(4); // 1
+
+const var123WithCustomFallback = variant([1, 2, 3], () => 3);
+var123WithCustomFallback(4); // 3
+
+var123WithPoorFallback([1, 2, 3], () => 99);
+var123WithPoorFallback(4); // throws an Error
+
+const varABC = variant(['a', 'b'], (i) => ['a', 'b'][i], String);
+varABC('a'); // 'a'
+varABC('b'); // 'b'
+varABC(0); // 'a'
+varABC(1); // 'b'
+```
+
+Returns **Conversion\<any, T>** 
