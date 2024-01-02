@@ -18,7 +18,10 @@ const isIterable = (i: any): i is Iterable<any> => typeof i === 'object' && i !=
  * boolean.convert([false, true]); // false
  * boolean.convert([123]); // true
  */
-export const boolean = new Converter<boolean>((i): i is boolean => typeof i === 'boolean', Boolean)
+export const boolean = new Converter<boolean>(
+	(i): i is boolean => typeof i === 'boolean',
+	Boolean
+)
 	.undefined(Boolean)
 	.number(Boolean)
 	.bigint(Boolean)
@@ -41,7 +44,10 @@ export const boolean = new Converter<boolean>((i): i is boolean => typeof i === 
  * number.convert([ [ [ 42 ] ] ]); // 42
  * number.convert(new Date('1970-01-01T00:00:00.999Z')); // 999
  */
-export const number = new Converter<number>((i): i is number => typeof i === 'number', Number)
+export const number = new Converter<number>(
+	(i): i is number => typeof i === 'number',
+	Number
+)
 	.undefined(Number)
 	.boolean(Number)
 	.bigint(Number)
@@ -209,7 +215,10 @@ export const double = new Converter<number>(
  * bigint.convert(Symbol.for('42')); // 42n
  * bigint.convert(new Date('1970-01-01T00:00:00.999Z')); // 999n
  */
-export const bigint = new Converter<bigint>((i): i is bigint => typeof i === 'bigint', () => BigInt(0))
+export const bigint = new Converter<bigint>(
+	(i): i is bigint => typeof i === 'bigint',
+	() => BigInt(0)
+)
 	.undefined(function(i) { return this.fallback(i); })
 	.boolean((i) => BigInt(i))
 	.number((i) => BigInt(Math.trunc(double.convert(i))))
@@ -232,7 +241,10 @@ export const bigint = new Converter<bigint>((i): i is bigint => typeof i === 'bi
  * string.convert(Symbol.for('42')); // '42'
  * string.convert(new Date('1970-01-01T00:00:00.999Z')); // '1970-01-01T00:00:00.999Z'
  */
-export const string = new Converter<string>((i): i is string => typeof i === 'string', String)
+export const string = new Converter<string>(
+	(i): i is string => typeof i === 'string',
+	String
+)
 	.undefined(() => '')
 	.boolean((i) => i ? ' ' : '')
 	.number((i) => i === i ? String(i) : '')
@@ -275,7 +287,10 @@ export const symbol = new Converter<symbol>(
  * array.convert(new Set([1, 2, 3])); // [1, 2, 3]
  * array.convert(new Map([[1, 2], [3, 4], [5, 6]])); // [[1, 2], [3, 4], [5, 6]]
  */
-export const array = new Converter<Array<any>>(Array.isArray, (i) => ([i]))
+export const array = new Converter<Array<any>>(
+	Array.isArray,
+	(i) => ([i])
+)
 	.undefined(() => [])
 	.boolean((i) => [i])
 	.number((i) => [i])
@@ -294,7 +309,9 @@ export const array = new Converter<Array<any>>(Array.isArray, (i) => ([i]))
  */
 
 // eslint-disable-next-line no-unused-vars
-export const fn = new Converter<(...args: any[]) => any>((i): i is (...args: any[]) => any => typeof i === 'function', (i) => () => i);
+export const fn = new Converter<(...args: any[]) => any>(
+	(i): i is (...args: any[]) => any => typeof i === 'function', (i) => () => i
+);
 
 /**
  * @memberof presets
@@ -303,7 +320,10 @@ export const fn = new Converter<(...args: any[]) => any>((i): i is (...args: any
  * date.convert([222, 333]); // Date('1970-01-01T00:00:00.222Z')
  * date.convert('abc'); // Date(NaN)
  */
-export const date = new Converter<Date>(isDate, () => new Date(NaN))
+export const date = new Converter<Date>(
+	isDate,
+	() => new Date(NaN)
+)
 	.undefined(function(i) { return this.fallback(i); })
 	.boolean((i) => new Date(Number(i)))
 	.number((i) => new Date(i))
@@ -318,7 +338,10 @@ export const date = new Converter<Date>(isDate, () => new Date(NaN))
  * @example
  * map.convert([ [true, 1], 2, '3']); // Map { [true, 1] }
  */
-export const map = new Converter<Map<any, any>>((i): i is Map<any, any> => i instanceof Map, () => new Map())
+export const map = new Converter<Map<any, any>>(
+	(i): i is Map<any, any> => i instanceof Map,
+	() => new Map()
+)
 	.register(isIterable, (i) => {
 		const result = new Map();
 		for (const item of i) {
@@ -336,7 +359,10 @@ export const map = new Converter<Map<any, any>>((i): i is Map<any, any> => i ins
  * @example
  * weakmap.convert([ [Boolean, 'bool'], [Number, 'num'], [String, 'str'], [true, 1], 2, '3']); // WeakMap { [Boolean, 'bool'], [Number, 'num'], [String, 'str'] }
  */
-export const weakmap = new Converter<WeakMap<any, any>>((i): i is WeakMap<any, any> => i instanceof WeakMap, () => new WeakMap())
+export const weakmap = new Converter<WeakMap<any, any>>(
+	(i): i is WeakMap<any, any> => i instanceof WeakMap,
+	() => new WeakMap()
+)
 	.register(isIterable, (i) => {
 		const result = new WeakMap();
 		for (const item of i) {
@@ -356,7 +382,10 @@ export const weakmap = new Converter<WeakMap<any, any>>((i): i is WeakMap<any, a
  * @example
  * set.convert([1, '2', 3]); // Set {1, "2", 3}
  */
-export const set = new Converter<Set<any>>((i): i is Set<any> => i instanceof Set, (i) => new Set().add(i))
+export const set = new Converter<Set<any>>(
+	(i): i is Set<any> => i instanceof Set,
+	(i) => new Set().add(i)
+)
 	.undefined(() => new Set())
 	.register(isNull, () => new Set())
 	.register(isIterable, (i) => new Set(i))
@@ -367,7 +396,10 @@ export const set = new Converter<Set<any>>((i): i is Set<any> => i instanceof Se
  * @example
  * weakset.convert([Boolean, Number, String, true, 2, '3']); // WeakSet { Boolean, Number, String }
  */
-export const weakset = new Converter<WeakSet<any>>((i): i is WeakSet<any> => i instanceof WeakSet, () => new WeakSet())
+export const weakset = new Converter<WeakSet<any>>(
+	(i): i is WeakSet<any> => i instanceof WeakSet,
+	() => new WeakSet()
+)
 	.register(isIterable, (i) => {
 		const result = new WeakSet();
 		for (const item of i) {
@@ -385,5 +417,8 @@ export const weakset = new Converter<WeakSet<any>>((i): i is WeakSet<any> => i i
  * promise.convert(Promise.resolve(1)); // Promise { 1 }
  * promise.convert(42); // Promise { 42 }
  */
-export const promise = new Converter<Promise<any>>((i): i is Promise<any> => i instanceof Promise, (i) => Promise.resolve(i));
+export const promise = new Converter<Promise<any>>(
+	(i): i is Promise<any> => i instanceof Promise,
+	(i) => Promise.resolve(i)
+);
 
