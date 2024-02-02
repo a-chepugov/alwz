@@ -2,7 +2,7 @@ import Converter from './Converter';
 
 const isNull = (i: any): i is null => i === null;
 const isDate = (i: any): i is Date => i instanceof Date;
-const isIterable = (i: any): i is Iterable<any> => typeof i === 'object' && i !== null && i[Symbol.iterator];
+const isIterable = (i: any): i is Iterable<any> => typeof i === 'object' && i !== null && typeof i[Symbol.iterator] === 'function';
 
 /**
  * @namespace presets
@@ -18,16 +18,18 @@ const isIterable = (i: any): i is Iterable<any> => typeof i === 'object' && i !=
  * boolean.convert([false, true]); // false
  * boolean.convert([123]); // true
  */
-export const boolean = new Converter<boolean>((i): i is boolean => typeof i === 'boolean', Boolean);
-boolean
-	.undefined(boolean.fallback)
+export const boolean = new Converter<boolean>(
+	(i): i is boolean => typeof i === 'boolean',
+	Boolean
+)
+	.undefined(Boolean)
 	.number(Boolean)
 	.bigint(Boolean)
 	.string(Boolean)
-	.symbol((i) => boolean.convert(string.convert(i)))
-	.register(isNull, boolean.fallback)
+	.symbol(function(i) { return this.convert(string.convert(i)); })
+	.register(isNull, Boolean)
 	.register(isDate, (i) => Boolean(i.getTime()))
-	.register(Array.isArray, (i) => boolean.convert(i[0]))
+	.register(Array.isArray, function(i) { return this.convert(i[0]); })
 ;
 
 /**
@@ -42,15 +44,17 @@ boolean
  * number.convert([ [ [ 42 ] ] ]); // 42
  * number.convert(new Date('1970-01-01T00:00:00.999Z')); // 999
  */
-export const number = new Converter<number>((i): i is number => typeof i === 'number', Number);
-number
+export const number = new Converter<number>(
+	(i): i is number => typeof i === 'number',
+	Number
+)
 	.undefined(Number)
 	.boolean(Number)
 	.bigint(Number)
 	.string(Number)
 	.symbol((i) => Number(string.convert(i)))
 	.register(isDate, (i) => i.getTime())
-	.register(Array.isArray, (i) => number.convert(i[0]))
+	.register(Array.isArray, function(i) { return this.convert(i[0]); })
 ;
 
 /**
@@ -144,33 +148,31 @@ export const [
 	],
 ]
 	.map(([min, max]) => {
-		const converter = new Converter<number>(
+		return new Converter<number>(
 			(i): i is number => typeof i === 'number' && Number.isInteger(i) && min <= i && i <= max,
 			() => 0
-		);
-		converter
-			.undefined(converter.fallback)
+		)
+			.undefined(function(i) { return this.fallback(i); })
 			.boolean(Number)
-			.number((i) => {
+			.number(function(i) {
 				if (i <= min) {
 					return min;
 				} else if (i >= max) {
 					return max;
 				} else {
-					if (Number.isFinite(i)) {
-						return Math.trunc(i);
+					if (Number.isNaN(i)) {
+						return this.fallback(i);
 					} else {
-						return converter.fallback();
+						return Math.trunc(i);
 					}
 				}
 			})
-			.bigint((i) => converter.convert(Number(i)))
-			.string((i) => converter.convert(Number(i)))
-			.symbol((i) => converter.convert(string.convert(i)))
-			.register(isNull, converter.fallback)
-			.register(isDate, (i) => converter.convert(i.getTime()))
-			.register(Array.isArray, (i) => converter.convert(i[0]));
-		return converter;
+			.bigint(function(i) { return this.convert(Number(i)); })
+			.string(function(i) { return this.convert(Number(i)); })
+			.symbol(function(i) { return this.convert(string.convert(i)); })
+			.register(isNull, function(i) { return this.fallback(i); })
+			.register(isDate, function(i) { return this.convert(i.getTime()); })
+			.register(Array.isArray, function(i) { return this.convert(i[0]); });
 	})
 ;
 
@@ -184,25 +186,28 @@ export const [
 export const double = new Converter<number>(
 	(i): i is number => typeof i === 'number' && Number.isFinite(i) && -Number.MAX_VALUE <= i && i <= Number.MAX_VALUE,
 	() => 0
-);
-double
-	.undefined(double.fallback)
+)
+	.undefined(function(i) { return this.fallback(i); })
 	.boolean(Number)
-	.number((i) => {
+	.number(function(i) {
 		if (i === Infinity) {
 			return Number.MAX_VALUE;
 		} else if (i === -Infinity) {
 			return -Number.MAX_VALUE;
 		} else {
-			return 0;
+			if (Number.isNaN(i)) {
+				return this.fallback(i);
+			} else {
+				return i;
+			}
 		}
 	})
-	.bigint((i) => double.convert(Number(i)))
-	.string((i) => double.convert(Number(i)))
-	.symbol((i) => double.convert(string.convert(i)))
-	.register(isNull, double.fallback)
-	.register(isDate, (i) => double.convert(i.getTime()))
-	.register(Array.isArray, (i) => double.convert(i[0]))
+	.bigint(function(i) { return this.convert(Number(i)); })
+	.string(function(i) { return this.convert(Number(i)); })
+	.symbol(function(i) { return this.convert(string.convert(i)); })
+	.register(isNull, function(i) { return this.fallback(i); })
+	.register(isDate, function(i) { return this.convert(i.getTime()); })
+	.register(Array.isArray, function(i) { return this.convert(i[0]); })
 ;
 
 /**
@@ -214,16 +219,18 @@ double
  * bigint.convert(Symbol.for('42')); // 42n
  * bigint.convert(new Date('1970-01-01T00:00:00.999Z')); // 999n
  */
-export const bigint = new Converter<bigint>((i): i is bigint => typeof i === 'bigint', () => BigInt(0));
-bigint
-	.undefined(bigint.fallback)
+export const bigint = new Converter<bigint>(
+	(i): i is bigint => typeof i === 'bigint',
+	() => BigInt(0)
+)
+	.undefined(function(i) { return this.fallback(i); })
 	.boolean((i) => BigInt(i))
 	.number((i) => BigInt(Math.trunc(double.convert(i))))
-	.string((i) => bigint.convert(Number(i)))
-	.symbol((i) => bigint.convert(string.convert(i)))
-	.register(isNull, bigint.fallback)
-	.register(isDate, (i) => bigint.convert(i.getTime()))
-	.register(Array.isArray, (i) => bigint.convert(i[0]))
+	.string(function(i) { return this.convert(Number(i)); })
+	.symbol(function(i) { return this.convert(string.convert(i)); })
+	.register(isNull, function(i) { return this.fallback(i); })
+	.register(isDate, function(i) { return this.convert(i.getTime()); })
+	.register(Array.isArray, function(i) { return this.convert(i[0]); })
 ;
 
 /**
@@ -238,23 +245,25 @@ bigint
  * string.convert(Symbol.for('42')); // '42'
  * string.convert(new Date('1970-01-01T00:00:00.999Z')); // '1970-01-01T00:00:00.999Z'
  */
-export const string = new Converter<string>((i): i is string => typeof i === 'string', String);
-string
+export const string = new Converter<string>(
+	(i): i is string => typeof i === 'string',
+	String
+)
 	.undefined(() => '')
 	.boolean((i) => i ? ' ' : '')
 	.number((i) => i === i ? String(i) : '')
 	.bigint(String)
 	.symbol((i) => Symbol.keyFor(i) || '')
 	.register(isNull, () => '')
-	.register(isDate, (i) => {
+	.register(isDate, function(i) {
 		const ts = i.getTime();
 		if (Number.isFinite(ts)) {
 			return i.toISOString();
 		} else {
-			return string.fallback('');
+			return new Date(0).toISOString();
 		}
 	})
-	.register(Array.isArray, (i) => string.convert(i[0]))
+	.register(Array.isArray, function(i) { return this.convert(i[0]); })
 ;
 
 /**
@@ -282,7 +291,10 @@ export const symbol = new Converter<symbol>(
  * array.convert(new Set([1, 2, 3])); // [1, 2, 3]
  * array.convert(new Map([[1, 2], [3, 4], [5, 6]])); // [[1, 2], [3, 4], [5, 6]]
  */
-export const array = new Converter<Array<any>>(Array.isArray, (i) => ([i]))
+export const array = new Converter<Array<any>>(
+	Array.isArray,
+	(i) => ([i])
+)
 	.undefined(() => [])
 	.boolean((i) => [i])
 	.number((i) => [i])
@@ -301,7 +313,9 @@ export const array = new Converter<Array<any>>(Array.isArray, (i) => ([i]))
  */
 
 // eslint-disable-next-line no-unused-vars
-export const fn = new Converter<(...args: any[]) => any>((i): i is (...args: any[]) => any => typeof i === 'function', (i) => () => i);
+export const fn = new Converter<(...args: any[]) => any>(
+	(i): i is (...args: any[]) => any => typeof i === 'function', (i) => () => i
+);
 
 /**
  * @memberof presets
@@ -310,15 +324,17 @@ export const fn = new Converter<(...args: any[]) => any>((i): i is (...args: any
  * date.convert([222, 333]); // Date('1970-01-01T00:00:00.222Z')
  * date.convert('abc'); // Date(NaN)
  */
-export const date = new Converter<Date>(isDate, () => new Date(NaN));
-date
-	.undefined(date.fallback)
+export const date = new Converter<Date>(
+	isDate,
+	() => new Date(NaN)
+)
+	.undefined(function(i) { return this.fallback(i); })
 	.boolean((i) => new Date(Number(i)))
 	.number((i) => new Date(i))
 	.bigint((i) => new Date(Number(i)))
 	.string((i) => new Date(i))
 	.symbol((i) => new Date(string.convert(i)))
-	.register(Array.isArray, (i) => date.convert(i[0]))
+	.register(Array.isArray, function(i) { return this.convert(i[0]); })
 ;
 
 /**
@@ -326,11 +342,14 @@ date
  * @example
  * map.convert([ [true, 1], 2, '3']); // Map { [true, 1] }
  */
-export const map = new Converter<Map<any, any>>((i): i is Map<any, any> => i instanceof Map, () => new Map())
+export const map = new Converter<Map<any, any>>(
+	(i): i is Map<any, any> => i instanceof Map,
+	() => new Map()
+)
 	.register(isIterable, (i) => {
 		const result = new Map();
 		for (const item of i) {
-			if (typeof item === 'object' && item !== null && item[Symbol.iterator]) {
+			if (isIterable(item)) {
 				const [key, value] = item;
 				result.set(key, value);
 			}
@@ -344,11 +363,14 @@ export const map = new Converter<Map<any, any>>((i): i is Map<any, any> => i ins
  * @example
  * weakmap.convert([ [Boolean, 'bool'], [Number, 'num'], [String, 'str'], [true, 1], 2, '3']); // WeakMap { [Boolean, 'bool'], [Number, 'num'], [String, 'str'] }
  */
-export const weakmap = new Converter<WeakMap<any, any>>((i): i is WeakMap<any, any> => i instanceof WeakMap, () => new WeakMap())
+export const weakmap = new Converter<WeakMap<any, any>>(
+	(i): i is WeakMap<any, any> => i instanceof WeakMap,
+	() => new WeakMap()
+)
 	.register(isIterable, (i) => {
 		const result = new WeakMap();
 		for (const item of i) {
-			if (typeof item === 'object' && item !== null && item[Symbol.iterator]) {
+			if (isIterable(item)) {
 				const [key, value] = item;
 				if ((typeof key === 'object' && key !== null) || typeof key === 'function') {
 					result.set(key, value);
@@ -364,7 +386,10 @@ export const weakmap = new Converter<WeakMap<any, any>>((i): i is WeakMap<any, a
  * @example
  * set.convert([1, '2', 3]); // Set {1, "2", 3}
  */
-export const set = new Converter<Set<any>>((i): i is Set<any> => i instanceof Set, (i) => new Set().add(i))
+export const set = new Converter<Set<any>>(
+	(i): i is Set<any> => i instanceof Set,
+	(i) => new Set().add(i)
+)
 	.undefined(() => new Set())
 	.register(isNull, () => new Set())
 	.register(isIterable, (i) => new Set(i))
@@ -375,7 +400,10 @@ export const set = new Converter<Set<any>>((i): i is Set<any> => i instanceof Se
  * @example
  * weakset.convert([Boolean, Number, String, true, 2, '3']); // WeakSet { Boolean, Number, String }
  */
-export const weakset = new Converter<WeakSet<any>>((i): i is WeakSet<any> => i instanceof WeakSet, () => new WeakSet())
+export const weakset = new Converter<WeakSet<any>>(
+	(i): i is WeakSet<any> => i instanceof WeakSet,
+	() => new WeakSet()
+)
 	.register(isIterable, (i) => {
 		const result = new WeakSet();
 		for (const item of i) {
@@ -393,5 +421,8 @@ export const weakset = new Converter<WeakSet<any>>((i): i is WeakSet<any> => i i
  * promise.convert(Promise.resolve(1)); // Promise { 1 }
  * promise.convert(42); // Promise { 42 }
  */
-export const promise = new Converter<Promise<any>>((i): i is Promise<any> => i instanceof Promise, (i) => Promise.resolve(i));
+export const promise = new Converter<Promise<any>>(
+	(i): i is Promise<any> => i instanceof Promise,
+	(i) => Promise.resolve(i)
+);
 
