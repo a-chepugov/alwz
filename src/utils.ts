@@ -73,6 +73,62 @@ export const tuple = (fns: Array<Conversion<any, any>>, initiator: Conversion<an
 		return fns.map((fn, index) => fn(array[index]));
 	};
 };
+
+/**
+ * @memberof utils
+ * @description constrain variable value within a given range
+ * @example
+ * const range37 = range(3, 7);
+ * range37(1); // 3
+ * range37(5); // 5
+ * range37(9); // 7
+ *
+ * const range37WithCustomFallback = range(3, 7, () => -1);
+ * range37WithCustomFallback(1); // -1
+ * range37WithCustomFallback(5); // 5
+ * range37WithCustomFallback(9); // -1
+ *
+ * const rangeString = range('k', 'w', undefined, String);
+ * rangeString('a'); // k
+ * rangeString('n'); // n
+ * rangeString('z'); // w
+ *
+ * @param {T} lower - lower range border
+ * @param {T} upper - upper range border
+ * @param {Fallback<T>} fallback - fallback generator
+ * @param {Conversion<any, T>} conversion - input data conversion
+ * @returns {Conversion<any, T>}
+ */
+export const range = <T = number>(
+	lower: T = -Number.MAX_VALUE as any,
+	upper: T = Number.MAX_VALUE as any,
+	fallback?: Fallback<T>,
+	conversion: Conversion<any, T> = presets.double.convert as any
+): Conversion<any, T> => {
+	assertConversion(conversion);
+
+	lower = conversion(lower);
+	upper = conversion(upper);
+
+	const fallbackActual = fallback === undefined
+		? (input?: any) => {
+			const converted = conversion(input);
+			return upper <= converted ? upper : lower;
+		}
+		: fallback;
+
+	assertFallback(fallbackActual);
+
+	return (input?: any) => {
+		const converted = conversion(input);
+		if ((lower <= converted) && (converted <= upper)) {
+			return converted;
+		}
+
+		return fallbackActual(input);
+	};
+};
+
 /**
  * @memberof utils
  * @description constrain variable to given variants
