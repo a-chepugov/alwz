@@ -160,10 +160,10 @@ export const [
 				} else if (i >= max) {
 					return max;
 				} else {
-					if (Number.isFinite(i)) {
-						return Math.trunc(i);
-					} else {
+					if (Number.isNaN(i)) {
 						return this.fallback(i);
+					} else {
+						return Math.trunc(i);
 					}
 				}
 			})
@@ -189,13 +189,17 @@ export const double = new Converter<number>(
 )
 	.undefined(function(i) { return this.fallback(i); })
 	.boolean(Number)
-	.number((i) => {
+	.number(function(i) {
 		if (i === Infinity) {
 			return Number.MAX_VALUE;
 		} else if (i === -Infinity) {
 			return -Number.MAX_VALUE;
 		} else {
-			return 0;
+			if (Number.isNaN(i)) {
+				return this.fallback(i);
+			} else {
+				return i;
+			}
 		}
 	})
 	.bigint(function(i) { return this.convert(Number(i)); })
