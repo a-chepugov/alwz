@@ -140,7 +140,7 @@ export const range = <T = number>(
  * @memberof utils
  * @description constrain variable to given variants
  * @example
- * const var123 = variants([1, 2, 3]);
+ * const var123 = variant([1, 2, 3]);
  * var123(1); // 1
  * var123(2); // 2
  * var123(3); // 3
