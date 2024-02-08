@@ -43,11 +43,11 @@ import * as presets from './presets';
  *
  * @example <caption>create tuples</caption>
  * const tuple = a.utils.tuple;
- * const Pair = tuple([a.uint, a.uint]);
- * Pair(['abc', 3.5, 100]); // [0, 3]
+ * const PairOfUint = tuple([a.uint, a.uint]);
+ * PairOfUint(['abc', 3.5, 100]); // [0, 3]
  *
- * const NumbersPair = tuple([Number, Number]);
- * NumbersPair(['abc', 3.5, 100]); // [NaN, 3.5]
+ * const PairOfNumbers = tuple([Number, Number]);
+ * PairOfNumbers(['abc', 3.5, 100]); // [NaN, 3.5]
  */
 
 /**
