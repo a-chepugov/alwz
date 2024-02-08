@@ -7,7 +7,7 @@ describe('utils', () => {
 
 		const array = utils.array;
 
-		test('throw on invalid convert', () => {
+		test('throw on invalid conversion', () => {
 			assert.throws(() => array(null));
 		});
 
@@ -40,11 +40,11 @@ describe('utils', () => {
 
 		const tuple = utils.tuple;
 
-		test('throw on invalid converts', () => {
+		test('throw on invalid conversions', () => {
 			assert.throws(() => tuple(null));
 		});
 
-		test('throw on invalid convert', () => {
+		test('throw on invalid conversion', () => {
 			assert.throws(() => tuple([null]));
 		});
 
