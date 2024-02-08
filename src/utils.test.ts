@@ -70,6 +70,55 @@ describe('utils', () => {
 
 	});
 
+	describe('range', () => {
+
+		const range = utils.range;
+
+		test('throw on invalid fallback', () => {
+			assert.throws(() => range(1, 2, null));
+		});
+
+		test('throw on invalid conversion', () => {
+			assert.throws(() => range(1, 2, Number,  null));
+		});
+
+		const range37 = range(3, 7);
+		const range37WithCustomFallback = range(3, 7, () => -1);
+		const rangeString = range('k', 'w', undefined, String);
+
+		const sets = [
+			{ work: range37, input: 3, output: 3 },
+			{ work: range37, input: 5, output: 5 },
+			{ work: range37, input: '5', output: 5 },
+			{ work: range37, input: 7, output: 7 },
+			{ work: range37, input: -Infinity, output: 3 },
+			{ work: range37, input: 1, output: 3 },
+			{ work: range37, input: undefined, output: 3 },
+			{ work: range37, input: null, output: 3 },
+			{ work: range37, input: NaN, output: 3 },
+			{ work: range37, input: 9, output: 7 },
+			{ work: range37, input: Infinity, output: 7 },
+
+			{ work: range37WithCustomFallback , input: 1, output: -1 },
+			{ work: range37WithCustomFallback , input: 9, output: -1 },
+
+			{ work: rangeString, input: 'a', output: 'k' },
+			{ work: rangeString, input: 'k', output: 'k' },
+			{ work: rangeString, input: 'n', output: 'n' },
+			{ work: rangeString, input: 'w', output: 'w' },
+			{ work: rangeString, input: 'z', output: 'w' },
+		];
+
+		for(let i = 0; i < sets.length; i++) {
+			const { work, input, output } = sets[i];
+			const name = `${i}: < ${String(input)} > gives ${String(output)}`;
+			test(name, () => {
+				assert.deepStrictEqual(work(input), output);
+			});
+		}
+
+	});
+
 	describe('variant', () => {
 
 		const variant = utils.variant;
