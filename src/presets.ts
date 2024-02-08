@@ -152,7 +152,7 @@ export const [
 			(i): i is number => typeof i === 'number' && Number.isInteger(i) && min <= i && i <= max,
 			() => 0
 		)
-			.undefined(function(i) { return this.fallback(i); })
+			.undefined(() => 0)
 			.boolean(Number)
 			.number(function(i) {
 				if (i <= min) {
@@ -161,7 +161,7 @@ export const [
 					return max;
 				} else {
 					if (Number.isNaN(i)) {
-						return this.fallback(i);
+						return 0;
 					} else {
 						return Math.trunc(i);
 					}
@@ -170,7 +170,7 @@ export const [
 			.bigint(function(i) { return this.convert(Number(i)); })
 			.string(function(i) { return this.convert(Number(i)); })
 			.symbol(function(i) { return this.convert(string.convert(i)); })
-			.register(isNull, function(i) { return this.fallback(i); })
+			.register(isNull, () => 0)
 			.register(isDate, function(i) { return this.convert(i.getTime()); })
 			.register(Array.isArray, function(i) { return this.convert(i[0]); });
 	})
@@ -187,7 +187,7 @@ export const double = new Converter<number>(
 	(i): i is number => typeof i === 'number' && Number.isFinite(i) && -Number.MAX_VALUE <= i && i <= Number.MAX_VALUE,
 	() => 0
 )
-	.undefined(function(i) { return this.fallback(i); })
+	.undefined(() => 0)
 	.boolean(Number)
 	.number(function(i) {
 		if (i === Infinity) {
@@ -196,7 +196,7 @@ export const double = new Converter<number>(
 			return -Number.MAX_VALUE;
 		} else {
 			if (Number.isNaN(i)) {
-				return this.fallback(i);
+				return 0;
 			} else {
 				return i;
 			}
@@ -205,7 +205,7 @@ export const double = new Converter<number>(
 	.bigint(function(i) { return this.convert(Number(i)); })
 	.string(function(i) { return this.convert(Number(i)); })
 	.symbol(function(i) { return this.convert(string.convert(i)); })
-	.register(isNull, function(i) { return this.fallback(i); })
+	.register(isNull, () => 0)
 	.register(isDate, function(i) { return this.convert(i.getTime()); })
 	.register(Array.isArray, function(i) { return this.convert(i[0]); })
 ;
@@ -223,12 +223,12 @@ export const bigint = new Converter<bigint>(
 	(i): i is bigint => typeof i === 'bigint',
 	() => BigInt(0)
 )
-	.undefined(function(i) { return this.fallback(i); })
+	.undefined(() => BigInt(0))
 	.boolean((i) => BigInt(i))
 	.number((i) => BigInt(Math.trunc(double.convert(i))))
 	.string(function(i) { return this.convert(Number(i)); })
 	.symbol(function(i) { return this.convert(string.convert(i)); })
-	.register(isNull, function(i) { return this.fallback(i); })
+	.register(isNull, () => BigInt(0))
 	.register(isDate, function(i) { return this.convert(i.getTime()); })
 	.register(Array.isArray, function(i) { return this.convert(i[0]); })
 ;
@@ -328,7 +328,7 @@ export const date = new Converter<Date>(
 	isDate,
 	() => new Date(NaN)
 )
-	.undefined(function(i) { return this.fallback(i); })
+	.undefined(() => new Date(NaN))
 	.boolean((i) => new Date(Number(i)))
 	.number((i) => new Date(i))
 	.bigint((i) => new Date(Number(i)))
