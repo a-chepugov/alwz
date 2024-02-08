@@ -678,6 +678,7 @@ var123(1); // 1
 var123(2); // 2
 var123(3); // 3
 var123(4); // 1
+var123(-5); // 1
 
 const var123WithCustomFallback = variant([1, 2, 3], () => -1);
 var123WithCustomFallback(4); // -1

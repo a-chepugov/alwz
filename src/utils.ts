@@ -3,7 +3,6 @@ import Converter, { Fallback, assertFallback, Conversion, isConversion, assertCo
 import * as presets from './presets';
 
 const InvalidArgument = class extends EV {};
-const InvalidResult = class extends EV {};
 
 /**
  * @namespace utils
