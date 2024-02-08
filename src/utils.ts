@@ -175,12 +175,7 @@ export const variant = <T = number>(
 			return converted;
 		}
 
-		const fallbacked = fallback(input);
-		if (values.includes(fallbacked)) {
-			return fallbacked;
-		}
-
-		throw new InvalidResult('variant calculation error', input);
+		return fallback(input);
 	};
 };
 

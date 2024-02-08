@@ -22,6 +22,8 @@ describe('utils', () => {
 			{ input: null, output: [] },
 			{ input: [], output: [] },
 			{ input: [true, 2, '3', {}], output: [1, 2, 3, NaN] },
+			// eslint-disable-next-line no-sparse-arrays
+			{ input: [, 1, undefined, 2, null, 3], output: [, 1, NaN, 2, 0, 3] },
 		];
 
 		for(let i = 0; i < sets.length; i++) {
