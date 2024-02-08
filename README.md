@@ -666,7 +666,7 @@ constrain variable to given variants
 
 #### Parameters
 
-*   `values` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<T>** valid values list (optional, default `[]`)
+*   `values` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<T>** valid values list
 *   `fallback` **Fallback\<T>** fallback value generator (optional, default `()=>values[0]`)
 *   `conversion` **Conversion\<any, T>** input data conversion (optional, default `presets.double.convert`)
 

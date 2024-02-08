@@ -167,7 +167,7 @@ export const range = <T = number>(
  * @returns {Conversion<any, T>}
  */
 export const variant = <T = number>(
-	values: Array<T> = [],
+	values: Array<T>,
 	fallback: Fallback<T> = () => values[0] as any,
 	conversion: Conversion<any, T> = presets.double.convert as any
 ): Conversion<any, T> => {
