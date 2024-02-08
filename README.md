@@ -621,6 +621,38 @@ tplNSB(['1', '2', '3']); // [1, '2', true]
 
 Returns **Conversion\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<any>>** 
 
+### range
+
+constrain variable value within a given range
+
+#### Parameters
+
+*   `lower` **T** lower range border (optional, default `-Number.MAX_VALUE`)
+*   `upper` **T** upper range border (optional, default `Number.MAX_VALUE`)
+*   `fallback` **Fallback\<T>** fallback generator
+*   `conversion` **Conversion\<any, T>** input data conversion (optional, default `presets.double.convert`)
+
+#### Examples
+
+```javascript
+const range37 = range(3, 7);
+range37(1); // 3
+range37(5); // 5
+range37(9); // 7
+
+const range37WithCustomFallback = range(3, 7, () => -1);
+range37WithCustomFallback(1); // -1
+range37WithCustomFallback(5); // 5
+range37WithCustomFallback(9); // -1
+
+const rangeString = range('k', 'w', undefined, String);
+rangeString('a'); // k
+rangeString('n'); // n
+rangeString('z'); // w
+```
+
+Returns **Conversion\<any, T>** 
+
 ### variant
 
 constrain variable to given variants
