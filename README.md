@@ -585,8 +585,8 @@ constrain data to an array elements of a given type
 
 #### Parameters
 
-*   `fn` **Conversion\<any, T>** 
-*   `initiator` **Conversion\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<any>>**  (optional, default `presets.array.convert`)
+*   `conversion` **Conversion\<any, T>** item conversion
+*   `initiator` **Conversion\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<any>>** input data initial conversion (optional, default `presets.array.convert`)
 
 #### Examples
 
@@ -597,6 +597,13 @@ numArray([]); // []
 numArray([true, 2, "3", {}]); // [1, 2, 3, NaN]
 ```
 
+sparse arrays behavior
+
+```javascript
+// Be aware of sparse arrays behavior - conversion is not performed for empty items
+numArray[1, , 3] // [1, , 3]
+```
+
 Returns **Conversion\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<T>>** 
 
 ### tuple
@@ -605,18 +612,18 @@ constrain data to a tuple with given types
 
 #### Parameters
 
-*   `fns` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Conversion\<any, any>>** 
-*   `initiator` **Conversion\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<any>>**  (optional, default `presets.array.convert`)
+*   `conversions` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Conversion\<any, any>>** tuple elemets conversions
+*   `initiator` **Conversion\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<any>>** input data initial conversion (optional, default `presets.array.convert`)
 
 #### Examples
 
 ```javascript
-const tplNSB = tuple(Number, String, Boolean);
-tplNSB(); // [NaN, 'undefined', false]
-tplNSB(null); // [NaN, 'undefined', false]
-tplNSB([]); // [NaN, '', false]
-tplNSB('5'); // [5, 'undefined', false]
-tplNSB(['1', '2', '3']); // [1, '2', true]
+const tupleNumStrBool = tuple([Number, String, Boolean]);
+tupleNumStrBool(); // [NaN, 'undefined', false]
+tupleNumStrBool(null); // [NaN, 'undefined', false]
+tupleNumStrBool([]); // [NaN, '', false]
+tupleNumStrBool('5'); // [5, 'undefined', false]
+tupleNumStrBool(['1', '2', '3']); // [1, '2', true]
 ```
 
 Returns **Conversion\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<any>>** 
@@ -629,7 +636,7 @@ constrain variable value within a given range
 
 *   `lower` **T** lower range border (optional, default `-Number.MAX_VALUE`)
 *   `upper` **T** upper range border (optional, default `Number.MAX_VALUE`)
-*   `fallback` **Fallback\<T>** fallback generator
+*   `fallback` **Fallback\<T>** fallback value generator
 *   `conversion` **Conversion\<any, T>** input data conversion (optional, default `presets.double.convert`)
 
 #### Examples
@@ -659,7 +666,7 @@ constrain variable to given variants
 
 #### Parameters
 
-*   `values` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<T>** valid values дшые (optional, default `[]`)
+*   `values` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<T>** valid values list (optional, default `[]`)
 *   `fallback` **Fallback\<T>** fallback value generator (optional, default `()=>values[0]`)
 *   `conversion` **Conversion\<any, T>** input data conversion (optional, default `presets.double.convert`)
 
@@ -672,11 +679,13 @@ var123(2); // 2
 var123(3); // 3
 var123(4); // 1
 
-const var123WithCustomFallback = variant([1, 2, 3], () => 3);
-var123WithCustomFallback(4); // 3
+const var123WithCustomFallback = variant([1, 2, 3], () => -1);
+var123WithCustomFallback(4); // -1
 
-var123WithPoorFallback([1, 2, 3], () => 99);
-var123WithPoorFallback(4); // throws an Error
+var123WithStrictFallback([1, 2, 3], () => {
+  throw new Error('invalid input');
+});
+var123WithStrictFallback(4); // throws an Error
 
 const varABC = variant(['a', 'b'], (i) => ['a', 'b'][i], String);
 varABC('a'); // 'a'
