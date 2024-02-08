@@ -24,6 +24,8 @@ describe('utils', () => {
 			{ input: [true, 2, '3', {}], output: [1, 2, 3, NaN] },
 			// eslint-disable-next-line no-sparse-arrays
 			{ input: [, 1, undefined, 2, null, 3], output: [, 1, NaN, 2, 0, 3] },
+			// eslint-disable-next-line no-sparse-arrays
+			{ input: [1, , 3], output: [1, , 3] },
 		];
 
 		for(let i = 0; i < sets.length; i++) {
@@ -52,7 +54,7 @@ describe('utils', () => {
 			assert.throws(() => tuple([Number, String], null));
 		});
 
-		const tplNSB = tuple([Number, String, Boolean]);
+		const tupleNumStrBool = tuple([Number, String, Boolean]);
 
 		const sets = [
 			{ input: undefined, output: [NaN, 'undefined', false] },
@@ -66,7 +68,7 @@ describe('utils', () => {
 			const { input, output } = sets[i];
 			const name = `${i}: < ${String(input)} > gives ${String(output)}`;
 			test(name, () => {
-				assert.deepStrictEqual(tplNSB(input), output);
+				assert.deepStrictEqual(tupleNumStrBool(input), output);
 			});
 		}
 
@@ -138,22 +140,22 @@ describe('utils', () => {
 		});
 
 		const var123 = variant([1, 2, 3]);
-		const var123WithCustomFallback = variant([1, 2, 3], () => 3);
+		const var123WithCustomFallback = variant([1, 2, 3], () => -1);
 		const varABC = variant(['a', 'b'], (i) => ['a', 'b'][i], String);
-		const var123WithPoorFallback = variant([1, 2, 3], () => 99);
 
 		const sets = [
 			{ work: var123, input: 1, output: 1 },
 			{ work: var123, input: '2', output: 2 },
 			{ work: var123, input: [3], output: 3 },
 			{ work: var123, input: 4, output: 1 },
+			{ work: var123, input: -5, output: 1 },
 			{ work: var123, input: undefined, output: 1 },
 			{ work: var123, input: null, output: 1 },
 			{ work: var123, input: NaN, output: 1 },
 			{ work: var123, input: -Infinity, output: 1 },
 			{ work: var123, input: Infinity, output: 1 },
 
-			{ work: var123WithCustomFallback, input: 4, output: 3 },
+			{ work: var123WithCustomFallback, input: 4, output: -1 },
 
 			{ work: varABC, input: 'a', output: 'a' },
 			{ work: varABC, input: 'b', output: 'b' },
@@ -169,8 +171,12 @@ describe('utils', () => {
 			});
 		}
 
-		test('throw on invalid fallback', () => {
-			assert.throws(() => var123WithPoorFallback(4));
+		const var123WithStrictFallback = variant([1, 2, 3], () => {
+			throw new Error('invalid input');
+		});
+
+		test('variant with throw on fallback', () => {
+			assert.throws(() => var123WithStrictFallback(4));
 		});
 
 	});
