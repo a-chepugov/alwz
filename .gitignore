@@ -1,8 +1,8 @@
 .git
 .idea
-coverage
-ignore
-node_modules
-doc
-build
-lib
+/coverage
+/ignore
+/node_modules
+/doc
+/build
+/lib
