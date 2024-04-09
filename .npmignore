@@ -5,6 +5,7 @@ docs
 ignore
 node_modules
 src
+tests
 .editorconfig
 .eslintignore
 .eslintrc.yml
