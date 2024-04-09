@@ -136,6 +136,7 @@ export const converters = new Aggregator()
 	.register('symbol', presets.symbol)
 	.register('fn', presets.fn)
 	.register('date', presets.date)
+	.register('object', presets.object)
 	.register('array', presets.array)
 	.register('map', presets.map)
 	.register('weakmap', presets.weakmap)
@@ -187,6 +188,7 @@ export const string = presets.string.convert;
 export const symbol = presets.symbol.convert;
 export const fn = presets.fn.convert;
 export const date = presets.date.convert;
+export const object = presets.object.convert;
 export const array = presets.array.convert;
 export const map = presets.map.convert;
 export const weakmap = presets.weakmap.convert;
