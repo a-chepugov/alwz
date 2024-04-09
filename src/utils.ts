@@ -1,6 +1,8 @@
 import EV from './Error';
-import Converter, { Fallback, assertFallback, Conversion, isConversion, assertConversion } from './Converter';
+import Converter, { Fallback, assertFallback, isConversion, assertConversion } from './Converter';
 import * as presets from './presets';
+
+type Conversion<INPUT, OUTPUT> = (input: INPUT) => OUTPUT;
 
 const InvalidArgument = class extends EV {};
 
@@ -28,16 +30,16 @@ const InvalidArgument = class extends EV {};
  * @returns {Conversion<any, Array<T>>}
  */
 export const array = <T>(
-	conversion: Conversion<any, T>,
-	initiator: Conversion<any, Array<any>> = presets.array.convert
-): Conversion<any, Array<T>> => {
+	conversion: Conversion<unknown, T>,
+	initiator: Conversion<unknown, Array<unknown>> = presets.array.convert
+): Conversion<unknown, Array<T>> => {
 	assertConversion(conversion);
 
 	if (!isConversion(initiator)) {
 		throw new Converter.InvalidConversionFunction('initiator must be a function', initiator);
 	}
 
-	return (input: any) => {
+	return (input?: unknown) => {
 		return initiator(input).map(conversion);
 	};
 };
@@ -58,9 +60,9 @@ export const array = <T>(
  * @returns {Conversion<any, Array<any>>}
  */
 export const tuple = (
-	conversions: Array<Conversion<any, any>>,
-	initiator: Conversion<any, Array<any>> = presets.array.convert
-): Conversion<any, Array<any>> => {
+	conversions: Array<Conversion<unknown, unknown>>,
+	initiator: Conversion<unknown, Array<unknown>> = presets.array.convert
+): Conversion<unknown, Array<unknown>> => {
 	if (!Array.isArray(conversions)) {
 		throw new Converter.InvalidConversionFunction('first argument must be an array', conversions);
 	}
@@ -75,7 +77,7 @@ export const tuple = (
 		throw new Converter.InvalidConversionFunction('initiator must be a function', initiator);
 	}
 
-	return (input: any) => {
+	return (input?: unknown) => {
 		const array = initiator(input);
 		return conversions.map((fn, index) => fn(array[index]));
 	};
@@ -107,18 +109,18 @@ export const tuple = (
  * @returns {Conversion<any, T>}
  */
 export const range = <T = number>(
-	lower: T = -Number.MAX_VALUE as any,
-	upper: T = Number.MAX_VALUE as any,
+	lower: T = -Number.MAX_VALUE as T,
+	upper: T = Number.MAX_VALUE as T,
 	fallback?: Fallback<T>,
-	conversion: Conversion<any, T> = presets.double.convert as any
-): Conversion<any, T> => {
+	conversion: Conversion<unknown, T> = presets.double.convert as Conversion<unknown, T>
+): Conversion<unknown, T> => {
 	assertConversion(conversion);
 
 	lower = conversion(lower);
 	upper = conversion(upper);
 
 	const fallbackActual = fallback === undefined
-		? (input?: any) => {
+		? (input?: unknown) => {
 			const converted = conversion(input);
 			return upper <= converted ? upper : lower;
 		}
@@ -126,7 +128,7 @@ export const range = <T = number>(
 
 	assertFallback(fallbackActual);
 
-	return (input?: any) => {
+	return (input?: unknown) => {
 		const converted = conversion(input);
 		if ((lower <= converted) && (converted <= upper)) {
 			return converted;
@@ -168,9 +170,9 @@ export const range = <T = number>(
  */
 export const variant = <T = number>(
 	values: Array<T>,
-	fallback: Fallback<T> = () => values[0] as any,
-	conversion: Conversion<any, T> = presets.double.convert as any
-): Conversion<any, T> => {
+	fallback: Fallback<T> = () => values[0] as T,
+	conversion: Conversion<unknown, T> = presets.double.convert as Conversion<unknown, T>
+): Conversion<unknown, T> => {
 	assertConversion(conversion);
 	assertFallback(fallback);
 
@@ -179,7 +181,7 @@ export const variant = <T = number>(
 	}
 	values = values.map((value) => conversion(value));
 
-	return (input?: any) => {
+	return (input?: unknown) => {
 		const converted = conversion(input);
 		if (values.includes(converted)) {
 			return converted;
