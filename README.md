@@ -14,7 +14,7 @@ import * as a from 'alwz';
 const a = require('alwz');
 ```
 
-## Predefined
+## Cast
 
 *   **See**: [presets](#presets)
 
@@ -23,14 +23,14 @@ convert data with presetted converters
 ### Examples
 
 ```javascript
-a.boolean([false, true]); // false
 a.byte('3'); // 3
 a.short(false); // 0
 a.int(true); // 1
-a.long(NaN); // 0
 a.uint(Infinity); // 4294967295
+a.long(NaN); // 0
+a.long(['1', '2', '3']); // 1 | ['1','2','3'] => '1' => 1
 a.array('abc'); // ['abc']
-a.array(['abc', 'def', 'ghi']); // ['abc', 'def', 'ghi']
+a.array([123, 'abc', {}, Math.max]); // [123, 'abc', {}, Math.max]
 ```
 
 ## Utils
@@ -329,7 +329,7 @@ string.convert(new Date('1970-01-01T00:00:00.999Z')); // '1970-01-01T00:00:00.99
 symbol.convert(false); // Symbol('')
 symbol.convert(42.5); // Symbol('42.5')
 symbol.convert('42.5'); // Symbol('42.5')
-symbol.convert([1.5, 2, 3]); Symbol('1.5')
+symbol.convert([1.5, 2, 3]); // Symbol('1.5')
 symbol.convert(new Date('1970-01-01T00:00:00.999Z')); // Symbol('1970-01-01T00:00:00.999Z')
 ```
 
@@ -431,7 +431,7 @@ converts input data to specific type
 
 ### Parameters
 
-*   `is` **IS\<T>** initial input data type checker. determines if any conversion is necessary
+*   `is` **IS\<T>** initial input data type checker(predicate). determines if any conversion is necessary
 *   `fallback` **Fallback\<T>** fallback value generator. runs if none of the available conversions are suitable
 
 ### Examples
@@ -504,7 +504,7 @@ adds conversion function for `INPUT` type
 
 #### Parameters
 
-*   `is` **IS\<INPUT>** input data type checker, determines if input can be processed by `conversion`
+*   `is` **IS\<INPUT>** input data type checker(predicate), determines if input can be processed by `conversion`
 *   `conversion` **Conversion\<INPUT, T>** `INPUT` to `T` conversion function
 
 ### unregister
@@ -513,7 +513,7 @@ removes conversion for `INPUT` type
 
 #### Parameters
 
-*   `is` **IS\<INPUT>** input type checker
+*   `is` **IS\<INPUT>** input type checker(predicate)
 
 ### undefined
 

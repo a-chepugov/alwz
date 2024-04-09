@@ -10,18 +10,18 @@ import * as presets from './presets';
  */
 
 /**
- * @name Predefined
+ * @name Cast
  * @see {@link presets presets}
  * @description convert data with presetted converters
  * @example
- * a.boolean([false, true]); // false
  * a.byte('3'); // 3
  * a.short(false); // 0
  * a.int(true); // 1
- * a.long(NaN); // 0
  * a.uint(Infinity); // 4294967295
+ * a.long(NaN); // 0
+ * a.long(['1', '2', '3']); // 1 | ['1','2','3'] => '1' => 1
  * a.array('abc'); // ['abc']
- * a.array(['abc', 'def', 'ghi']); // ['abc', 'def', 'ghi']
+ * a.array([123, 'abc', {}, Math.max]); // [123, 'abc', {}, Math.max]
  */
 
 /**
