@@ -191,3 +191,37 @@ export const variant = <T = number>(
 	};
 };
 
+/**
+ * @memberof utils
+ * @description cast data into an object with a given schema
+ * @param {Record<string, Conversion<any, T>>} schema
+ * @param {Conversion<any, T>} conversion - input data conversion
+ * @returns {Conversion<any, T>}
+ */
+export const object = <T extends object, Keys extends keyof T>(
+	schema: { [key in Keys]: Conversion<any, T[key]> },
+	conversion: Conversion<any, any> = presets.object.convert as any
+): Conversion<any, T> => {
+	if (typeof schema !== 'object' || schema === null) {
+		throw new InvalidArgument('schema must must be an object', schema);
+	}
+
+	for (const key in schema) {
+		const conversion = schema[key] as Conversion<any, any>;
+		assertConversion(conversion);
+	}
+
+	assertConversion(conversion);
+
+	return (input: any) => {
+		const result = {} as T;
+		const source = conversion(input);
+
+		for (const key in schema) {
+			const type = schema[key] as Conversion<any, any>;
+			result[key] = type(source?.[key]);
+		}
+		return result;
+	};
+};
+
