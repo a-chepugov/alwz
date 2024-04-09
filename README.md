@@ -366,6 +366,19 @@ date.convert([222, 333]); // Date('1970-01-01T00:00:00.222Z')
 date.convert('abc'); // Date(NaN)
 ```
 
+### object
+
+#### Examples
+
+```javascript
+object.convert(undefined); // {}
+object.convert(null); // {}
+object.convert(false); // Boolean { false }
+object.convert(1); // Number { 1 }
+object.convert('2'); // String { 2 }
+object.convert([1, '2', 3n]); // [1, '2', 3n]
+```
+
 ### map
 
 #### Examples

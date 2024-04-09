@@ -339,6 +339,13 @@ export const date = new Converter<Date>(
 
 /**
  * @memberof presets
+ * @example
+ * object.convert(undefined); // {}
+ * object.convert(null); // {}
+ * object.convert(false); // Boolean { false }
+ * object.convert(1); // Number { 1 }
+ * object.convert('2'); // String { 2 }
+ * object.convert([1, '2', 3n]); // [1, '2', 3n]
  */
 export const object = new Converter<object>((i): i is object => typeof i === 'object' && i !== null, Object);
 
