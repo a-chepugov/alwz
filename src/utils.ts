@@ -25,9 +25,9 @@ const InvalidArgument = class extends EV {};
  * @example <caption>sparse arrays behavior</caption>
  * // Be aware of sparse arrays behavior - conversion is not performed for empty items
  * numArray[1, , 3] // [1, , 3]
- * @param {Conversion<any, T>} conversion - item conversion
- * @param {Conversion<any, Array<any>>} initiator - input data initial conversion
- * @returns {Conversion<any, Array<T>>}
+ * @param {Conversion<*, T>} conversion - item conversion
+ * @param {Conversion<*, Array<*>>} initiator - input data initial conversion
+ * @returns {Conversion<*, Array<T>>}
  */
 export const array = <T>(
 	conversion: Conversion<unknown, T>,
@@ -55,9 +55,9 @@ export const array = <T>(
  * tupleNumStrBool('5'); // [5, 'undefined', false]
  * tupleNumStrBool(['1', '2', '3']); // [1, '2', true]
  *
- * @param {Array<Conversion<any, any>>} conversions - tuple elemets conversions
- * @param {Conversion<any, Array<any>>} initiator - input data initial conversion
- * @returns {Conversion<any, Array<any>>}
+ * @param {Array<Conversion<*, *>>} conversions - tuple elemets conversions
+ * @param {Conversion<*, Array<*>>} initiator - input data initial conversion
+ * @returns {Conversion<*, Array<*>>}
  */
 export const tuple = (
 	conversions: Array<Conversion<unknown, unknown>>,
@@ -105,8 +105,8 @@ export const tuple = (
  * @param {T} lower - lower range border
  * @param {T} upper - upper range border
  * @param {Fallback<T>} fallback - fallback value generator
- * @param {Conversion<any, T>} conversion - input data conversion
- * @returns {Conversion<any, T>}
+ * @param {Conversion<*, T>} conversion - input data conversion
+ * @returns {Conversion<*, T>}
  */
 export const range = <T = number>(
 	lower: T = -Number.MAX_VALUE as T,
@@ -165,8 +165,8 @@ export const range = <T = number>(
  *
  * @param {Array<T>} values - valid values list
  * @param {Fallback<T>} fallback - fallback value generator
- * @param {Conversion<any, T>} conversion - input data conversion
- * @returns {Conversion<any, T>}
+ * @param {Conversion<*, T>} conversion - input data conversion
+ * @returns {Conversion<*, T>}
  */
 export const variant = <T = number>(
 	values: Array<T>,
