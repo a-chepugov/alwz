@@ -115,7 +115,7 @@ export class Converter<T> {
 	protected _conversions: Map<IS<any>, Conversion<any, T>>;
 
 	/**
-	 * @param {IS<T>} is - initial input data type checker. determines if any conversion is necessary
+	 * @param {IS<T>} is - initial input data type checker(predicate). determines if any conversion is necessary
 	 * @param {Fallback<T>} fallback - fallback value generator. runs if none of the available conversions are suitable
 	 */
 	constructor(is: IS<T>, fallback: Fallback<T>) {
@@ -178,7 +178,7 @@ export class Converter<T> {
 
 	/**
 	 * @description adds conversion function for `INPUT` type
-	 * @param {IS<INPUT>} is - input data type checker, determines if input can be processed by `conversion`
+	 * @param {IS<INPUT>} is - input data type checker(predicate), determines if input can be processed by `conversion`
 	 * @param {Conversion<INPUT, T>} conversion - `INPUT` to `T` conversion function
 	 */
 	register<INPUT>(is: IS<INPUT>, conversion: Conversion<INPUT, T>) {
@@ -190,7 +190,7 @@ export class Converter<T> {
 
 	/**
 	 * @description removes conversion for `INPUT` type
-	 * @param {IS<INPUT>} is - input type checker
+	 * @param {IS<INPUT>} is - input type checker(predicate)
 	 */
 	unregister<INPUT>(is: IS<INPUT>) {
 		assertIS(is);
