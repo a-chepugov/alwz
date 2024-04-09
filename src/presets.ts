@@ -272,7 +272,7 @@ export const string = new Converter<string>(
  * symbol.convert(false); // Symbol('')
  * symbol.convert(42.5); // Symbol('42.5')
  * symbol.convert('42.5'); // Symbol('42.5')
- * symbol.convert([1.5, 2, 3]); Symbol('1.5')
+ * symbol.convert([1.5, 2, 3]); // Symbol('1.5')
  * symbol.convert(new Date('1970-01-01T00:00:00.999Z')); // Symbol('1970-01-01T00:00:00.999Z')
  */
 export const symbol = new Converter<symbol>(
