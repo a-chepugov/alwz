@@ -339,6 +339,11 @@ export const date = new Converter<Date>(
 
 /**
  * @memberof presets
+ */
+export const object = new Converter<object>((i): i is object => typeof i === 'object' && i !== null, Object);
+
+/**
+ * @memberof presets
  * @example
  * map.convert([ [true, 1], 2, '3']); // Map { [true, 1] }
  */
