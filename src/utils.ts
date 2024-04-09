@@ -194,6 +194,17 @@ export const variant = <T = number>(
 /**
  * @memberof utils
  * @description cast data into an object with a given schema
+ * @example
+ * const objABC = utils.object({
+ *   a: a.ubyte,
+ *   b: utils.array(utils.object({
+ *     c: a.int,
+ *     d: utils.array(a.string),
+ *   })),
+ * });
+ * objABC(undefined); // { a: 0, b: [] }
+ * objABC({ a: 999, b: [{ c: 2.5, d: 3 }, null] }); // { a: 255, b: [{ c: 2, d: ['3'] }, { c: 0, d: [] }] }
+ *
  * @param {Record<string, Conversion<any, T>>} schema
  * @param {Conversion<any, T>} conversion - input data conversion
  * @returns {Conversion<any, T>}
