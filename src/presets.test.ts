@@ -285,6 +285,11 @@ describe('presets', () => {
 				{ input: new Date(8), check: (o, i) => !o.has(i) },
 				{ input: new WeakSet, check: (o, i) => (i === o) },
 			].map(({ input, result, check }) => ({ work: a.weakset, instance: WeakSet, input, result, check })),
+		}, {
+			name: 'promise', tests: [
+				{ input: Promise.resolve(1), check: (o, i) => (i === o) },
+				{ input: 2, result: Promise.resolve(2) },
+			].map(({ input, result, check }) => ({ work: a.promise, instance: Promise, input, result, check })),
 		}];
 
 		for (const {name, tests } of sets) {
