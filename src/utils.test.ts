@@ -86,11 +86,16 @@ describe('utils', () => {
 			assert.throws(() => range(1, 2, Number,  null));
 		});
 
+		const rangeDefault = range();
 		const range37 = range(3, 7);
 		const range37WithCustomFallback = range(3, 7, () => -1);
 		const rangeString = range('k', 'w', undefined, String);
 
 		const sets = [
+			{ work: rangeDefault, input: 3, output: 3 },
+			{ work: rangeDefault, input: -Infinity, output: -Number.MAX_VALUE },
+			{ work: rangeDefault, input: Infinity, output: Number.MAX_VALUE },
+
 			{ work: range37, input: 3, output: 3 },
 			{ work: range37, input: 5, output: 5 },
 			{ work: range37, input: '5', output: 5 },
