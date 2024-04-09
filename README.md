@@ -709,3 +709,28 @@ varABC(1); // 'b'
 ```
 
 Returns **Conversion\<any, T>** 
+
+### object
+
+cast data into an object with a given schema
+
+#### Parameters
+
+*   `schema` **Record<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), Conversion\<any, T>>** 
+*   `conversion` **Conversion\<any, T>** input data conversion (optional, default `presets.object.convert`)
+
+#### Examples
+
+```javascript
+const objABC = utils.object({
+  a: a.ubyte,
+  b: utils.array(utils.object({
+    c: a.int,
+    d: utils.array(a.string),
+  })),
+});
+objABC(undefined); // { a: 0, b: [] }
+objABC({ a: 999, b: [{ c: 2.5, d: 3 }, null] }); // { a: 255, b: [{ c: 2, d: ['3'] }, { c: 0, d: [] }] }
+```
+
+Returns **Conversion\<any, T>** 
