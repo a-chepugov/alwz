@@ -159,6 +159,29 @@ describe('presets', () => {
 				{ input: Promise.resolve(), check: (o) => isNaN(o.getTime()) },
 			].map(({ input, result, check }) => ({ work: a.date, instance: Date, input, result, check })),
 		}, {
+			name: 'object', tests: [
+				{ input: undefined, result: {} },
+				{ input: null, result: {} },
+				{ input: true, result: new Boolean(true) },
+				{ input: NaN, result: new Number(NaN) },
+				{ input: 1, result: new Number(1) },
+				{ input: '2', result: new String('2') },
+				{ input: 3n, check: (o, i) => o * i === 9n },
+				{ input: Symbol.for('123') },
+				{ input: new Date(8), check: (o, i) => o === i },
+				{ input: () => 7, check: (o, i) => o === i, type: 'function' },
+				{ input: {}, check: (o, i) => o === i },
+				{ input: {6: 6}, check: (o, i) => o === i },
+				{ input: [], check: (o, i) => o === i },
+				{ input: [1, '2', 3n], check: (o, i) => o === i },
+				{ input: new Date(8), check: (o, i) => o === i },
+				{ input: new Map([[1, 2]]), check: (o, i) => o === i },
+				{ input: new WeakMap, check: (o, i) => o === i },
+				{ input: new Set([1, 2]), check: (o, i) => o === i },
+				{ input: new WeakSet, check: (o, i) => o === i },
+				{ input: Promise.resolve(), check: (o, i) => o === i },
+			].map(({ input, result, check, type }) => ({ work: a.object, type: type || 'object', instance: Object, input, result, check })),
+		}, {
 			name: 'array', tests: [
 				{ input: undefined, check: (o) => o.length === 0 },
 				{ input: null, check: (o) => o.length === 0 },
@@ -262,6 +285,11 @@ describe('presets', () => {
 				{ input: new Date(8), check: (o, i) => !o.has(i) },
 				{ input: new WeakSet, check: (o, i) => (i === o) },
 			].map(({ input, result, check }) => ({ work: a.weakset, instance: WeakSet, input, result, check })),
+		}, {
+			name: 'promise', tests: [
+				{ input: Promise.resolve(1), check: (o, i) => (i === o) },
+				{ input: 2, result: Promise.resolve(2) },
+			].map(({ input, result, check }) => ({ work: a.promise, instance: Promise, input, result, check })),
 		}];
 
 		for (const {name, tests } of sets) {
@@ -280,10 +308,10 @@ describe('presets', () => {
 							assert.strictEqual(typeof data, type);
 						}
 						if (instance) {
-							assert(data instanceof instance);
+							assert.strictEqual(data instanceof instance, true);
 						}
 						if (result) {
-							assert.strictEqual(data, result);
+							assert.deepStrictEqual(data, result);
 						}
 						if (check) {
 							assert.strictEqual(check(data, input), true);

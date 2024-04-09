@@ -1,5 +1,6 @@
 import assert from 'assert';
 import * as utils from './utils';
+import * as a from './index';
 
 describe('utils', () => {
 
@@ -86,11 +87,16 @@ describe('utils', () => {
 			assert.throws(() => range(1, 2, Number,  null));
 		});
 
+		const rangeDefault = range();
 		const range37 = range(3, 7);
 		const range37WithCustomFallback = range(3, 7, () => -1);
 		const rangeString = range('k', 'w', undefined, String);
 
 		const sets = [
+			{ work: rangeDefault, input: 3, output: 3 },
+			{ work: rangeDefault, input: -Infinity, output: -Number.MAX_VALUE },
+			{ work: rangeDefault, input: Infinity, output: Number.MAX_VALUE },
+
 			{ work: range37, input: 3, output: 3 },
 			{ work: range37, input: 5, output: 5 },
 			{ work: range37, input: '5', output: 5 },
@@ -178,6 +184,79 @@ describe('utils', () => {
 		test('variant with throw on fallback', () => {
 			assert.throws(() => var123WithStrictFallback(4));
 		});
+
+	});
+
+	describe('object', () => {
+
+		test('throw on invalid schema', () => {
+			assert.throws(() => utils.object(null));
+		});
+
+		test('throw on invalid conversion', () => {
+			assert.throws(() => utils.object({}, null));
+		});
+
+		const objShallow = utils.object({
+			a: a.boolean,
+			b: a.int,
+			c: a.string,
+		});
+
+		const objNested = utils.object({
+			a: a.ubyte,
+			b: utils.array(utils.object({
+				c: a.int,
+				d: utils.array(a.string),
+			})),
+		});
+
+		// @ts-ignore
+		const objCircular = utils.object({
+			a: a.uint,
+			children: objChildrenArr,
+		});
+
+		function objChildrenArr(input) {
+			return utils.array(objCircular)(input);
+		}
+
+		const sets = [
+			{ work: objShallow, input: undefined, output: { a: false, b: 0, c: '' } },
+			{ work: objShallow, input: null, output: { a: false, b: 0, c: '' } },
+			{ work: objShallow, input: {}, output: { a: false, b: 0, c: '' } },
+			{ work: objShallow, input: { a: 1, b: ['2', '3'], c: 4 }, output: { a: true, b: 2, c: '4' } },
+
+			{ work: objNested ,
+				input: undefined,
+				output: { a: 0, b: [] },
+			},
+			{ work: objNested ,
+				input: { a: 999, b: [{ c: 2.5, d: 3 }, null] },
+				output: { a: 255, b: [{ c: 2, d: ['3'] }, { c: 0, d: [] }] },
+			},
+
+			{ work: objCircular, input: {}, output: { a: 0, children: [] } },
+			{ work: objCircular,
+				input: {
+					a: 1, children: [{ a: 2 }, { a: 3, children: [{ a: 4 }] }],
+				},
+				output: {
+					a: 1, children: [
+						{ a: 2, children: [] },
+						{ a: 3, children: [{ a: 4, children: [] }] },
+					],
+				},
+			},
+		];
+
+		for(let i = 0; i < sets.length; i++) {
+			const { work, input, output } = sets[i];
+			const name = `${i}: < ${JSON.stringify(input)} > gives ${JSON.stringify(output)}`;
+			test(name, () => {
+				assert.deepStrictEqual(work(input), output);
+			});
+		}
 
 	});
 

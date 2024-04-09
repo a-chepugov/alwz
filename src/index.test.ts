@@ -6,14 +6,13 @@ describe('index', () => {
 	describe('Predefined', () => {
 
 		test('check', () => {
-			assert.deepStrictEqual(a.boolean([false, true]), false);
 			assert.deepStrictEqual(a.byte('3'), 3);
 			assert.deepStrictEqual(a.short(false), 0);
-			assert.deepStrictEqual(a.int(true), 1);
-			assert.deepStrictEqual(a.long(NaN), 0);
 			assert.deepStrictEqual(a.uint(Infinity), 4294967295);
+			assert.deepStrictEqual(a.long(NaN), 0);
+			assert.deepStrictEqual(a.long(['1', '2', '3']), 1);
 			assert.deepStrictEqual(a.array('abc'), ['abc']);
-			assert.deepStrictEqual(a.array(['abc', 'def', 'ghi']), ['abc', 'def', 'ghi']);
+			assert.deepStrictEqual(a.array([123, 'abc', {}, Math.max]), [123, 'abc', {}, Math.max]);
 		});
 
 	});

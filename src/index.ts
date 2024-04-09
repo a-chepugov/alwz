@@ -10,18 +10,18 @@ import * as presets from './presets';
  */
 
 /**
- * @name Predefined
+ * @name Cast
  * @see {@link presets presets}
  * @description convert data with presetted converters
  * @example
- * a.boolean([false, true]); // false
  * a.byte('3'); // 3
  * a.short(false); // 0
  * a.int(true); // 1
- * a.long(NaN); // 0
  * a.uint(Infinity); // 4294967295
+ * a.long(NaN); // 0
+ * a.long(['1', '2', '3']); // 1 | ['1','2','3'] => '1' => 1
  * a.array('abc'); // ['abc']
- * a.array(['abc', 'def', 'ghi']); // ['abc', 'def', 'ghi']
+ * a.array([123, 'abc', {}, Math.max]); // [123, 'abc', {}, Math.max]
  */
 
 /**
@@ -136,6 +136,7 @@ export const converters = new Aggregator()
 	.register('symbol', presets.symbol)
 	.register('fn', presets.fn)
 	.register('date', presets.date)
+	.register('object', presets.object)
 	.register('array', presets.array)
 	.register('map', presets.map)
 	.register('weakmap', presets.weakmap)
@@ -187,6 +188,7 @@ export const string = presets.string.convert;
 export const symbol = presets.symbol.convert;
 export const fn = presets.fn.convert;
 export const date = presets.date.convert;
+export const object = presets.object.convert;
 export const array = presets.array.convert;
 export const map = presets.map.convert;
 export const weakmap = presets.weakmap.convert;
