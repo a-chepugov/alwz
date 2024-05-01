@@ -1,4 +1,4 @@
-import Converter from './Converter';
+import Converter from './models/Converter';
 
 const isNull = (i: any): i is null => i === null;
 const isDate = (i: any): i is Date => i instanceof Date;

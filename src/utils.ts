@@ -1,5 +1,5 @@
-import EV from './Error';
-import Converter, { Fallback, assertFallback, isConversion, assertConversion } from './Converter';
+import EV from './models/Error';
+import Converter, { Fallback, assertFallback, isConversion, assertConversion } from './models/Converter';
 import * as presets from './presets';
 
 type Conversion<INPUT, OUTPUT> = (input: INPUT) => OUTPUT;
