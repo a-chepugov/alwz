@@ -149,7 +149,7 @@ describe('Converter', () => {
 
 	test(`conversion register methods for types throws on invalid input`, () => {
 		const conv = new Converter((i: any): i is number => typeof i === 'number', () => 1);
-		assert.throws(() => conv.undefined(undefined));
+		assert.throws(() => conv.undefined(0));
 		assert.throws(() => conv.boolead(false));
 		assert.throws(() => conv.number(1));
 		assert.throws(() => conv.string('string'));
