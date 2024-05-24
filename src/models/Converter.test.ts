@@ -175,6 +175,20 @@ describe('Converter', () => {
 		assert.strictEqual(converter.convert([1]), 1);
 	});
 
+	test(`'type' method sets conversion rules tor types`, () => {
+		const conv = new Converter(() => false, () => '');
+		conv.type('number', String);
+		assert.strictEqual(conv.types.number, String);
+	});
+
+	test('`type` method unsets conversion rules tor types if second argument is `undefined`', () => {
+		const conv = new Converter(() => false, () => '');
+		conv.type('number', String);
+		assert.strictEqual(conv.types.number, String);
+		conv.type('number');
+		assert.strictEqual(conv.types.number, undefined);
+	});
+
 	test(`'types' getter returns object with conversion rules tor types`, () => {
 		const num = (i) => Number(i);
 
