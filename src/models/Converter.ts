@@ -215,55 +215,43 @@ export class Converter<T> {
 	/**
 	 * @description conversion rule setter for `undefined` input
 	 */
-	undefined(conversion: Conversion<undefined, T>) {
-		assertConversion(conversion);
-		this._types.undefined = conversion;
-		return this;
+	undefined(conversion?: Conversion<undefined, T>) {
+		return this.type('undefined', conversion);
 	}
 
 	/**
 	 * @description conversion rule setter for `boolean` input
 	 */
-	boolean(conversion: Conversion<boolean, T>) {
-		assertConversion(conversion);
-		this._types.boolean = conversion;
-		return this;
+	boolean(conversion?: Conversion<boolean, T>) {
+		return this.type('boolean', conversion);
 	}
 
 	/**
 	 * @description conversion rule setter for `number` input
 	 */
-	number(conversion: Conversion<number, T>) {
-		assertConversion(conversion);
-		this._types.number = conversion;
-		return this;
+	number(conversion?: Conversion<number, T>) {
+		return this.type('number', conversion);
 	}
 
 	/**
 	 * @description conversion rule setter for `bigint` input
 	 */
-	bigint(conversion: Conversion<bigint, T>) {
-		assertConversion(conversion);
-		this._types.bigint = conversion;
-		return this;
+	bigint(conversion?: Conversion<bigint, T>) {
+		return this.type('bigint', conversion);
 	}
 
 	/**
 	 * @description conversion rule setter for `string` input
 	 */
-	string(conversion: Conversion<string, T>) {
-		assertConversion(conversion);
-		this._types.string = conversion;
-		return this;
+	string(conversion?: Conversion<string, T>) {
+		return this.type('string', conversion);
 	}
 
 	/**
 	 * @description conversion rule setter for `symbol` input
 	 */
-	symbol(conversion: Conversion<symbol, T>) {
-		assertConversion(conversion);
-		this._types.symbol = conversion;
-		return this;
+	symbol(conversion?: Conversion<symbol, T>) {
+		return this.type('symbol', conversion);
 	}
 
 	/**
