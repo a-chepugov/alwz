@@ -274,6 +274,17 @@ export class Converter<T> {
 		const types = Object.entries(this._types) as Array<[Types, Conversion<Types, T>]>;
 		types.forEach(([type, conversion]: [Types, Conversion<any, T>]) => converter[type](conversion));
 		this._conversions.forEach((conversion: Conversion<any, T>, is: IS<T>) => converter.register(is, conversion));
+
+	static build<T>(
+		is: IS<T>,
+		fallback: Fallback<T>,
+		types: Partial<Record<Types, Conversion<any, T>>> = {},
+		conversions: Array<[IS<any>, Conversion<any, T>]> = []
+	) {
+		const converter = new Converter(is, fallback);
+		const typesList = Object.entries(types) as Array<[Types, Conversion<any, T>]>;
+		typesList.forEach(([type, conversion]: [Types, Conversion<any, T>]) => converter.type(type, conversion));
+		conversions.forEach(([is, conversion]: [IS<T>, Conversion<any, T>]) => converter.register(is, conversion));
 		return converter;
 	}
 
