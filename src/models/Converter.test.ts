@@ -261,6 +261,37 @@ describe('Converter', () => {
 		assert.throws(() => c.convert([2]));
 	});
 
+	test(`build with is & fallback only`, () => {
+		const converter = Converter.build(
+			(i): i is number => typeof i === 'number',
+			() => 0
+		);
+		assert.strictEqual(converter.convert(1), 1);
+		assert.strictEqual(converter.convert('a'), 0);
+	});
+
+	test(`build with is & fallback & types`, () => {
+		const converter = Converter.build(
+			(i): i is number => typeof i === 'number',
+			() => 0,
+			{ string: () => -1 }
+		);
+		assert.strictEqual(converter.convert('a'), -1);
+	});
+
+	test(`build with is & fallback & conversions`, () => {
+		const converter = Converter.build(
+			(i): i is number => typeof i === 'number',
+			() => 0,
+			{},
+			[
+				[Array.isArray, () => -2],
+				[(i): i is Date => i instanceof Date, () => -3],
+			]
+		);
+		assert.strictEqual(converter.convert(new Date()), -3);
+		assert.strictEqual(converter.convert([]), -2);
+	});
 
 	test(`clone`, () => {
 		const converter = new Converter((i) => typeof i === 'number', () => 0).undefined(() => 1);
