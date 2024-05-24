@@ -199,6 +199,20 @@ export class Converter<T> {
 	}
 
 	/**
+	 * @description set conversion rule setter for `types`
+	 */
+	type(type: Types, conversion?: Conversion<undefined, T>) {
+		if (conversion === undefined) {
+			delete this._types[type];
+		} else {
+			assertConversion(conversion);
+			// @ts-ignore
+			this._types[type] = conversion;
+		}
+		return this;
+	}
+
+	/**
 	 * @description conversion rule setter for `undefined` input
 	 */
 	undefined(conversion: Conversion<undefined, T>) {
