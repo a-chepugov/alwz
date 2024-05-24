@@ -10,7 +10,7 @@ const InvalidArgument = class extends EV {};
  * @namespace utils
  * @description extra utils functions
  * @example
- * const { array, tuple } = a.utils;
+ * const { array, tuple, range, variant, object } = a.utils;
  */
 
 /**
