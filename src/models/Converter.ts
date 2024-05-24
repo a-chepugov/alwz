@@ -270,10 +270,8 @@ export class Converter<T> {
 	 * clone.convert(); // 2
 	*/
 	clone() {
-		const converter = new Converter(this.is, this.fallback);
-		const types = Object.entries(this._types) as Array<[Types, Conversion<Types, T>]>;
-		types.forEach(([type, conversion]: [Types, Conversion<any, T>]) => converter[type](conversion));
-		this._conversions.forEach((conversion: Conversion<any, T>, is: IS<T>) => converter.register(is, conversion));
+		return Converter.build(this.is, this.fallback, this.types, this.conversions);
+	}
 
 	static build<T>(
 		is: IS<T>,
