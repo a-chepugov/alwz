@@ -515,6 +515,15 @@ removes conversion for `INPUT` type
 
 *   `is` **IS\<INPUT>** input type checker(predicate)
 
+### type
+
+set conversion rule setter for `types`
+
+#### Parameters
+
+*   `type`  
+*   `conversion`  
+
 ### undefined
 
 conversion rule setter for `undefined` input
@@ -589,7 +598,7 @@ extra utils functions
 ### Examples
 
 ```javascript
-const { array, tuple } = a.utils;
+const { array, tuple, range, variant, object } = a.utils;
 ```
 
 ### array
