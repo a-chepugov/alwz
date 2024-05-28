@@ -1,6 +1,6 @@
 {
   "name": "alwz",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "Extendable library for typecasting",
   "main": "./build/commonjs/index.js",
   "exports": {
@@ -10,10 +10,6 @@
   "scripts": {
     "prepublishOnly": "npm run test && npm run lint && npm run build && npm run readme",
     "build": "npm run build:commonjs && npm run build:es",
-    "esbuild:": "esbuild --bundle --outdir=./build --platform=node --target=node16 --packages=external --tree-shaking=true",
-    "esbuild-micro": "npm run esbuild: --minify ./source/index.ts",
-    "esbuild-mini:": "npm run esbuild: --minify-syntax --minify-identifiers --minify-whitespace",
-    "esbuild-mini": "npm run esbuild-mini: ./source/index.ts",
     "build:commonjs": "tsc --project tsconfig.commonjs.json",
     "build:es": "tsc --project tsconfig.base.json",
     "build:development": "tsc --project tsconfig.base.json --watch",
@@ -49,19 +45,19 @@
   },
   "homepage": "https://github.com/a-chepugov/alwz#readme",
   "devDependencies": {
-    "@babel/cli": "^7.14.8",
-    "@babel/core": "^7.15.0",
-    "@babel/preset-env": "^7.15.0",
-    "@babel/preset-typescript": "^7.15.0",
-    "@types/jest": "^27.0.1",
-    "@types/node": "^16.18.25",
-    "@typescript-eslint/eslint-plugin": "^5.3.0",
-    "@typescript-eslint/parser": "^5.3.0",
-    "babel-jest": "^27.1.0",
-    "documentation": "^13.2.5",
-    "esbuild": "^0.17.18",
-    "eslint": "^7.32.0",
-    "jest": "^27.1.0",
-    "typescript": "^5.0.4"
+    "@babel/cli": "^7.24.6",
+    "@babel/core": "^7.24.6",
+    "@babel/preset-env": "^7.24.6",
+    "@babel/preset-typescript": "^7.24.6",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.12.12",
+    "@typescript-eslint/eslint-plugin": "^7.11.0",
+    "@typescript-eslint/parser": "^7.11.0",
+    "babel-jest": "^29.7.0",
+    "documentation": "^14.0.3",
+    "eslint": "^8.57.0",
+    "jest": "^29.7.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
   }
 }

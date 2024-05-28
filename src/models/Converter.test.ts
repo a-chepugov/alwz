@@ -149,7 +149,7 @@ describe('Converter', () => {
 
 	test(`conversion register methods for types throws on invalid input`, () => {
 		const conv = new Converter((i: any): i is number => typeof i === 'number', () => 1);
-		assert.throws(() => conv.undefined(undefined));
+		assert.throws(() => conv.undefined(0));
 		assert.throws(() => conv.boolead(false));
 		assert.throws(() => conv.number(1));
 		assert.throws(() => conv.string('string'));
@@ -173,6 +173,20 @@ describe('Converter', () => {
 
 		converter.register(Array.isArray, (i) => converter.convert(i[0]));
 		assert.strictEqual(converter.convert([1]), 1);
+	});
+
+	test(`'type' method sets conversion rules tor types`, () => {
+		const conv = new Converter(() => false, () => '');
+		conv.type('number', String);
+		assert.strictEqual(conv.types.number, String);
+	});
+
+	test('`type` method unsets conversion rules tor types if second argument is `undefined`', () => {
+		const conv = new Converter(() => false, () => '');
+		conv.type('number', String);
+		assert.strictEqual(conv.types.number, String);
+		conv.type('number');
+		assert.strictEqual(conv.types.number, undefined);
 	});
 
 	test(`'types' getter returns object with conversion rules tor types`, () => {
@@ -247,6 +261,37 @@ describe('Converter', () => {
 		assert.throws(() => c.convert([2]));
 	});
 
+	test(`build with is & fallback only`, () => {
+		const converter = Converter.build(
+			(i): i is number => typeof i === 'number',
+			() => 0
+		);
+		assert.strictEqual(converter.convert(1), 1);
+		assert.strictEqual(converter.convert('a'), 0);
+	});
+
+	test(`build with is & fallback & types`, () => {
+		const converter = Converter.build(
+			(i): i is number => typeof i === 'number',
+			() => 0,
+			{ string: () => -1 }
+		);
+		assert.strictEqual(converter.convert('a'), -1);
+	});
+
+	test(`build with is & fallback & conversions`, () => {
+		const converter = Converter.build(
+			(i): i is number => typeof i === 'number',
+			() => 0,
+			{},
+			[
+				[Array.isArray, () => -2],
+				[(i): i is Date => i instanceof Date, () => -3],
+			]
+		);
+		assert.strictEqual(converter.convert(new Date()), -3);
+		assert.strictEqual(converter.convert([]), -2);
+	});
 
 	test(`clone`, () => {
 		const converter = new Converter((i) => typeof i === 'number', () => 0).undefined(() => 1);

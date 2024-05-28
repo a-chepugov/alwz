@@ -55,7 +55,7 @@ export class Aggregator extends Registry<string, Converter<any>> {
 		} else {
 			throw new Aggregator.AbsentConverter('converter has not been registered', name);
 		}
-	}
+	};
 
 	to = (name: any) => this.converter(name).convert;
 

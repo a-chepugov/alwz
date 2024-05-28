@@ -1,4 +1,4 @@
-import Converter from './Converter';
+import Converter from './models/Converter';
 
 const isNull = (i: any): i is null => i === null;
 const isDate = (i: any): i is Date => i instanceof Date;
@@ -184,22 +184,18 @@ export const [
  * double.convert(NaN); // 0
  */
 export const double = new Converter<number>(
-	(i): i is number => typeof i === 'number' && Number.isFinite(i) && -Number.MAX_VALUE <= i && i <= Number.MAX_VALUE,
+	(i): i is number => typeof i === 'number' && -Number.MAX_VALUE <= i && i <= Number.MAX_VALUE,
 	() => 0
 )
 	.undefined(() => 0)
 	.boolean(Number)
 	.number(function(i) {
-		if (i === Infinity) {
+		if (i >= Number.MAX_VALUE) {
 			return Number.MAX_VALUE;
-		} else if (i === -Infinity) {
+		} else if (i <= -Number.MAX_VALUE) {
 			return -Number.MAX_VALUE;
 		} else {
-			if (Number.isNaN(i)) {
-				return 0;
-			} else {
-				return i;
-			}
+			return 0;
 		}
 	})
 	.bigint(function(i) { return this.convert(Number(i)); })
