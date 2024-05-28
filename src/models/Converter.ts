@@ -178,7 +178,7 @@ export class Converter<OUTPUT> {
 			}
 		}
 		return this._fallback(input);
-	}
+	};
 
 	/**
 	 * @description adds conversion function for `INPUT` type
