@@ -431,8 +431,8 @@ converts input data to specific type
 
 ### Parameters
 
-*   `is` **IS\<T>** initial input data type checker(predicate). determines if any conversion is necessary
-*   `fallback` **Fallback\<T>** fallback value generator. runs if none of the available conversions are suitable
+*   `is` **IS\<OUTPUT>** initial input data type checker(predicate). determines if any conversion is necessary
+*   `fallback` **Fallback\<OUTPUT>** fallback value generator. runs if none of the available conversions are suitable
 
 ### Examples
 
@@ -505,7 +505,7 @@ adds conversion function for `INPUT` type
 #### Parameters
 
 *   `is` **IS\<INPUT>** input data type checker(predicate), determines if input can be processed by `conversion`
-*   `conversion` **Conversion\<INPUT, T>** `INPUT` to `T` conversion function
+*   `conversion` **Conversion\<INPUT, OUTPUT>** `INPUT` to `OUTPUT` conversion function
 
 ### unregister
 
