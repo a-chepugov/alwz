@@ -521,8 +521,8 @@ set conversion rule setter for `types`
 
 #### Parameters
 
-*   `type`  
-*   `conversion`  
+*   `type` &#x20;
+*   `conversion` &#x20;
 
 ### undefined
 
@@ -530,7 +530,7 @@ conversion rule setter for `undefined` input
 
 #### Parameters
 
-*   `conversion`  
+*   `conversion` &#x20;
 
 ### boolean
 
@@ -538,7 +538,7 @@ conversion rule setter for `boolean` input
 
 #### Parameters
 
-*   `conversion`  
+*   `conversion` &#x20;
 
 ### number
 
@@ -546,7 +546,7 @@ conversion rule setter for `number` input
 
 #### Parameters
 
-*   `conversion`  
+*   `conversion` &#x20;
 
 ### bigint
 
@@ -554,7 +554,7 @@ conversion rule setter for `bigint` input
 
 #### Parameters
 
-*   `conversion`  
+*   `conversion` &#x20;
 
 ### string
 
@@ -562,7 +562,7 @@ conversion rule setter for `string` input
 
 #### Parameters
 
-*   `conversion`  
+*   `conversion` &#x20;
 
 ### symbol
 
@@ -570,7 +570,7 @@ conversion rule setter for `symbol` input
 
 #### Parameters
 
-*   `conversion`  
+*   `conversion` &#x20;
 
 ### clone
 
@@ -607,7 +607,7 @@ constrain data to an array elements of a given type
 
 #### Parameters
 
-*   `conversion` **Conversion\<any, T>** item conversion
+*   `conversion` **Conversion\<any, OUTPUT>** item conversion
 *   `initiator` **Conversion\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<any>>** input data initial conversion (optional, default `presets.array.convert`)
 
 #### Examples
@@ -626,7 +626,7 @@ sparse arrays behavior
 numArray[1, , 3] // [1, , 3]
 ```
 
-Returns **Conversion\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<T>>** 
+Returns **Conversion\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<OUTPUT>>**&#x20;
 
 ### tuple
 
@@ -648,7 +648,7 @@ tupleNumStrBool('5'); // [5, 'undefined', false]
 tupleNumStrBool(['1', '2', '3']); // [1, '2', true]
 ```
 
-Returns **Conversion\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<any>>** 
+Returns **Conversion\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<any>>**&#x20;
 
 ### range
 
@@ -656,10 +656,10 @@ constrain variable value within a given range
 
 #### Parameters
 
-*   `lower` **T** lower range border (optional, default `-Number.MAX_VALUE`)
-*   `upper` **T** upper range border (optional, default `Number.MAX_VALUE`)
-*   `fallback` **Fallback\<T>** fallback value generator
-*   `conversion` **Conversion\<any, T>** input data conversion (optional, default `presets.double.convert`)
+*   `lower` **OUTPUT** lower range border (optional, default `-Number.MAX_VALUE`)
+*   `upper` **OUTPUT** upper range border (optional, default `Number.MAX_VALUE`)
+*   `fallback` **Fallback\<OUTPUT>** fallback value generator
+*   `conversion` **Conversion\<any, OUTPUT>** input data conversion (optional, default `presets.double.convert`)
 
 #### Examples
 
@@ -680,7 +680,7 @@ rangeString('n'); // n
 rangeString('z'); // w
 ```
 
-Returns **Conversion\<any, T>** 
+Returns **Conversion\<any, OUTPUT>**&#x20;
 
 ### variant
 
@@ -688,9 +688,9 @@ constrain variable to given variants
 
 #### Parameters
 
-*   `values` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<T>** valid values list
-*   `fallback` **Fallback\<T>** fallback value generator (optional, default `()=>values[0]`)
-*   `conversion` **Conversion\<any, T>** input data conversion (optional, default `presets.double.convert`)
+*   `values` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<OUTPUT>** valid values list
+*   `fallback` **Fallback\<OUTPUT>** fallback value generator (optional, default `()=>values[0]`)
+*   `conversion` **Conversion\<any, OUTPUT>** input data conversion (optional, default `presets.double.convert`)
 
 #### Examples
 
@@ -717,7 +717,7 @@ varABC(0); // 'a'
 varABC(1); // 'b'
 ```
 
-Returns **Conversion\<any, T>** 
+Returns **Conversion\<any, OUTPUT>**&#x20;
 
 ### object
 
@@ -725,8 +725,8 @@ cast data into an object with a given schema
 
 #### Parameters
 
-*   `schema` **Record<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), Conversion\<any, T>>** 
-*   `conversion` **Conversion\<any, T>** input data conversion (optional, default `presets.object.convert`)
+*   `schema` **Record<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), Conversion\<any, OUTPUT>>**&#x20;
+*   `conversion` **Conversion\<any, OUTPUT>** input data conversion (optional, default `presets.object.convert`)
 
 #### Examples
 
@@ -742,4 +742,4 @@ objABC(undefined); // { a: 0, b: [] }
 objABC({ a: 999, b: [{ c: 2.5, d: 3 }, null] }); // { a: 255, b: [{ c: 2, d: ['3'] }, { c: 0, d: [] }] }
 ```
 
-Returns **Conversion\<any, T>** 
+Returns **Conversion\<any, OUTPUT>**&#x20;
