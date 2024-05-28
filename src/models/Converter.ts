@@ -33,16 +33,20 @@ export function assertConversion<INPUT, OUTPUT>(input: unknown): true | never {
 	throw new Converter.InvalidConversionFunction('conversion must be a function', input);
 }
 
-type Types = 'undefined' | 'boolean' | 'number' | 'bigint' | 'string' | 'symbol';
-
-type TypesConverters<T> = {
-	undefined?: Conversion<undefined, T>,
-	boolean?: Conversion<boolean, T>,
-	number?: Conversion<number, T>,
-	bigint?: Conversion<bigint, T>,
-	string?: Conversion<string, T>,
-	symbol?: Conversion<symbol, T>
+type Types = {
+	undefined: undefined,
+	boolean: boolean,
+	number: number,
+	bigint: bigint,
+	string: string,
+	symbol: symbol,
 }
+
+type TypeName = keyof Types;
+
+type TypeConverters<OUTPUT> = {
+	[Key in keyof Types]?: Conversion<Types[Key], OUTPUT>;
+};
 
 /**
  * @description converts input data to specific type
@@ -99,7 +103,7 @@ type TypesConverters<T> = {
  * converter.convert([4]); // 4
  * converter.convert(Promise.resolve(5)); // Error
  */
-export class Converter<T> {
+export class Converter<OUTPUT> {
 
 	static InvalidTypeCheckFunction = class extends EV {};
 	static InvalidFallbackFunction = class extends EV {};
@@ -107,18 +111,18 @@ export class Converter<T> {
 	static InvalidConverter = class extends EV {};
 
 	// @ts-ignore
-	_is: IS<T>;
+	_is: IS<OUTPUT>;
 	// @ts-ignore
-	_fallback: Fallback<T>;
+	_fallback: Fallback<OUTPUT>;
 
-	protected _types: TypesConverters<T>;
-	protected _conversions: Map<IS<any>, Conversion<any, T>>;
+	protected _types: TypeConverters<OUTPUT>;
+	protected _conversions: Map<IS<any>, Conversion<any, OUTPUT>>;
 
 	/**
-	 * @param {IS<T>} is - initial input data type checker(predicate). determines if any conversion is necessary
-	 * @param {Fallback<T>} fallback - fallback value generator. runs if none of the available conversions are suitable
+	 * @param {IS<OUTPUT>} is - initial input data type checker(predicate). determines if any conversion is necessary
+	 * @param {Fallback<OUTPUT>} fallback - fallback value generator. runs if none of the available conversions are suitable
 	 */
-	constructor(is: IS<T>, fallback: Fallback<T>) {
+	constructor(is: IS<OUTPUT>, fallback: Fallback<OUTPUT>) {
 		this.is = is;
 		this.fallback = fallback;
 
@@ -132,7 +136,7 @@ export class Converter<T> {
 		return this._is;
 	}
 
-	set is(is: IS<T>) {
+	set is(is: IS<OUTPUT>) {
 		assertIS(is);
 		this._is = is;
 	}
@@ -141,16 +145,16 @@ export class Converter<T> {
 		return this._fallback;
 	}
 
-	set fallback(fallback: Fallback<T>) {
+	set fallback(fallback: Fallback<OUTPUT>) {
 		assertFallback(fallback);
 		this._fallback = fallback;
 	}
 
-	get types(): TypesConverters<T> {
+	get types(): TypeConverters<OUTPUT> {
 		return Object.assign({}, this._types);
 	}
 
-	get conversions(): Array<[IS<unknown>, Conversion<unknown, T>]> {
+	get conversions(): Array<[IS<unknown>, Conversion<unknown, OUTPUT>]> {
 		return Array.from(this._conversions);
 	}
 
@@ -158,17 +162,17 @@ export class Converter<T> {
 	 * @description converts data according to saved conversion rules
 	 * @param {*} input - input data
 	 */
-	convert = (input?: unknown): T => {
+	convert = (input?: unknown): OUTPUT => {
 		if (this._is(input)) return input;
 
-		const type = typeof input as Types;
+		const type = (typeof input) as TypeName;
 		if (type in this._types) {
-			const conversion = this._types[type] as Conversion<typeof input, T>;
+			const conversion = this._types[type] as Conversion<typeof input, OUTPUT>;
 			return conversion.call(this, input);
 		} else {
 			for (const is of this._conversions.keys()) {
 				if (is(input)) {
-					const conversion = this._conversions.get(is) as Conversion<typeof input, T>;
+					const conversion = this._conversions.get(is) as Conversion<typeof input, OUTPUT>;
 					return conversion.call(this, input);
 				}
 			}
@@ -179,9 +183,9 @@ export class Converter<T> {
 	/**
 	 * @description adds conversion function for `INPUT` type
 	 * @param {IS<INPUT>} is - input data type checker(predicate), determines if input can be processed by `conversion`
-	 * @param {Conversion<INPUT, T>} conversion - `INPUT` to `T` conversion function
+	 * @param {Conversion<INPUT, OUTPUT>} conversion - `INPUT` to `OUTPUT` conversion function
 	 */
-	register<INPUT>(is: IS<INPUT>, conversion: Conversion<INPUT, T>) {
+	register<INPUT>(is: IS<INPUT>, conversion: Conversion<INPUT, OUTPUT>) {
 		assertIS(is);
 		assertConversion(conversion);
 		this._conversions.set(is, conversion);
@@ -201,13 +205,12 @@ export class Converter<T> {
 	/**
 	 * @description set conversion rule setter for `types`
 	 */
-	type(type: Types, conversion?: Conversion<undefined, T>) {
+	type(type: TypeName, conversion?: Conversion<unknown, OUTPUT>) {
 		if (conversion === undefined) {
 			delete this._types[type];
 		} else {
 			assertConversion(conversion);
-			// @ts-ignore
-			this._types[type] = conversion;
+			this._types[type] = conversion as Conversion<unknown, OUTPUT>;
 		}
 		return this;
 	}
@@ -215,42 +218,42 @@ export class Converter<T> {
 	/**
 	 * @description conversion rule setter for `undefined` input
 	 */
-	undefined(conversion?: Conversion<undefined, T>) {
+	undefined(conversion?: Conversion<undefined, OUTPUT>) {
 		return this.type('undefined', conversion);
 	}
 
 	/**
 	 * @description conversion rule setter for `boolean` input
 	 */
-	boolean(conversion?: Conversion<boolean, T>) {
+	boolean(conversion?: Conversion<boolean, OUTPUT>) {
 		return this.type('boolean', conversion);
 	}
 
 	/**
 	 * @description conversion rule setter for `number` input
 	 */
-	number(conversion?: Conversion<number, T>) {
+	number(conversion?: Conversion<number, OUTPUT>) {
 		return this.type('number', conversion);
 	}
 
 	/**
 	 * @description conversion rule setter for `bigint` input
 	 */
-	bigint(conversion?: Conversion<bigint, T>) {
+	bigint(conversion?: Conversion<bigint, OUTPUT>) {
 		return this.type('bigint', conversion);
 	}
 
 	/**
 	 * @description conversion rule setter for `string` input
 	 */
-	string(conversion?: Conversion<string, T>) {
+	string(conversion?: Conversion<string, OUTPUT>) {
 		return this.type('string', conversion);
 	}
 
 	/**
 	 * @description conversion rule setter for `symbol` input
 	 */
-	symbol(conversion?: Conversion<symbol, T>) {
+	symbol(conversion?: Conversion<symbol, OUTPUT>) {
 		return this.type('symbol', conversion);
 	}
 
@@ -273,16 +276,16 @@ export class Converter<T> {
 		return Converter.build(this.is, this.fallback, this.types, this.conversions);
 	}
 
-	static build<T>(
-		is: IS<T>,
-		fallback: Fallback<T>,
-		types: Partial<Record<Types, Conversion<any, T>>> = {},
-		conversions: Array<[IS<any>, Conversion<any, T>]> = []
+	static build<OUTPUT>(
+		is: IS<OUTPUT>,
+		fallback: Fallback<OUTPUT>,
+		types: Partial<Record<TypeName, Conversion<any, OUTPUT>>> = {},
+		conversions: Array<[IS<any>, Conversion<any, OUTPUT>]> = []
 	) {
 		const converter = new Converter(is, fallback);
-		const typesList = Object.entries(types) as Array<[Types, Conversion<any, T>]>;
-		typesList.forEach(([type, conversion]: [Types, Conversion<any, T>]) => converter.type(type, conversion));
-		conversions.forEach(([is, conversion]: [IS<T>, Conversion<any, T>]) => converter.register(is, conversion));
+		const typesList = Object.entries(types) as Array<[TypeName, Conversion<any, OUTPUT>]>;
+		typesList.forEach(([type, conversion]: [TypeName, Conversion<any, OUTPUT>]) => converter.type(type, conversion));
+		conversions.forEach(([is, conversion]: [IS<OUTPUT>, Conversion<any, OUTPUT>]) => converter.register(is, conversion));
 		return converter;
 	}
 
