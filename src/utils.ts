@@ -25,14 +25,14 @@ const InvalidArgument = class extends EV {};
  * @example <caption>sparse arrays behavior</caption>
  * // Be aware of sparse arrays behavior - conversion is not performed for empty items
  * numArray[1, , 3] // [1, , 3]
- * @param {Conversion<*, T>} conversion - item conversion
+ * @param {Conversion<*, OUTPUT>} conversion - item conversion
  * @param {Conversion<*, Array<*>>} initiator - input data initial conversion
- * @returns {Conversion<*, Array<T>>}
+ * @returns {Conversion<*, Array<OUTPUT>>}
  */
-export const array = <T>(
-	conversion: Conversion<unknown, T>,
+export const array = <OUTPUT>(
+	conversion: Conversion<unknown, OUTPUT>,
 	initiator: Conversion<unknown, Array<unknown>> = presets.array.convert
-): Conversion<unknown, Array<T>> => {
+): Conversion<unknown, Array<OUTPUT>> => {
 	assertConversion(conversion);
 
 	if (!isConversion(initiator)) {
@@ -102,18 +102,18 @@ export const tuple = (
  * rangeString('n'); // n
  * rangeString('z'); // w
  *
- * @param {T} lower - lower range border
- * @param {T} upper - upper range border
- * @param {Fallback<T>} fallback - fallback value generator
- * @param {Conversion<*, T>} conversion - input data conversion
- * @returns {Conversion<*, T>}
+ * @param {OUTPUT} lower - lower range border
+ * @param {OUTPUT} upper - upper range border
+ * @param {Fallback<OUTPUT>} fallback - fallback value generator
+ * @param {Conversion<*, OUTPUT>} conversion - input data conversion
+ * @returns {Conversion<*, OUTPUT>}
  */
-export const range = <T = number>(
-	lower: T = -Number.MAX_VALUE as T,
-	upper: T = Number.MAX_VALUE as T,
-	fallback?: Fallback<T>,
-	conversion: Conversion<unknown, T> = presets.double.convert as Conversion<unknown, T>
-): Conversion<unknown, T> => {
+export const range = <OUTPUT = number>(
+	lower: OUTPUT = -Number.MAX_VALUE as OUTPUT,
+	upper: OUTPUT = Number.MAX_VALUE as OUTPUT,
+	fallback?: Fallback<OUTPUT>,
+	conversion: Conversion<unknown, OUTPUT> = presets.double.convert as Conversion<unknown, OUTPUT>
+): Conversion<unknown, OUTPUT> => {
 	assertConversion(conversion);
 
 	lower = conversion(lower);
@@ -163,16 +163,16 @@ export const range = <T = number>(
  * varABC(0); // 'a'
  * varABC(1); // 'b'
  *
- * @param {Array<T>} values - valid values list
- * @param {Fallback<T>} fallback - fallback value generator
- * @param {Conversion<*, T>} conversion - input data conversion
- * @returns {Conversion<*, T>}
+ * @param {Array<OUTPUT>} values - valid values list
+ * @param {Fallback<OUTPUT>} fallback - fallback value generator
+ * @param {Conversion<*, OUTPUT>} conversion - input data conversion
+ * @returns {Conversion<*, OUTPUT>}
  */
-export const variant = <T = number>(
-	values: Array<T>,
-	fallback: Fallback<T> = () => values[0] as T,
-	conversion: Conversion<unknown, T> = presets.double.convert as Conversion<unknown, T>
-): Conversion<unknown, T> => {
+export const variant = <OUTPUT = number>(
+	values: Array<OUTPUT>,
+	fallback: Fallback<OUTPUT> = () => values[0] as OUTPUT,
+	conversion: Conversion<unknown, OUTPUT> = presets.double.convert as Conversion<unknown, OUTPUT>
+): Conversion<unknown, OUTPUT> => {
 	assertConversion(conversion);
 	assertFallback(fallback);
 
@@ -205,14 +205,14 @@ export const variant = <T = number>(
  * objABC(undefined); // { a: 0, b: [] }
  * objABC({ a: 999, b: [{ c: 2.5, d: 3 }, null] }); // { a: 255, b: [{ c: 2, d: ['3'] }, { c: 0, d: [] }] }
  *
- * @param {Record<string, Conversion<any, T>>} schema
- * @param {Conversion<any, T>} conversion - input data conversion
- * @returns {Conversion<any, T>}
+ * @param {Record<string, Conversion<any, OUTPUT>>} schema
+ * @param {Conversion<any, OUTPUT>} conversion - input data conversion
+ * @returns {Conversion<any, OUTPUT>}
  */
-export const object = <T extends object, Keys extends keyof T>(
-	schema: { [key in Keys]: Conversion<any, T[key]> },
+export const object = <OUTPUT extends object, Keys extends keyof OUTPUT>(
+	schema: { [key in Keys]: Conversion<any, OUTPUT[key]> },
 	conversion: Conversion<any, any> = presets.object.convert as any
-): Conversion<any, T> => {
+): Conversion<any, OUTPUT> => {
 	if (typeof schema !== 'object' || schema === null) {
 		throw new InvalidArgument('schema must must be an object', schema);
 	}
@@ -225,7 +225,7 @@ export const object = <T extends object, Keys extends keyof T>(
 	assertConversion(conversion);
 
 	return (input: any) => {
-		const result = {} as T;
+		const result = {} as OUTPUT;
 		const source = conversion(input);
 
 		for (const key in schema) {
