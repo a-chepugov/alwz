@@ -236,3 +236,36 @@ export const object = <OUTPUT extends object, Keys extends keyof OUTPUT>(
 	};
 };
 
+/**
+ * @memberof utils
+ * @description cast data into a dictionary
+ * @example
+ * const dictInt = utils.dictionary(a.ubyte);,
+ *
+ * dictInt(undefined); // { }
+ * dictInt({ a: null, b: true, c: '2', d: [3, 4] }); // { a: 0, b: 1, c: 2, d: 3 }
+ *
+ * @param {(value: any, key: string | number) => VALUE} conversion - item conversion
+ * @param {Conversion<any, any>} initiator - input data conversion
+ * @returns {Conversion<any, Record<string | number, VALUE>>}
+ */
+export const dictionary = <KEY extends string | number, VALUE>(
+	conversion: (value: unknown, key: KEY) => VALUE,
+	initiator : Conversion<unknown, unknown> = presets.object.convert as any
+): Conversion<unknown, Record<KEY, VALUE>> => {
+	if (typeof conversion !== 'function') {
+		throw new InvalidArgument('conversion must be a function', conversion);
+	}
+
+	assertConversion(initiator);
+
+	return (input: any) => {
+		const result = {} as Record<KEY, VALUE>;
+		const source = initiator(input) as Record<KEY, unknown>;
+
+		for (const key in source) {
+			result[key] = conversion(source?.[key], key);
+		}
+		return result;
+	};
+};
