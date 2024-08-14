@@ -10,7 +10,7 @@ import * as presets from './presets';
  */
 
 /**
- * @name Cast
+ * @name Types
  * @see {@link presets presets}
  * @description convert data with presetted converters
  * @example
@@ -25,7 +25,7 @@ import * as presets from './presets';
  */
 
 /**
- * @name Utils
+ * @name Structures
  * @see {@link utils utils}
  * @description construct complex data
  * @example <caption>ensure an array output</caption>
@@ -51,7 +51,7 @@ import * as presets from './presets';
  */
 
 /**
- * @name Transform
+ * @name Transformations
  * @see {@link Converter Converter}
  * @description create custom converters
  *

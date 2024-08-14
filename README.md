@@ -14,7 +14,7 @@ import * as a from 'alwz';
 const a = require('alwz');
 ```
 
-## Cast
+## Types
 
 *   **See**: [presets](#presets)
 
@@ -33,7 +33,7 @@ a.array('abc'); // ['abc']
 a.array([123, 'abc', {}, Math.max]); // [123, 'abc', {}, Math.max]
 ```
 
-## Utils
+## Structures
 
 *   **See**: [utils](#utils)
 
@@ -71,7 +71,7 @@ const PairOfNumbers = tuple([Number, Number]);
 PairOfNumbers(['abc', 3.5, 100]); // [NaN, 3.5]
 ```
 
-## Transform
+## Transformations
 
 *   **See**: [Converter](#converter)
 
