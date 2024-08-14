@@ -743,3 +743,23 @@ objABC({ a: 999, b: [{ c: 2.5, d: 3 }, null] }); // { a: 255, b: [{ c: 2, d: ['3
 ```
 
 Returns **Conversion\<any, OUTPUT>**&#x20;
+
+### dictionary
+
+cast data into a dictionary
+
+#### Parameters
+
+*   `conversion` &#x20;
+*   `initiator` **Conversion\<any, any>** input data conversion (optional, default `presets.object.convert`)
+
+#### Examples
+
+```javascript
+const dictInt = utils.dictionary(a.ubyte);,
+
+dictInt(undefined); // { }
+dictInt({ a: null, b: true, c: '2', d: [3, 4] }); // { a: 0, b: 1, c: 2, d: 3 }
+```
+
+Returns **Conversion\<any, Record<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)), VALUE>>**&#x20;
