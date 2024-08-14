@@ -14,7 +14,7 @@ import * as a from 'alwz';
 const a = require('alwz');
 ```
 
-## Cast
+## Types
 
 *   **See**: [presets](#presets)
 
@@ -33,7 +33,7 @@ a.array('abc'); // ['abc']
 a.array([123, 'abc', {}, Math.max]); // [123, 'abc', {}, Math.max]
 ```
 
-## Utils
+## Structures
 
 *   **See**: [utils](#utils)
 
@@ -71,7 +71,7 @@ const PairOfNumbers = tuple([Number, Number]);
 PairOfNumbers(['abc', 3.5, 100]); // [NaN, 3.5]
 ```
 
-## Transform
+## Transformations
 
 *   **See**: [Converter](#converter)
 
@@ -100,38 +100,6 @@ bool('yes'); // true
 bool('no'); // false
 bool('false'); // false
 ```
-
-create specific converters
-
-```javascript
-const even = new a.Converter(
-  (input) => typeof input === 'number' && input % 2 === 0, // initial input check
-  (input) => Number(input) % 2 === 0 ? Number(input) : 0 // fallback value generator
-);
-
-even
-  .undefined(() => -2)
-  .boolean((input) => input ? -4 : -6)
-  .number(function(input) {
-    const result = Math.trunc(Math.abs(input || 0) / 2) * 2;
-    return this.is(result) ? result : this.fallback(input);
-  })
-  .string((input) => even.convert(Number(input)))
-  .register(Array.isArray, (input) => even.convert(input[0])); // take first and try again
-
-even.convert(8); // 8
-even.convert(undefined); // -2
-even.convert(true); // -4
-even.convert(false); // -6
-even.convert(NaN); // 0
-even.convert(11); // 10
-even.convert('15'); // 14
-even.convert([17, 18, 19]); // 16
-```
-
-## converters
-
-### Examples
 
 parse colon-separated number/string records
 
@@ -420,6 +388,193 @@ promise.convert(Promise.resolve(1)); // Promise { 1 }
 promise.convert(42); // Promise { 42 }
 ```
 
+## utils
+
+extra utils functions
+
+### Examples
+
+```javascript
+const { array, tuple, range, variant, object, dictionary } = a.utils;
+```
+
+### array
+
+constrain data to an array elements of a given type
+
+#### Parameters
+
+*   `conversion` **Conversion\<any, OUTPUT>** item conversion
+*   `initiator` **Conversion\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<any>>** input data initial conversion (optional, default `presets.array.convert`)
+
+#### Examples
+
+```javascript
+const Numbers = array(Number);
+
+Numbers(); // []
+Numbers([]); // []
+Numbers([true, 2, "3", {}]); // [1, 2, 3, NaN]
+```
+
+sparse arrays behavior
+
+```javascript
+// Be aware of sparse arrays behavior - conversion is not performed for empty items
+numArray[1, , 3] // [1, , 3]
+```
+
+Returns **Conversion\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<OUTPUT>>**&#x20;
+
+### tuple
+
+constrain data to a tuple with given types
+
+#### Parameters
+
+*   `conversions` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Conversion\<any, any>>** tuple elemets conversions
+*   `initiator` **Conversion\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<any>>** input data initial conversion (optional, default `presets.array.convert`)
+
+#### Examples
+
+```javascript
+const NumStrBool = tuple([Number, String, Boolean]);
+
+NumStrBool(); // [NaN, 'undefined', false]
+NumStrBool(null); // [NaN, 'undefined', false]
+NumStrBool([]); // [NaN, '', false]
+NumStrBool('5'); // [5, 'undefined', false]
+NumStrBool(['1', '2', '3']); // [1, '2', true]
+```
+
+Returns **Conversion\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<any>>**&#x20;
+
+### range
+
+constrain variable value within a given range
+
+#### Parameters
+
+*   `lower` **OUTPUT** lower range border (optional, default `-Number.MAX_VALUE`)
+*   `upper` **OUTPUT** upper range border (optional, default `Number.MAX_VALUE`)
+*   `fallback` **Fallback\<OUTPUT>** fallback value generator
+*   `conversion` **Conversion\<any, OUTPUT>** input data conversion (optional, default `presets.double.convert`)
+
+#### Examples
+
+```javascript
+const range37 = range(3, 7);
+
+range37(1); // 3
+range37(5); // 5
+range37(9); // 7
+
+
+const range37WithCustomFallback = range(3, 7, () => -1);
+
+range37WithCustomFallback(1); // -1
+range37WithCustomFallback(5); // 5
+range37WithCustomFallback(9); // -1
+
+
+const rangeString = range('k', 'w', undefined, String);
+
+rangeString('a'); // k
+rangeString('n'); // n
+rangeString('z'); // w
+```
+
+Returns **Conversion\<any, OUTPUT>**&#x20;
+
+### variant
+
+constrain variable to given variants
+
+#### Parameters
+
+*   `values` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<OUTPUT>** valid values list
+*   `fallback` **Fallback\<OUTPUT>** fallback value generator (optional, default `()=>values[0]`)
+*   `conversion` **Conversion\<any, OUTPUT>** input data conversion (optional, default `presets.double.convert`)
+
+#### Examples
+
+```javascript
+const oneOf123 = variant([1, 2, 3]);
+
+oneOf123(1); // 1
+oneOf123(2); // 2
+oneOf123(3); // 3
+oneOf123(4); // 1
+oneOf123(-5); // 1
+
+
+const oneOf123WithCustomFallback = variant([1, 2, 3], () => -1);
+
+oneOf123WithCustomFallback(4); // -1
+
+
+oneOf123Strict([1, 2, 3], () => {
+  throw new Error('invalid input');
+});
+oneOf123Strict(4); // throws an Error
+
+
+const oneOfAB = variant(['a', 'b'], (i) => ['a', 'b'][i], String);
+
+oneOfAB('a'); // 'a'
+oneOfAB('b'); // 'b'
+oneOfAB(0); // 'a'
+oneOfAB(1); // 'b'
+```
+
+Returns **Conversion\<any, OUTPUT>**&#x20;
+
+### object
+
+cast data into an object with a given schema
+
+#### Parameters
+
+*   `schema` **Record<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), Conversion\<any, OUTPUT>>**&#x20;
+*   `conversion` **Conversion\<any, OUTPUT>** input data conversion (optional, default `presets.object.convert`)
+
+#### Examples
+
+```javascript
+const obj = object({
+  a: a.ubyte,
+  b: array(object({
+    c: a.int,
+    d: a.string,
+  })),
+});
+
+obj(undefined); // { a: 0, b: [] }
+obj({ a: 999, b: [{ c: 2.5, d: 3 }, null] }); // { a: 255, b: [{ c: 2, d: '3' }, { c: 0, d: '' }] }
+```
+
+Returns **Conversion\<any, OUTPUT>**&#x20;
+
+### dictionary
+
+cast data into a dictionary
+
+#### Parameters
+
+*   `conversion` &#x20;
+*   `initiator` **Conversion\<any, any>** input data conversion (optional, default `presets.object.convert`)
+
+#### Examples
+
+```javascript
+const dictOfInt = utils.dictionary(a.int);
+
+dictOfInt(undefined); // { }
+dictInt({ a: null, b: true, c: '2', d: [3, 4] }); // { a: 0, b: 1, c: 2, d: 3 }
+```
+
+Returns **Conversion\<any, Record<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)), VALUE>>**&#x20;
+
 ## Converter
 
 converts input data to specific type
@@ -590,176 +745,3 @@ const clone = converter
 converter.convert(); // 1
 clone.convert(); // 2
 ```
-
-## utils
-
-extra utils functions
-
-### Examples
-
-```javascript
-const { array, tuple, range, variant, object } = a.utils;
-```
-
-### array
-
-constrain data to an array elements of a given type
-
-#### Parameters
-
-*   `conversion` **Conversion\<any, OUTPUT>** item conversion
-*   `initiator` **Conversion\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<any>>** input data initial conversion (optional, default `presets.array.convert`)
-
-#### Examples
-
-```javascript
-const numArray = array(Number);
-numArray(); // []
-numArray([]); // []
-numArray([true, 2, "3", {}]); // [1, 2, 3, NaN]
-```
-
-sparse arrays behavior
-
-```javascript
-// Be aware of sparse arrays behavior - conversion is not performed for empty items
-numArray[1, , 3] // [1, , 3]
-```
-
-Returns **Conversion\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<OUTPUT>>**&#x20;
-
-### tuple
-
-constrain data to a tuple with given types
-
-#### Parameters
-
-*   `conversions` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Conversion\<any, any>>** tuple elemets conversions
-*   `initiator` **Conversion\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<any>>** input data initial conversion (optional, default `presets.array.convert`)
-
-#### Examples
-
-```javascript
-const tupleNumStrBool = tuple([Number, String, Boolean]);
-tupleNumStrBool(); // [NaN, 'undefined', false]
-tupleNumStrBool(null); // [NaN, 'undefined', false]
-tupleNumStrBool([]); // [NaN, '', false]
-tupleNumStrBool('5'); // [5, 'undefined', false]
-tupleNumStrBool(['1', '2', '3']); // [1, '2', true]
-```
-
-Returns **Conversion\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<any>>**&#x20;
-
-### range
-
-constrain variable value within a given range
-
-#### Parameters
-
-*   `lower` **OUTPUT** lower range border (optional, default `-Number.MAX_VALUE`)
-*   `upper` **OUTPUT** upper range border (optional, default `Number.MAX_VALUE`)
-*   `fallback` **Fallback\<OUTPUT>** fallback value generator
-*   `conversion` **Conversion\<any, OUTPUT>** input data conversion (optional, default `presets.double.convert`)
-
-#### Examples
-
-```javascript
-const range37 = range(3, 7);
-range37(1); // 3
-range37(5); // 5
-range37(9); // 7
-
-const range37WithCustomFallback = range(3, 7, () => -1);
-range37WithCustomFallback(1); // -1
-range37WithCustomFallback(5); // 5
-range37WithCustomFallback(9); // -1
-
-const rangeString = range('k', 'w', undefined, String);
-rangeString('a'); // k
-rangeString('n'); // n
-rangeString('z'); // w
-```
-
-Returns **Conversion\<any, OUTPUT>**&#x20;
-
-### variant
-
-constrain variable to given variants
-
-#### Parameters
-
-*   `values` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<OUTPUT>** valid values list
-*   `fallback` **Fallback\<OUTPUT>** fallback value generator (optional, default `()=>values[0]`)
-*   `conversion` **Conversion\<any, OUTPUT>** input data conversion (optional, default `presets.double.convert`)
-
-#### Examples
-
-```javascript
-const var123 = variant([1, 2, 3]);
-var123(1); // 1
-var123(2); // 2
-var123(3); // 3
-var123(4); // 1
-var123(-5); // 1
-
-const var123WithCustomFallback = variant([1, 2, 3], () => -1);
-var123WithCustomFallback(4); // -1
-
-var123WithStrictFallback([1, 2, 3], () => {
-  throw new Error('invalid input');
-});
-var123WithStrictFallback(4); // throws an Error
-
-const varABC = variant(['a', 'b'], (i) => ['a', 'b'][i], String);
-varABC('a'); // 'a'
-varABC('b'); // 'b'
-varABC(0); // 'a'
-varABC(1); // 'b'
-```
-
-Returns **Conversion\<any, OUTPUT>**&#x20;
-
-### object
-
-cast data into an object with a given schema
-
-#### Parameters
-
-*   `schema` **Record<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), Conversion\<any, OUTPUT>>**&#x20;
-*   `conversion` **Conversion\<any, OUTPUT>** input data conversion (optional, default `presets.object.convert`)
-
-#### Examples
-
-```javascript
-const objABC = utils.object({
-  a: a.ubyte,
-  b: utils.array(utils.object({
-    c: a.int,
-    d: utils.array(a.string),
-  })),
-});
-objABC(undefined); // { a: 0, b: [] }
-objABC({ a: 999, b: [{ c: 2.5, d: 3 }, null] }); // { a: 255, b: [{ c: 2, d: ['3'] }, { c: 0, d: [] }] }
-```
-
-Returns **Conversion\<any, OUTPUT>**&#x20;
-
-### dictionary
-
-cast data into a dictionary
-
-#### Parameters
-
-*   `conversion` &#x20;
-*   `initiator` **Conversion\<any, any>** input data conversion (optional, default `presets.object.convert`)
-
-#### Examples
-
-```javascript
-const dictInt = utils.dictionary(a.ubyte);,
-
-dictInt(undefined); // { }
-dictInt({ a: null, b: true, c: '2', d: [3, 4] }); // { a: 0, b: 1, c: 2, d: 3 }
-```
-
-Returns **Conversion\<any, Record<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)), VALUE>>**&#x20;

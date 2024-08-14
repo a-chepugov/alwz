@@ -207,7 +207,7 @@ describe('utils', () => {
 			a: a.ubyte,
 			b: utils.array(utils.object({
 				c: a.int,
-				d: utils.array(a.string),
+				d: a.string,
 			})),
 		});
 
@@ -233,7 +233,7 @@ describe('utils', () => {
 			},
 			{ work: objNested ,
 				input: { a: 999, b: [{ c: 2.5, d: 3 }, null] },
-				output: { a: 255, b: [{ c: 2, d: ['3'] }, { c: 0, d: [] }] },
+				output: { a: 255, b: [{ c: 2, d: '3' }, { c: 0, d: '' }] },
 			},
 
 			{ work: objCircular, input: {}, output: { a: 0, children: [] } },
