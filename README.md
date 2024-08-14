@@ -101,38 +101,6 @@ bool('no'); // false
 bool('false'); // false
 ```
 
-create specific converters
-
-```javascript
-const even = new a.Converter(
-  (input) => typeof input === 'number' && input % 2 === 0, // initial input check
-  (input) => Number(input) % 2 === 0 ? Number(input) : 0 // fallback value generator
-);
-
-even
-  .undefined(() => -2)
-  .boolean((input) => input ? -4 : -6)
-  .number(function(input) {
-    const result = Math.trunc(Math.abs(input || 0) / 2) * 2;
-    return this.is(result) ? result : this.fallback(input);
-  })
-  .string((input) => even.convert(Number(input)))
-  .register(Array.isArray, (input) => even.convert(input[0])); // take first and try again
-
-even.convert(8); // 8
-even.convert(undefined); // -2
-even.convert(true); // -4
-even.convert(false); // -6
-even.convert(NaN); // 0
-even.convert(11); // 10
-even.convert('15'); // 14
-even.convert([17, 18, 19]); // 16
-```
-
-## converters
-
-### Examples
-
 parse colon-separated number/string records
 
 ```javascript
