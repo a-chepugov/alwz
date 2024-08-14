@@ -235,6 +235,7 @@ describe('presets', () => {
 				{ input: Math.sin, check: (o, i) => !o.has(i) },
 				{ input: {}, check: (o,i ) => !o.has(i) },
 				{ input: [3], check: (o, i) => !o.has(i[0]) },
+				{ input: [[null, 1]], check: (o, i) => !o.has(i[0][0]) },
 				{ input: [[3, 3]], check: (o, i) => !o.has(i[0][0]) },
 				{ input: [[Object, 3]], check: (o, i) => o.has(i[0][0]) },
 				{ input: [[Math.abs, Math.abs]], check: (o, i) => o.has(i[0][0]) },

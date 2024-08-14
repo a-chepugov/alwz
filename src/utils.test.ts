@@ -207,7 +207,7 @@ describe('utils', () => {
 			a: a.ubyte,
 			b: utils.array(utils.object({
 				c: a.int,
-				d: utils.array(a.string),
+				d: a.string,
 			})),
 		});
 
@@ -233,7 +233,7 @@ describe('utils', () => {
 			},
 			{ work: objNested ,
 				input: { a: 999, b: [{ c: 2.5, d: 3 }, null] },
-				output: { a: 255, b: [{ c: 2, d: ['3'] }, { c: 0, d: [] }] },
+				output: { a: 255, b: [{ c: 2, d: '3' }, { c: 0, d: '' }] },
 			},
 
 			{ work: objCircular, input: {}, output: { a: 0, children: [] } },
@@ -258,6 +258,99 @@ describe('utils', () => {
 			});
 		}
 
+	});
+
+	describe('dictionary', () => {
+
+		test('throw on invalid converter', () => {
+			assert.throws(() => utils.dictionary(null));
+		});
+
+		test('throw on invalid conversion', () => {
+			assert.throws(() => utils.dictionary(() => true, null));
+		});
+
+		const dictShallow = utils.dictionary(a.int);
+
+		const dictNested = utils.dictionary(
+			utils.array(utils.dictionary(a.string))
+		);
+
+		const dictKeys = utils.dictionary((v, k) => `${k}:${v}`);
+
+		const sets = [
+			{ work: dictShallow, input: undefined, output: {} },
+			{ work: dictShallow, input: null, output: {} },
+			{ work: dictShallow, input: {}, output: {} },
+			{ work: dictShallow, input: { a: null, b: true, c: '2', d: [3, 4] }, output: { a: 0, b: 1, c: 2, d: 3 } },
+
+			{ work: dictNested,
+				input: { a: { b: 1} },
+				output: { a: [{ b: '1' }] },
+			},
+			{ work: dictNested,
+				input: { a: 999, b: [{ c: 2.5, d: 3 }, null] },
+				output: { a: [{}], b: [{ c: "2.5", d: '3'}, {}] },
+			},
+
+			{ work: dictKeys, input: { a: 1, b: 2}, output: { a: 'a:1', b: 'b:2' } },
+		];
+
+		for(let i = 0; i < sets.length; i++) {
+			const { work, input, output } = sets[i];
+			const name = `${i}: < ${JSON.stringify(input)} > gives ${JSON.stringify(output)}`;
+			test(name, () => {
+				assert.deepStrictEqual(work(input), output);
+			});
+		}
+
+	});
+
+
+	describe('mixed', () => {
+		const conversion = utils.object({
+			id: a.ulong,
+			rates: a.utils.tuple([a.uint, a.uint, a.uint]),
+			name: a.string,
+			nicks: utils.dictionary(a.utils.array(a.string)),
+			emails: a.utils.array(a.string),
+		});
+
+		const sets = [
+			{ work: conversion, input: undefined, output: { id: 0, rates: [0, 0, 0], name: "", nicks: {}, emails: [] } },
+			{ work: conversion, input: null, output: { id: 0, rates: [0, 0, 0], name: "", nicks: {}, emails: [] } },
+			{ work: conversion, input: {}, output: { id: 0, rates: [0, 0, 0], name: "", nicks: {}, emails: [] } },
+			{ work: conversion,
+				input: {
+					id: '1',
+					name: 42,
+					rates: ['4', 5, true],
+					nicks: {
+						work: ['42', 'omni'],
+						home: 'any',
+					},
+					emails: [ '42@example.com' ],
+				},
+				output: {
+					id: 1,
+					rates: [4, 5, 1],
+					name: '42',
+					nicks: {
+						work: ['42', 'omni'],
+						home: ['any'],
+					},
+					emails: [ '42@example.com' ],
+				},
+			},
+		];
+
+		for(let i = 0; i < sets.length; i++) {
+			const { work, input, output } = sets[i];
+			const name = `${i}: < ${JSON.stringify(input)} > gives ${JSON.stringify(output)}`;
+			test(name, () => {
+				assert.deepStrictEqual(work(input), output);
+			});
+		}
 	});
 
 });

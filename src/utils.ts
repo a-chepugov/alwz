@@ -10,17 +10,18 @@ const InvalidArgument = class extends EV {};
  * @namespace utils
  * @description extra utils functions
  * @example
- * const { array, tuple, range, variant, object } = a.utils;
+ * const { array, tuple, range, variant, object, dictionary } = a.utils;
  */
 
 /**
  * @memberof utils
  * @description constrain data to an array elements of a given type
  * @example
- * const numArray = array(Number);
- * numArray(); // []
- * numArray([]); // []
- * numArray([true, 2, "3", {}]); // [1, 2, 3, NaN]
+ * const Numbers = array(Number);
+ *
+ * Numbers(); // []
+ * Numbers([]); // []
+ * Numbers([true, 2, "3", {}]); // [1, 2, 3, NaN]
  *
  * @example <caption>sparse arrays behavior</caption>
  * // Be aware of sparse arrays behavior - conversion is not performed for empty items
@@ -48,12 +49,13 @@ export const array = <OUTPUT>(
  * @memberof utils
  * @description constrain data to a tuple with given types
  * @example
- * const tupleNumStrBool = tuple([Number, String, Boolean]);
- * tupleNumStrBool(); // [NaN, 'undefined', false]
- * tupleNumStrBool(null); // [NaN, 'undefined', false]
- * tupleNumStrBool([]); // [NaN, '', false]
- * tupleNumStrBool('5'); // [5, 'undefined', false]
- * tupleNumStrBool(['1', '2', '3']); // [1, '2', true]
+ * const NumStrBool = tuple([Number, String, Boolean]);
+ *
+ * NumStrBool(); // [NaN, 'undefined', false]
+ * NumStrBool(null); // [NaN, 'undefined', false]
+ * NumStrBool([]); // [NaN, '', false]
+ * NumStrBool('5'); // [5, 'undefined', false]
+ * NumStrBool(['1', '2', '3']); // [1, '2', true]
  *
  * @param {Array<Conversion<*, *>>} conversions - tuple elemets conversions
  * @param {Conversion<*, Array<*>>} initiator - input data initial conversion
@@ -88,16 +90,21 @@ export const tuple = (
  * @description constrain variable value within a given range
  * @example
  * const range37 = range(3, 7);
+ *
  * range37(1); // 3
  * range37(5); // 5
  * range37(9); // 7
  *
+ *
  * const range37WithCustomFallback = range(3, 7, () => -1);
+ *
  * range37WithCustomFallback(1); // -1
  * range37WithCustomFallback(5); // 5
  * range37WithCustomFallback(9); // -1
  *
+ *
  * const rangeString = range('k', 'w', undefined, String);
+ *
  * rangeString('a'); // k
  * rangeString('n'); // n
  * rangeString('z'); // w
@@ -142,26 +149,32 @@ export const range = <OUTPUT = number>(
  * @memberof utils
  * @description constrain variable to given variants
  * @example
- * const var123 = variant([1, 2, 3]);
- * var123(1); // 1
- * var123(2); // 2
- * var123(3); // 3
- * var123(4); // 1
- * var123(-5); // 1
+ * const oneOf123 = variant([1, 2, 3]);
  *
- * const var123WithCustomFallback = variant([1, 2, 3], () => -1);
- * var123WithCustomFallback(4); // -1
+ * oneOf123(1); // 1
+ * oneOf123(2); // 2
+ * oneOf123(3); // 3
+ * oneOf123(4); // 1
+ * oneOf123(-5); // 1
  *
- * var123WithStrictFallback([1, 2, 3], () => {
+ *
+ * const oneOf123WithCustomFallback = variant([1, 2, 3], () => -1);
+ *
+ * oneOf123WithCustomFallback(4); // -1
+ *
+ *
+ * oneOf123Strict([1, 2, 3], () => {
  *   throw new Error('invalid input');
  * });
- * var123WithStrictFallback(4); // throws an Error
+ * oneOf123Strict(4); // throws an Error
  *
- * const varABC = variant(['a', 'b'], (i) => ['a', 'b'][i], String);
- * varABC('a'); // 'a'
- * varABC('b'); // 'b'
- * varABC(0); // 'a'
- * varABC(1); // 'b'
+ *
+ * const oneOfAB = variant(['a', 'b'], (i) => ['a', 'b'][i], String);
+ *
+ * oneOfAB('a'); // 'a'
+ * oneOfAB('b'); // 'b'
+ * oneOfAB(0); // 'a'
+ * oneOfAB(1); // 'b'
  *
  * @param {Array<OUTPUT>} values - valid values list
  * @param {Fallback<OUTPUT>} fallback - fallback value generator
@@ -195,15 +208,16 @@ export const variant = <OUTPUT = number>(
  * @memberof utils
  * @description cast data into an object with a given schema
  * @example
- * const objABC = utils.object({
+ * const obj = object({
  *   a: a.ubyte,
- *   b: utils.array(utils.object({
+ *   b: array(object({
  *     c: a.int,
- *     d: utils.array(a.string),
+ *     d: a.string,
  *   })),
  * });
- * objABC(undefined); // { a: 0, b: [] }
- * objABC({ a: 999, b: [{ c: 2.5, d: 3 }, null] }); // { a: 255, b: [{ c: 2, d: ['3'] }, { c: 0, d: [] }] }
+ *
+ * obj(undefined); // { a: 0, b: [] }
+ * obj({ a: 999, b: [{ c: 2.5, d: 3 }, null] }); // { a: 255, b: [{ c: 2, d: '3' }, { c: 0, d: '' }] }
  *
  * @param {Record<string, Conversion<any, OUTPUT>>} schema
  * @param {Conversion<any, OUTPUT>} conversion - input data conversion
@@ -236,3 +250,36 @@ export const object = <OUTPUT extends object, Keys extends keyof OUTPUT>(
 	};
 };
 
+/**
+ * @memberof utils
+ * @description cast data into a dictionary
+ * @example
+ * const dictOfInt = utils.dictionary(a.int);
+ *
+ * dictOfInt(undefined); // { }
+ * dictInt({ a: null, b: true, c: '2', d: [3, 4] }); // { a: 0, b: 1, c: 2, d: 3 }
+ *
+ * @param {(value: any, key: string | number) => VALUE} conversion - item conversion
+ * @param {Conversion<any, any>} initiator - input data conversion
+ * @returns {Conversion<any, Record<string | number, VALUE>>}
+ */
+export const dictionary = <KEY extends string | number, VALUE>(
+	conversion: (value: unknown, key: KEY) => VALUE,
+	initiator : Conversion<unknown, unknown> = presets.object.convert as any
+): Conversion<unknown, Record<KEY, VALUE>> => {
+	if (typeof conversion !== 'function') {
+		throw new InvalidArgument('conversion must be a function', conversion);
+	}
+
+	assertConversion(initiator);
+
+	return (input: any) => {
+		const result = {} as Record<KEY, VALUE>;
+		const source = initiator(input) as Record<KEY, unknown>;
+
+		for (const key in source) {
+			result[key] = conversion(source?.[key], key);
+		}
+		return result;
+	};
+};

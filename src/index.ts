@@ -10,7 +10,7 @@ import * as presets from './presets';
  */
 
 /**
- * @name Cast
+ * @name Types
  * @see {@link presets presets}
  * @description convert data with presetted converters
  * @example
@@ -25,7 +25,7 @@ import * as presets from './presets';
  */
 
 /**
- * @name Utils
+ * @name Structures
  * @see {@link utils utils}
  * @description construct complex data
  * @example <caption>ensure an array output</caption>
@@ -51,7 +51,7 @@ import * as presets from './presets';
  */
 
 /**
- * @name Transform
+ * @name Transformations
  * @see {@link Converter Converter}
  * @description create custom converters
  *
@@ -74,33 +74,6 @@ import * as presets from './presets';
  * bool('no'); // false
  * bool('false'); // false
  *
- * @example <caption>create specific converters</caption>
- * const even = new a.Converter(
- *   (input) => typeof input === 'number' && input % 2 === 0, // initial input check
- *   (input) => Number(input) % 2 === 0 ? Number(input) : 0 // fallback value generator
- * );
- *
- * even
- *   .undefined(() => -2)
- *   .boolean((input) => input ? -4 : -6)
- *   .number(function(input) {
- *     const result = Math.trunc(Math.abs(input || 0) / 2) * 2;
- *     return this.is(result) ? result : this.fallback(input);
- *   })
- *   .string((input) => even.convert(Number(input)))
- *   .register(Array.isArray, (input) => even.convert(input[0])); // take first and try again
- *
- * even.convert(8); // 8
- * even.convert(undefined); // -2
- * even.convert(true); // -4
- * even.convert(false); // -6
- * even.convert(NaN); // 0
- * even.convert(11); // 10
- * even.convert('15'); // 14
- * even.convert([17, 18, 19]); // 16
- */
-
-/**
  * @example <caption>parse colon-separated number/string records</caption>
  * const PathArray = a.default.get('array')
  *   .clone()
@@ -196,7 +169,7 @@ export const set = presets.set.convert;
 export const weakset = presets.weakset.convert;
 export const promise = presets.promise.convert;
 
+export * as utils from './utils';
 
 export { default as Converter } from './models/Converter';
 export { default as Aggregator } from './models/Aggregator';
-export * as utils from './utils';
