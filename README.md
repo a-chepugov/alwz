@@ -395,7 +395,7 @@ extra utils functions
 ### Examples
 
 ```javascript
-const { array, tuple, range, variant, object } = a.utils;
+const { array, tuple, range, variant, object, dictionary } = a.utils;
 ```
 
 ### array
@@ -410,10 +410,11 @@ constrain data to an array elements of a given type
 #### Examples
 
 ```javascript
-const numArray = array(Number);
-numArray(); // []
-numArray([]); // []
-numArray([true, 2, "3", {}]); // [1, 2, 3, NaN]
+const Numbers = array(Number);
+
+Numbers(); // []
+Numbers([]); // []
+Numbers([true, 2, "3", {}]); // [1, 2, 3, NaN]
 ```
 
 sparse arrays behavior
@@ -437,12 +438,13 @@ constrain data to a tuple with given types
 #### Examples
 
 ```javascript
-const tupleNumStrBool = tuple([Number, String, Boolean]);
-tupleNumStrBool(); // [NaN, 'undefined', false]
-tupleNumStrBool(null); // [NaN, 'undefined', false]
-tupleNumStrBool([]); // [NaN, '', false]
-tupleNumStrBool('5'); // [5, 'undefined', false]
-tupleNumStrBool(['1', '2', '3']); // [1, '2', true]
+const NumStrBool = tuple([Number, String, Boolean]);
+
+NumStrBool(); // [NaN, 'undefined', false]
+NumStrBool(null); // [NaN, 'undefined', false]
+NumStrBool([]); // [NaN, '', false]
+NumStrBool('5'); // [5, 'undefined', false]
+NumStrBool(['1', '2', '3']); // [1, '2', true]
 ```
 
 Returns **Conversion\<any, [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<any>>**&#x20;
@@ -462,16 +464,21 @@ constrain variable value within a given range
 
 ```javascript
 const range37 = range(3, 7);
+
 range37(1); // 3
 range37(5); // 5
 range37(9); // 7
 
+
 const range37WithCustomFallback = range(3, 7, () => -1);
+
 range37WithCustomFallback(1); // -1
 range37WithCustomFallback(5); // 5
 range37WithCustomFallback(9); // -1
 
+
 const rangeString = range('k', 'w', undefined, String);
+
 rangeString('a'); // k
 rangeString('n'); // n
 rangeString('z'); // w
@@ -492,26 +499,32 @@ constrain variable to given variants
 #### Examples
 
 ```javascript
-const var123 = variant([1, 2, 3]);
-var123(1); // 1
-var123(2); // 2
-var123(3); // 3
-var123(4); // 1
-var123(-5); // 1
+const oneOf123 = variant([1, 2, 3]);
 
-const var123WithCustomFallback = variant([1, 2, 3], () => -1);
-var123WithCustomFallback(4); // -1
+oneOf123(1); // 1
+oneOf123(2); // 2
+oneOf123(3); // 3
+oneOf123(4); // 1
+oneOf123(-5); // 1
 
-var123WithStrictFallback([1, 2, 3], () => {
+
+const oneOf123WithCustomFallback = variant([1, 2, 3], () => -1);
+
+oneOf123WithCustomFallback(4); // -1
+
+
+oneOf123Strict([1, 2, 3], () => {
   throw new Error('invalid input');
 });
-var123WithStrictFallback(4); // throws an Error
+oneOf123Strict(4); // throws an Error
 
-const varABC = variant(['a', 'b'], (i) => ['a', 'b'][i], String);
-varABC('a'); // 'a'
-varABC('b'); // 'b'
-varABC(0); // 'a'
-varABC(1); // 'b'
+
+const oneOfAB = variant(['a', 'b'], (i) => ['a', 'b'][i], String);
+
+oneOfAB('a'); // 'a'
+oneOfAB('b'); // 'b'
+oneOfAB(0); // 'a'
+oneOfAB(1); // 'b'
 ```
 
 Returns **Conversion\<any, OUTPUT>**&#x20;
@@ -528,15 +541,16 @@ cast data into an object with a given schema
 #### Examples
 
 ```javascript
-const objABC = utils.object({
+const obj = object({
   a: a.ubyte,
-  b: utils.array(utils.object({
+  b: array(object({
     c: a.int,
-    d: utils.array(a.string),
+    d: a.string,
   })),
 });
-objABC(undefined); // { a: 0, b: [] }
-objABC({ a: 999, b: [{ c: 2.5, d: 3 }, null] }); // { a: 255, b: [{ c: 2, d: ['3'] }, { c: 0, d: [] }] }
+
+obj(undefined); // { a: 0, b: [] }
+obj({ a: 999, b: [{ c: 2.5, d: 3 }, null] }); // { a: 255, b: [{ c: 2, d: '3' }, { c: 0, d: '' }] }
 ```
 
 Returns **Conversion\<any, OUTPUT>**&#x20;
@@ -553,9 +567,9 @@ cast data into a dictionary
 #### Examples
 
 ```javascript
-const dictInt = utils.dictionary(a.ubyte);,
+const dictOfInt = utils.dictionary(a.int);
 
-dictInt(undefined); // { }
+dictOfInt(undefined); // { }
 dictInt({ a: null, b: true, c: '2', d: [3, 4] }); // { a: 0, b: 1, c: 2, d: 3 }
 ```
 
