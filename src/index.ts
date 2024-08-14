@@ -196,7 +196,7 @@ export const set = presets.set.convert;
 export const weakset = presets.weakset.convert;
 export const promise = presets.promise.convert;
 
+export * as utils from './utils';
 
 export { default as Converter } from './models/Converter';
 export { default as Aggregator } from './models/Aggregator';
-export * as utils from './utils';
