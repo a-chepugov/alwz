@@ -273,19 +273,28 @@ export class Converter<OUTPUT> {
 	 * clone.convert(); // 2
 	*/
 	clone() {
-		return Converter.build(this.is, this.fallback, this.types, this.conversions);
+		return Converter.build(this._is, this._fallback, this._types, this._conversions);
 	}
 
 	static build<OUTPUT>(
 		is: IS<OUTPUT>,
 		fallback: Fallback<OUTPUT>,
 		types: Partial<TypeConversions<OUTPUT>> = {},
-		conversions: Array<[IS<any>, Conversion<any, OUTPUT>]> = []
+		conversions: Iterable<[IS<any>, Conversion<any, OUTPUT>]> = []
 	) {
 		const converter = new Converter(is, fallback);
-		const typesList = Object.entries(types) as Array<[keyof TypesMap, Conversion<any, OUTPUT>]>;
-		typesList.forEach(([type, conversion]: [keyof TypesMap, Conversion<any, OUTPUT>]) => converter.type(type, conversion));
-		conversions.forEach(([is, conversion]: [IS<OUTPUT>, Conversion<any, OUTPUT>]) => converter.register(is, conversion));
+
+		for (const type in types) {
+			converter.type(
+				type as keyof TypesMap,
+				types[type as keyof TypesMap]
+			);
+		}
+
+		for (const [is, conversion] of conversions) {
+			converter.register(is, conversion);
+		}
+
 		return converter;
 	}
 
