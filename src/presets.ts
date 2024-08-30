@@ -51,6 +51,7 @@ export const number = new Converter<number>(
 	.bigint(Number)
 	.string(Number)
 	.symbol((i) => Number(string.convert(i)))
+	.register(is.null, () => 0)
 	.register(is.Array, function(i) { return this.convert(i[0]); })
 	.register(is.Date, (i) => i.getTime())
 ;
@@ -104,6 +105,16 @@ export const number = new Converter<number>(
  * long.convert(-Infinity); // MIN_SAFE_INTEGER
  */
 
+const numeric = number.clone()
+	.undefined(() => 0)
+	.bigint(function(i) { return this.convert(Number(i)); })
+	.string(function(i) { return this.convert(Number(i)); })
+	.symbol(function(i) { return this.convert(string.convert(i)); })
+	.register(is.Date, function(i) { return this.convert(i.getTime()); })
+	;
+
+numeric.fallback = () => 0;
+
 /**
  * @memberof presets
  * @name unsigned
@@ -132,36 +143,22 @@ export const {
 } = Object.fromEntries(
 	Object.entries(numbers.integers)
 		.map(([name, [min, max]]) => {
-			const guard = intIs[name as keyof typeof numbers.integers];
 
-			return [
-				name,
-				new Converter<number>(
-					guard,
-					() => 0
-				)
-					.undefined(() => 0)
-					.boolean(Number)
-					.number(function(i) {
-						if (i <= min) {
-							return min;
-						} else if (i >= max) {
-							return max;
-						} else {
-							if (Number.isNaN(i)) {
-								return 0;
-							} else {
-								return Math.trunc(i);
-							}
-						}
-					})
-					.bigint(function(i) { return this.convert(Number(i)); })
-					.string(function(i) { return this.convert(Number(i)); })
-					.symbol(function(i) { return this.convert(string.convert(i)); })
-					.register(is.null, () => 0)
-					.register(is.Date, function(i) { return this.convert(i.getTime()); })
-					.register(is.Array, function(i) { return this.convert(i[0]); }),
-			];
+			const converter = numeric.clone()
+				.number(function(i) {
+					if (i <= min) {
+						return min;
+					} else if (i >= max) {
+						return max;
+					} else if (Number.isNaN(i)) {
+						return 0;
+					} else {
+						return Math.trunc(i);
+					}
+				});
+			converter.is = intIs[name as keyof typeof numbers.integers];
+
+			return [name, converter];
 		}))
 ;
 
@@ -177,32 +174,19 @@ export const {
 } = Object.fromEntries(
 	Object.entries(numbers.floats)
 		.map(([name, [min, max]]) => {
-			const guard = floatIs[name as keyof typeof numbers.floats];
+			const converter = numeric.clone()
+				.number(function(i) {
+					if (i >= max) {
+						return max;
+					} else if (i <= min) {
+						return min;
+					} else {
+						return 0;
+					}
+				});
+			converter.is = floatIs[name as keyof typeof numbers.floats];
 
-			return [
-				name,
-				new Converter<number>(
-					guard,
-					() => 0
-				)
-					.undefined(() => 0)
-					.boolean(Number)
-					.number(function(i) {
-						if (i >= max) {
-							return Number.MAX_VALUE;
-						} else if (i <= min) {
-							return min;
-						} else {
-							return 0;
-						}
-					})
-					.bigint(function(i) { return this.convert(Number(i)); })
-					.string(function(i) { return this.convert(Number(i)); })
-					.symbol(function(i) { return this.convert(string.convert(i)); })
-					.register(is.null, () => 0)
-					.register(is.Date, function(i) { return this.convert(i.getTime()); })
-					.register(is.Array, function(i) { return this.convert(i[0]); }),
-			];
+			return [name, converter];
 		}))
 ;
 
