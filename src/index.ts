@@ -171,5 +171,23 @@ export const promise = presets.promise.convert;
 
 export * as utils from './utils';
 
+/**
+ * @name Predicates
+ * @see {@link is is}
+ * @description data type checks
+ * @example
+ * const { is } = a;
+ *
+ * is.void(0); // false
+ * is.void(null); // true
+ * is.value(null); // false
+ * is.value(0); // true
+ * is.ubyte(255); // true
+ * is.int(Infinity); // false
+ * is.object(null); // false
+ * is.Iterable(new Set()); // true
+ */
+export { default as is } from './is';
+
 export { default as Converter } from './models/Converter';
 export { default as Aggregator } from './models/Aggregator';
