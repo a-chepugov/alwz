@@ -176,5 +176,24 @@ describe('index', () => {
 
 	});
 
+	describe('Predicates', () => {
+		const is = a.is;
+		const set = [
+			[is.void(0), false],
+			[is.void(null), true],
+			[is.value(null), false],
+			[is.value(0), true],
+			[is.ubyte(255), true],
+			[is.int(Infinity), false],
+			[is.object(null), false],
+			[is.Iterable(new Set()), true],
+		];
+
+		for (const index in set) {
+			const [received, expected] = set[index];
+			test(index, () => assert.strictEqual(received, expected));
+		}
+	});
+
 });
 
