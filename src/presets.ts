@@ -26,8 +26,8 @@ export const boolean = new Converter<boolean>(
 	.string(Boolean)
 	.symbol(function(i) { return this.convert(string.convert(i)); })
 	.register(is.null, Boolean)
-	.register(is.Date, (i) => Boolean(i.getTime()))
 	.register(is.Array, function(i) { return this.convert(i[0]); })
+	.register(is.Date, (i) => Boolean(i.getTime()))
 ;
 
 /**
@@ -51,8 +51,8 @@ export const number = new Converter<number>(
 	.bigint(Number)
 	.string(Number)
 	.symbol((i) => Number(string.convert(i)))
-	.register(is.Date, (i) => i.getTime())
 	.register(is.Array, function(i) { return this.convert(i[0]); })
+	.register(is.Date, (i) => i.getTime())
 ;
 
 /**
@@ -225,8 +225,8 @@ export const bigint = new Converter<bigint>(
 	.string(function(i) { return this.convert(Number(i)); })
 	.symbol(function(i) { return this.convert(string.convert(i)); })
 	.register(is.null, () => BigInt(0))
-	.register(is.Date, function(i) { return this.convert(i.getTime()); })
 	.register(is.Array, function(i) { return this.convert(i[0]); })
+	.register(is.Date, function(i) { return this.convert(i.getTime()); })
 ;
 
 /**
@@ -251,6 +251,7 @@ export const string = new Converter<string>(
 	.bigint(String)
 	.symbol((i) => Symbol.keyFor(i) || '')
 	.register(is.null, () => '')
+	.register(is.Array, function(i) { return this.convert(i[0]); })
 	.register(is.Date, function(i) {
 		const ts = i.getTime();
 		if (Number.isFinite(ts)) {
@@ -259,7 +260,6 @@ export const string = new Converter<string>(
 			return new Date(0).toISOString();
 		}
 	})
-	.register(is.Array, function(i) { return this.convert(i[0]); })
 ;
 
 /**
