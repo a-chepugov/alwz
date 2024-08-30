@@ -203,7 +203,9 @@ export class Converter<OUTPUT> {
 	}
 
 	/**
-	 * @description set conversion rule setter for `types`
+	 * @description set conversion rule for `type` if `conversion` is defined or unset if undefined
+	 * @param {string} name - one of types (`typeof` result)
+	 * @param {Conversion} [conversion]
 	 */
 	type<Name extends keyof TypesMap>(name: Name, conversion?: TypeConversion<Name, OUTPUT>) {
 		if (conversion === undefined) {
@@ -217,6 +219,7 @@ export class Converter<OUTPUT> {
 
 	/**
 	 * @description conversion rule setter for `undefined` input
+	 * @param {Conversion} [conversion]
 	 */
 	undefined(conversion?: Conversion<undefined, OUTPUT>) {
 		return this.type('undefined', conversion);
@@ -224,6 +227,7 @@ export class Converter<OUTPUT> {
 
 	/**
 	 * @description conversion rule setter for `boolean` input
+	 * @param {Conversion} [conversion]
 	 */
 	boolean(conversion?: Conversion<boolean, OUTPUT>) {
 		return this.type('boolean', conversion);
@@ -231,6 +235,7 @@ export class Converter<OUTPUT> {
 
 	/**
 	 * @description conversion rule setter for `number` input
+	 * @param {Conversion} [conversion]
 	 */
 	number(conversion?: Conversion<number, OUTPUT>) {
 		return this.type('number', conversion);
@@ -238,6 +243,7 @@ export class Converter<OUTPUT> {
 
 	/**
 	 * @description conversion rule setter for `bigint` input
+	 * @param {Conversion} [conversion]
 	 */
 	bigint(conversion?: Conversion<bigint, OUTPUT>) {
 		return this.type('bigint', conversion);
@@ -245,6 +251,7 @@ export class Converter<OUTPUT> {
 
 	/**
 	 * @description conversion rule setter for `string` input
+	 * @param {Conversion} [conversion]
 	 */
 	string(conversion?: Conversion<string, OUTPUT>) {
 		return this.type('string', conversion);
@@ -252,6 +259,7 @@ export class Converter<OUTPUT> {
 
 	/**
 	 * @description conversion rule setter for `symbol` input
+	 * @param {Conversion} [conversion]
 	 */
 	symbol(conversion?: Conversion<symbol, OUTPUT>) {
 		return this.type('symbol', conversion);
