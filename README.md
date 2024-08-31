@@ -818,12 +818,12 @@ removes conversion for `INPUT` type
 
 ### type
 
-set conversion rule setter for `types`
+set conversion rule for `type` if `conversion` is defined or unset if undefined
 
 #### Parameters
 
-*   `type` &#x20;
-*   `conversion` &#x20;
+*   `name` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** one of types (`typeof` result)
+*   `conversion` **Conversion?**&#x20;
 
 ### undefined
 
@@ -831,7 +831,7 @@ conversion rule setter for `undefined` input
 
 #### Parameters
 
-*   `conversion` &#x20;
+*   `conversion` **Conversion?**&#x20;
 
 ### boolean
 
@@ -839,7 +839,7 @@ conversion rule setter for `boolean` input
 
 #### Parameters
 
-*   `conversion` &#x20;
+*   `conversion` **Conversion?**&#x20;
 
 ### number
 
@@ -847,7 +847,7 @@ conversion rule setter for `number` input
 
 #### Parameters
 
-*   `conversion` &#x20;
+*   `conversion` **Conversion?**&#x20;
 
 ### bigint
 
@@ -855,7 +855,7 @@ conversion rule setter for `bigint` input
 
 #### Parameters
 
-*   `conversion` &#x20;
+*   `conversion` **Conversion?**&#x20;
 
 ### string
 
@@ -863,7 +863,7 @@ conversion rule setter for `string` input
 
 #### Parameters
 
-*   `conversion` &#x20;
+*   `conversion` **Conversion?**&#x20;
 
 ### symbol
 
@@ -871,7 +871,7 @@ conversion rule setter for `symbol` input
 
 #### Parameters
 
-*   `conversion` &#x20;
+*   `conversion` **Conversion?**&#x20;
 
 ### clone
 
