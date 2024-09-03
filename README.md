@@ -153,6 +153,27 @@ const Arr = a.default.get('array'); // Converter<Array>
 const Unknown = a.default.get('123'); // undefined
 ```
 
+## Predicates
+
+*   **See**: [is](#is)
+
+data type checks
+
+### Examples
+
+```javascript
+const { is } = a;
+
+is.void(0); // false
+is.void(null); // true
+is.value(null); // false
+is.value(0); // true
+is.ubyte(255); // true
+is.int(Infinity); // false
+is.object(null); // false
+is.Iterable(new Set()); // true
+```
+
 ## presets
 
 ### boolean
@@ -575,6 +596,131 @@ dictInt({ a: null, b: true, c: '2', d: [3, 4] }); // { a: 0, b: 1, c: 2, d: 3 }
 
 Returns **Conversion\<any, Record<([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)), VALUE>>**&#x20;
 
+## is
+
+guard functions (pattern matching check)
+
+### undefined
+
+### null
+
+### void
+
+undefined or null
+
+#### Examples
+
+```javascript
+is.void(null) // true
+is.void(0) // false
+```
+
+### value
+
+any value except undefined or null
+
+#### Examples
+
+```javascript
+is.value(null) // false
+is.value(0) // true
+```
+
+### boolean
+
+#### Examples
+
+```javascript
+is.boolean(1) // false
+is.boolean(true) // true
+```
+
+### number
+
+#### Examples
+
+```javascript
+is.number(NaN) // true
+is.number(Infinity) // true
+is.number(1) // true
+is.number('1') // false
+```
+
+#### integers
+
+byte, short, int, long
+
+##### Examples
+
+```javascript
+is.int(NaN) // false
+is.long(Infinity) // false
+is.uint(-1) // false
+is.uint(1) // true
+is.uint(1.5) // false
+```
+
+#### floats
+
+double
+
+##### Examples
+
+```javascript
+is.double(NaN) // false
+is.double(Infinity) // false
+is.double(1.5) // true
+```
+
+### bigint
+
+### string
+
+### symbol
+
+### function
+
+### object
+
+any object (null excluded)
+
+#### Examples
+
+```javascript
+is.object(null) // false
+is.object({}) // true
+```
+
+### Error
+
+### Array
+
+### Date
+
+### RegExp
+
+### Promise
+
+### Set
+
+### WeakSet
+
+### Map
+
+### WeakMap
+
+### Iterable
+
+can be iterated
+
+#### Examples
+
+```javascript
+is.Iterable(new Map()); // true
+is.Iterable([]); // true
+is.Iterable({}); // false
+```
+
 ## Converter
 
 converts input data to specific type
@@ -672,12 +818,12 @@ removes conversion for `INPUT` type
 
 ### type
 
-set conversion rule setter for `types`
+set conversion rule for `type` if `conversion` is defined or unset if undefined
 
 #### Parameters
 
-*   `type` &#x20;
-*   `conversion` &#x20;
+*   `name` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** one of types (`typeof` result)
+*   `conversion` **Conversion?**&#x20;
 
 ### undefined
 
@@ -685,7 +831,7 @@ conversion rule setter for `undefined` input
 
 #### Parameters
 
-*   `conversion` &#x20;
+*   `conversion` **Conversion?**&#x20;
 
 ### boolean
 
@@ -693,7 +839,7 @@ conversion rule setter for `boolean` input
 
 #### Parameters
 
-*   `conversion` &#x20;
+*   `conversion` **Conversion?**&#x20;
 
 ### number
 
@@ -701,7 +847,7 @@ conversion rule setter for `number` input
 
 #### Parameters
 
-*   `conversion` &#x20;
+*   `conversion` **Conversion?**&#x20;
 
 ### bigint
 
@@ -709,7 +855,7 @@ conversion rule setter for `bigint` input
 
 #### Parameters
 
-*   `conversion` &#x20;
+*   `conversion` **Conversion?**&#x20;
 
 ### string
 
@@ -717,7 +863,7 @@ conversion rule setter for `string` input
 
 #### Parameters
 
-*   `conversion` &#x20;
+*   `conversion` **Conversion?**&#x20;
 
 ### symbol
 
@@ -725,7 +871,7 @@ conversion rule setter for `symbol` input
 
 #### Parameters
 
-*   `conversion` &#x20;
+*   `conversion` **Conversion?**&#x20;
 
 ### clone
 
