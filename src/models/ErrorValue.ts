@@ -1,10 +1,14 @@
 // eslint-disable-next-line require-jsdoc
 export class ErrorValue extends Error {
 	value?: unknown;
-	constructor(message: string, value?: unknown) {
-		super(message);
+	constructor(message?: string, value?: unknown, options?: unknown) {
+		// @ts-ignore
+		super(message, options);
 		this.value = value;
-		Object.freeze(this);
+	}
+
+	throw() {
+		throw this;
 	}
 }
 
