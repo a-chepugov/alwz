@@ -166,5 +166,37 @@ describe('index', () => {
 		});
 	});
 
+	describe('ErrorValue', () => {
+		const { ErrorValue } = a;
+
+		test('throw an error with extra data', () => {
+			const inc = (input) => typeof input === 'number'
+				? input + 1
+				: new ErrorValue('invalid list', { input, date: Date.now() }).throw();
+
+			assert.throws(() => inc('1'), (error) => {
+				assert.strictEqual(error?.value?.input, '1');
+				assert.strictEqual(typeof error?.value?.date, 'number');
+				return true;
+			});
+		});
+
+		test('intercept and wrap error', () => {
+			const cause = new Error('oops, something went wrong');
+			const fn = () => {
+				try {
+					throw cause;
+				} catch (error) {
+					throw new ErrorValue('urgent message', { data: 'some additional data' }, { cause: error }).throw();
+				}
+			};
+			assert.throws(() => fn(), (error) => {
+				assert.strictEqual(error?.value?.data, 'some additional data');
+				assert.strictEqual(error?.cause, cause);
+				return true;
+			});
+		});
+	});
+
 });
 
