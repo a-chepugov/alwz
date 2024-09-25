@@ -190,6 +190,28 @@ export * as utils from './utils.js';
 export { default as is } from './is.js';
 export { default as Converter } from './models/Converter.js';
 export { default as Aggregator } from './models/Aggregator.js';
+
+/**
+ * @name Checks
+ * @see {@link Is}
+ * @description create readable check functions
+ * @example
+ * const { Is } = a;
+ *
+ * const isAlphaOrBeta = Is.variant(['Alpha', 'Beta']);
+ * isAlphaOrBeta('Alpha'); // true;
+ * isAlphaOrBeta('Gamma'); // false;
+ *
+ * class X {}
+ * class Y extends X {}
+ *
+ * const isX = Is.instance(X);
+ * isX(new X); // true
+ * isX(new Y); // true
+ * isX({}); // false
+ */
+export { default as Is } from './models/Is.js';
+
 /**
  * @name Errors
  * @see {@link ErrorValue}
