@@ -190,3 +190,23 @@ export * as utils from './utils.js';
 export { default as is } from './is.js';
 export { default as Converter } from './models/Converter.js';
 export { default as Aggregator } from './models/Aggregator.js';
+/**
+ * @name Errors
+ * @see {@link ErrorValue}
+ * @description create informative errors
+ * @example <caption>add additional value to an error</caption>
+ * const { ErrorValue } = a;
+ * const inc = (input) => typeof input === 'number'
+ *   ? input + 1
+ *   : new ErrorValue('invalid list', { input, date: Date.now() }).throw();
+ *
+ * inc('1'); // Error { message: 'invalid number', value: { input: '1', date: 946684800000 } }
+ *
+ * @example <caption>intercept and wrap thrown ones</caption>
+ * try {
+ *  throw new Error('oops, something went wrong');
+ * } catch (error) {
+ *  throw new ErrorValue('urgent message', { data: 'some additional data' }, { cause: error });
+ * }
+ */
+export { default as ErrorValue } from './models/ErrorValue.js';
