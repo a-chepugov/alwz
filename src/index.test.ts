@@ -166,6 +166,32 @@ describe('index', () => {
 		});
 	});
 
+	describe('Guards', () => {
+		const Is = a.Is;
+
+		const isAlphaOrBeta = Is.variant(['Alpha', 'Beta']);
+
+		/** */
+		class X {}
+		/** */
+		class Y extends X {}
+
+		const isX = Is.instance(X);
+
+		const set = [
+			[isAlphaOrBeta('Alpha'), true],
+			[isAlphaOrBeta('Gamma'), false],
+			[isX(new X), true],
+			[isX(new Y), true],
+			[isX({}), false],
+		];
+
+		for (const index in set) {
+			const [received, expected] = set[index];
+			test(index, () => assert.strictEqual(received, expected));
+		}
+	});
+
 	describe('ErrorValue', () => {
 		const { ErrorValue } = a;
 
