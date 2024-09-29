@@ -4,6 +4,7 @@ coverage
 docs
 ignore
 node_modules
+scripts
 src
 tests
 .editorconfig
