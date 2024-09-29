@@ -1,6 +1,6 @@
 import assert from 'assert';
-import Aggregator from './Aggregator';
-import Converter from './Converter';
+import Aggregator from './Aggregator.js';
+import Converter from './Converter.js';
 
 describe('Aggregator', () => {
 	const even = new Converter((input: any) => !(input % 2), () => 2);

@@ -1,12 +1,14 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
-    "outDir": "build/es",
+    "outDir": "build",
     "target": "es2015",
-    "module": "es2015",
+    "noEmit": true,
+    "declaration": false,
+    "removeComments": true,
     "moduleResolution" : "node",
-    "declaration": true,
     "strict": true,
+    "strictNullChecks": true,
     "alwaysStrict": true,
     "noImplicitAny": true,
     "allowJs": false,
@@ -14,13 +16,18 @@
     "stripInternal": true,
     "sourceMap": true,
     "noErrorTruncation": true,
+    "esModuleInterop": true,
     "pretty": true
   },
+  "include": [ "src" ],
   "exclude": [
     "./*.js",
+    "./*.cjs",
+    "./*.mjs",
     "./*.ts",
     "lib",
     "build",
+    "coverage",
     "docs",
     "./node_modules/**/*.ts",
     "**/*.test.ts"
