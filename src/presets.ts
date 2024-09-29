@@ -1,6 +1,6 @@
-import Converter from './models/Converter';
-import * as numbers from './constants/numbers';
-import is, { integers as intIs, floats as floatIs } from './is';
+import Converter from './models/Converter.js';
+import * as numbers from './constants/numbers.js';
+import is, { integers as intIs, floats as floatIs } from './is.js';
 
 /**
  * @namespace presets

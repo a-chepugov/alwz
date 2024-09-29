@@ -1,5 +1,5 @@
-import Aggregator from './models/Aggregator';
-import * as presets from './presets';
+import Aggregator from './models/Aggregator.js';
+import * as presets from './presets.js';
 
 /**
  * @name Import
@@ -169,7 +169,7 @@ export const set = presets.set.convert;
 export const weakset = presets.weakset.convert;
 export const promise = presets.promise.convert;
 
-export * as utils from './utils';
+export * as utils from './utils.js';
 
 /**
  * @name Predicates
@@ -187,7 +187,6 @@ export * as utils from './utils';
  * is.object(null); // false
  * is.Iterable(new Set()); // true
  */
-export { default as is } from './is';
-
-export { default as Converter } from './models/Converter';
-export { default as Aggregator } from './models/Aggregator';
+export { default as is } from './is.js';
+export { default as Converter } from './models/Converter.js';
+export { default as Aggregator } from './models/Aggregator.js';

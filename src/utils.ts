@@ -1,6 +1,6 @@
-import EV from './models/Error';
-import Converter, { Fallback, assertFallback, isConversion, assertConversion } from './models/Converter';
-import * as presets from './presets';
+import EV from './models/Error.js';
+import Converter, { Fallback, assertFallback, isConversion, assertConversion } from './models/Converter.js';
+import * as presets from './presets.js';
 
 type Conversion<INPUT, OUTPUT> = (input: INPUT) => OUTPUT;
 
