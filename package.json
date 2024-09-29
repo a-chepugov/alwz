@@ -11,7 +11,7 @@
     "types": "./build/types/index.d.ts"
   },
   "scripts": {
-    "prepublishOnly": "npm run test && npm run lint && npm run build && npm run readme",
+    "prepublishOnly": "npm run test && npm run lint && npm run build:clear && npm run test:build && npm run readme",
     "build": "npm run build:types && npm run build:main && npm run build:cjs && npm run build:esm",
     "build:types": "tsc --project tsconfig.types.json",
     "build:main": "tsc --project tsconfig.main.json",
