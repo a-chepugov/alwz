@@ -4,11 +4,14 @@ import is from './is.js';
 
 describe('is', () => {
 	const sets = [
-		{ name: 'undefined', yes: [undefined], no: [false, -1, 2n, '3', {} ] },
-		{ name: 'null', yes: [null], no: [undefined, false, -1, 2n, '3', {} ] },
+		// eslint-disable-next-line no-sparse-arrays
+		{ name: 'undefined', yes: [, undefined], no: [false, 0, -1, 2n, '3', {} ] },
+		{ name: 'null', yes: [null], no: [undefined, false, 0, -1, 2n, '3', {} ] },
 
-		{ name: 'void', yes: [undefined, null], no: [false, -1, 2n, '3', {} ] },
-		{ name: 'value', yes: [false, 0, 2n, '3', {}], no: [undefined, null] },
+		// eslint-disable-next-line no-sparse-arrays
+		{ name: 'void', yes: [, undefined, null], no: [false, 0, -1, 2n, '3', {} ] },
+		// eslint-disable-next-line no-sparse-arrays
+		{ name: 'value', yes: [false, 0, 2n, '3', {}], no: [, undefined, null] },
 
 		{ name: 'boolean', yes: [false, true], no: [undefined, 1, -1, 2n, '3', {} ] },
 		{ name: 'number', yes: [-1, NaN, Infinity], no: [undefined, false, 2n, '3', {} ] },
@@ -48,17 +51,21 @@ describe('is', () => {
 		const guard = is[name];
 
 		describe(name, () => {
-			yes.forEach((input, index) => {
+			for (let index = 0; index < yes.length; index++) {
+				const input = yes[index];
+
 				test(`true: ${index + 1}: ${String(input)}`, () => {
 					assert.strictEqual(guard(input), true);
 				});
-			});
+			}
 
-			no.forEach((input, index) => {
+			for (let index = 0; index < no.length; index++) {
+				const input = no[index];
+
 				test(`false: ${index + 1}: ${String(input)}`, () => {
 					assert.strictEqual(guard(input), false);
 				});
-			});
+			}
 
 		});
 	});
