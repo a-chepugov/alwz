@@ -1,5 +1,5 @@
 import assert from 'assert';
-import Converter from './Converter';
+import Converter from './Converter.js';
 
 describe('Converter', () => {
 

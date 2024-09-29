@@ -4,6 +4,7 @@ coverage
 docs
 ignore
 node_modules
+scripts
 src
 tests
 .editorconfig
@@ -16,4 +17,7 @@ _test.sh
 babel.config.js
 jest.config.ts
 tsconfig.base.json
-tsconfig.commonjs.json
+tsconfig.cjs.json
+tsconfig.esm.json
+tsconfig.main.json
+tsconfig.types.json

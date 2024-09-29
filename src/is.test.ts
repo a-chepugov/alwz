@@ -1,6 +1,6 @@
 // @ts-nocheck
 import assert from 'assert';
-import is from './is';
+import is from './is.js';
 
 describe('is', () => {
 	const sets = [

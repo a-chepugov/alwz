@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "build/main",
+    "module": "ES2015",
+    "noEmit": false,
+    "declaration": false,
+    "removeComments": false
+  }
+}

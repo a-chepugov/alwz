@@ -1,6 +1,6 @@
 // @ts-nocheck
 import assert from 'assert';
-import * as a from './index';
+import * as a from './index.js';
 
 const isNaN = (o: any) => o !== o;
 

@@ -1,6 +1,6 @@
-import Converter from './Converter';
-import EV from './Error';
-import Registry from './Registry';
+import Converter from './Converter.js';
+import EV from './Error.js';
+import Registry from './Registry.js';
 
 /**
  * @ignore

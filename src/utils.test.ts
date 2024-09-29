@@ -1,6 +1,6 @@
 import assert from 'assert';
-import * as utils from './utils';
-import * as a from './index';
+import * as utils from './utils.js';
+import * as a from './index.js';
 
 describe('utils', () => {
 
