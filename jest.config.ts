@@ -74,6 +74,8 @@ export default {
   moduleFileExtensions: [
     "js",
     "jsx",
+    "cjs",
+    "mjs",
     "ts",
     "tsx",
     "json",

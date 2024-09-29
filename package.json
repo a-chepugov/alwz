@@ -27,6 +27,11 @@
     "version:patch": "npm version patch",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --fix --ext .ts",
+    "test:build:main": "jest --collectCoverage=false --testMatch=**/tests/index.js",
+    "test:build:cjs": "jest --collectCoverage=false --testMatch=**/tests/index.cjs",
+    "test:build:esm_": "jest --collectCoverage=false --testMatch=**/tests/index.mjs",
+    "test:build:esm": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" npm run test:build:esm_",
+    "test:build": "npm run test:build:main && npm run test:build:cjs && npm run test:build:esm",
     "test:development": "jest --watch",
     "test": "jest"
   },
