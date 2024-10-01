@@ -83,7 +83,7 @@ extend an existing converter
 
 ```javascript
 // make boolean smarter
-const bool = a.default.get('boolean')
+const bool = a.converters.get('boolean')
   .clone()
   .string(function(v) { // string input processing
     if (v === 'true' || v === 'yes') {
@@ -104,14 +104,14 @@ bool('false'); // false
 parse colon-separated number/string records
 
 ```javascript
-const PathArray = a.default.get('array')
+const PathArray = a.converters.get('array')
   .clone()
   .string((i) => [...i.matchAll(/\/(\w+)/g)].map((i) => i[1]))
   .convert;
 
 const DSV2Tuple = a.utils.tuple(
   [String, String, Number, Number, String, PathArray, PathArray],
-  a.default.get('array')
+  a.converters.get('array')
     .clone()
     .string((i) => i.split(':'))
     .convert
@@ -141,16 +141,16 @@ registry of predefined converters
 
 ```javascript
 // get list of predefined converters
-Array.from(a.default.keys()); // ['boolean', 'byte', 'int', 'long', 'double', 'string', ...];
+Array.from(a.converters.keys()); // ['boolean', 'byte', 'int', 'long', 'double', 'string', ...];
 
 // retrieving with existence check
-const Num = a.default.converter('number'); // Converter<number>
-const Str = a.default.converter('string'); // Converter<string>
-a.default.converter('123'); // Error
+const Num = a.converters.converter('number'); // Converter<number>
+const Str = a.converters.converter('string'); // Converter<string>
+a.converters.converter('123'); // Error
 
 // direct retrieving
-const Arr = a.default.get('array'); // Converter<Array>
-const Unknown = a.default.get('123'); // undefined
+const Arr = a.converters.get('array'); // Converter<Array>
+const Unknown = a.converters.get('123'); // undefined
 ```
 
 ## Predicates
@@ -389,7 +389,7 @@ weakmap.convert([ [Boolean, 'bool'], [Number, 'num'], [String, 'str'], [true, 1]
 #### Examples
 
 ```javascript
-set.convert([1, '2', 3]); // Set {1, "2", 3}
+set.convert([1, '2', 3]); // Set {1, '2', 3}
 ```
 
 ### weakset
@@ -695,6 +695,13 @@ is.object({}) // true
 
 ### Array
 
+#### Examples
+
+```javascript
+is.Array({}) // false
+is.Array([]) // true
+```
+
 ### Date
 
 ### RegExp
@@ -726,13 +733,13 @@ is.Iterable({}); // false
 converts input data to specific type
 
 *   at first checks if conversion is necessary
-*   then attempts conversion based on the input data type
-*   searches among registered conversions if no matching type is found
-*   generates a fallback value if no suitable conversion can be found
+*   attempts conversion based on the input data type
+*   searches for suitable conversions among registered
+*   calls a fallback function
 
 ### Parameters
 
-*   `is` **IS\<OUTPUT>** initial input data type checker(predicate). determines if any conversion is necessary
+*   `is` **IS\<OUTPUT>** initial input data type check (predicate). determines if any conversion is necessary
 *   `fallback` **Fallback\<OUTPUT>** fallback value generator. runs if none of the available conversions are suitable
 
 ### Examples
@@ -805,7 +812,7 @@ adds conversion function for `INPUT` type
 
 #### Parameters
 
-*   `is` **IS\<INPUT>** input data type checker(predicate), determines if input can be processed by `conversion`
+*   `is` **IS\<INPUT>** input data type check (predicate), determines if input can be processed by `conversion`
 *   `conversion` **Conversion\<INPUT, OUTPUT>** `INPUT` to `OUTPUT` conversion function
 
 ### unregister
@@ -814,11 +821,11 @@ removes conversion for `INPUT` type
 
 #### Parameters
 
-*   `is` **IS\<INPUT>** input type checker(predicate)
+*   `is` **IS\<INPUT>** input type check (predicate)
 
 ### type
 
-set conversion rule for `type` if `conversion` is defined or unset if undefined
+set conversion rule for type `name` if `conversion` is defined or unset if undefined
 
 #### Parameters
 

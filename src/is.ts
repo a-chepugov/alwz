@@ -41,7 +41,7 @@ export default {
 	 * is.void(null) // true
 	 * is.void(0) // false
 	 * @memberof is */
-	void: (i?: unknown): i is undefined | null => i === undefined || i === null,
+	void: (i?: unknown): i is (undefined | null) => i === undefined || i === null,
 
 	/** @function value
 	 * @description any value except undefined or null
@@ -118,6 +118,7 @@ export default {
 	Error: (i?: unknown): i is Error => i instanceof Error,
 
 	/** @function Array
+	 * @example
 	 * is.Array({}) // false
 	 * is.Array([]) // true
 	 * @memberof is */

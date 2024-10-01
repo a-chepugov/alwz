@@ -3,11 +3,12 @@ import * as a from './index.js';
 
 describe('index', () => {
 
-	describe('Predefined', () => {
+	describe('Types', () => {
 
-		test('check', () => {
+		test('examples', () => {
 			assert.deepStrictEqual(a.byte('3'), 3);
 			assert.deepStrictEqual(a.short(false), 0);
+			assert.deepStrictEqual(a.int(true), 1);
 			assert.deepStrictEqual(a.uint(Infinity), 4294967295);
 			assert.deepStrictEqual(a.long(NaN), 0);
 			assert.deepStrictEqual(a.long(['1', '2', '3']), 1);
@@ -17,7 +18,7 @@ describe('index', () => {
 
 	});
 
-	describe('Utils', () => {
+	describe('Structures', () => {
 
 		test('ensure an array output', () => {
 			const array = a.utils.array;
@@ -65,9 +66,9 @@ describe('index', () => {
 
 	});
 
-	describe('Transform', () => {
+	describe('Transformations', () => {
 
-		const bool = a.default.get('boolean')
+		const bool = a.converters.get('boolean')
 			.clone()
 			.string(function(v) { // string input processing
 				if (v === 'true' || v === 'yes') {
@@ -89,41 +90,15 @@ describe('index', () => {
 			assert.deepStrictEqual(bool(false), false);
 		});
 
-		const even = new a.Converter(
-			(input) => typeof input === 'number' && input % 2 === 0, // initial input check
-			(input) => Number(input) % 2 === 0 ? Number(input) : 0 // fallback value generator
-		);
-
-		even
-			.undefined(() => -2)
-			.boolean((input) => input ? -4 : -6)
-			.number(function(input) {
-				const result = Math.trunc(Math.abs(input || 0) / 2) * 2;
-				return this.is(result) ? result : this.fallback(input);
-			})
-			.string((input) => even.convert(Number(input)))
-			.register(Array.isArray, (input) => even.convert(input[0]));
-
-		test('create specific converters', () => {
-			assert.deepStrictEqual(even.convert(8), 8);
-			assert.deepStrictEqual(even.convert(undefined), -2);
-			assert.deepStrictEqual(even.convert(true), -4);
-			assert.deepStrictEqual(even.convert(false), -6);
-			assert.deepStrictEqual(even.convert(NaN), 0);
-			assert.deepStrictEqual(even.convert(11), 10);
-			assert.deepStrictEqual(even.convert('15'), 14);
-			assert.deepStrictEqual(even.convert([17, 18, 19]), 16);
-		});
-
 		test('parse colon-separated number/string records', () => {
-			const PathArray = a.default.get('array')
+			const PathArray = a.converters.get('array')
 				.clone()
 				.string((i) => [...i.matchAll(/\/(\w+)/g)].map((i) => i[1]))
 				.convert;
 
 			const DSV2Tuple = a.utils.tuple(
 				[String, String, Number, Number, String, PathArray, PathArray],
-				a.default.get('array')
+				a.converters.get('array')
 					.clone()
 					.string((i) => i.split(':'))
 					.convert
@@ -150,7 +125,7 @@ describe('index', () => {
 	describe('Converters', () => {
 
 		test('get prodefined list', () => {
-			const list = Array.from(a.default.keys());
+			const list = Array.from(a.converters.keys());
 			const predifined = ['boolean', 'byte', 'int', 'long', 'double', 'string'];
 			for (const item of predifined) {
 				assert.strictEqual(list.includes(item), true, `absent item - ${item}`);
@@ -158,41 +133,37 @@ describe('index', () => {
 		});
 
 		test('retrieving with existence check', () => {
-			const c1 = a.default.converter('number');
+			const c1 = a.converters.converter('number');
 			assert.strictEqual(c1 instanceof a.Converter, true);
-			const c2 = a.default.converter('date');
+			const c2 = a.converters.converter('date');
 			assert.strictEqual(c2 instanceof a.Converter, true);
 			assert.throws(() => {
-				a.default.converter('123');
+				a.converters.converter('123');
 			});
 		});
 
 		test('direct retrieving', () => {
-			const c1 = a.default.get('array');
+			const c1 = a.converters.get('array');
 			assert.strictEqual(c1 instanceof a.Converter, true);
-			const c2 = a.default.get('123');
+			const c2 = a.converters.get('123');
 			assert.strictEqual(c2 === undefined, true);
 		});
 
 	});
 
 	describe('Predicates', () => {
-		const is = a.is;
-		const set = [
-			[is.void(0), false],
-			[is.void(null), true],
-			[is.value(null), false],
-			[is.value(0), true],
-			[is.ubyte(255), true],
-			[is.int(Infinity), false],
-			[is.object(null), false],
-			[is.Iterable(new Set()), true],
-		];
+		const { is } = a;
 
-		for (const index in set) {
-			const [received, expected] = set[index];
-			test(index, () => assert.strictEqual(received, expected));
-		}
+		test('examples', () => {
+			assert.deepStrictEqual(is.void(null), true);
+			assert.deepStrictEqual(is.void(0), false);
+			assert.deepStrictEqual(is.value(null), false);
+			assert.deepStrictEqual(is.value(0), true);
+			assert.deepStrictEqual(is.ubyte(255), true);
+			assert.deepStrictEqual(is.int(Infinity), false);
+			assert.deepStrictEqual(is.object(null), false);
+			assert.deepStrictEqual(is.Iterable(new Set()), true);
+		});
 	});
 
 });

@@ -51,9 +51,9 @@ type TypeConversion<Name, OUTPUT> = Name extends keyof TypeConversions<OUTPUT> ?
 /**
  * @description converts input data to specific type
  * - at first checks if conversion is necessary
- * - then attempts conversion based on the input data type
- * - searches among registered conversions if no matching type is found
- * - generates a fallback value if no suitable conversion can be found
+ * - attempts conversion based on the input data type
+ * - searches for suitable conversions among registered
+ * - calls a fallback function
  *
  * @example <caption>converter creation</caption>
  * const positive = new Converter(
@@ -119,7 +119,7 @@ export class Converter<OUTPUT> {
 	protected _conversions: Map<IS<any>, Conversion<any, OUTPUT>>;
 
 	/**
-	 * @param {IS<OUTPUT>} is - initial input data type checker(predicate). determines if any conversion is necessary
+	 * @param {IS<OUTPUT>} is - initial input data type check (predicate). determines if any conversion is necessary
 	 * @param {Fallback<OUTPUT>} fallback - fallback value generator. runs if none of the available conversions are suitable
 	 */
 	constructor(is: IS<OUTPUT>, fallback: Fallback<OUTPUT>) {
@@ -182,7 +182,7 @@ export class Converter<OUTPUT> {
 
 	/**
 	 * @description adds conversion function for `INPUT` type
-	 * @param {IS<INPUT>} is - input data type checker(predicate), determines if input can be processed by `conversion`
+	 * @param {IS<INPUT>} is - input data type check (predicate), determines if input can be processed by `conversion`
 	 * @param {Conversion<INPUT, OUTPUT>} conversion - `INPUT` to `OUTPUT` conversion function
 	 */
 	register<INPUT>(is: IS<INPUT>, conversion: Conversion<INPUT, OUTPUT>) {
@@ -194,7 +194,7 @@ export class Converter<OUTPUT> {
 
 	/**
 	 * @description removes conversion for `INPUT` type
-	 * @param {IS<INPUT>} is - input type checker(predicate)
+	 * @param {IS<INPUT>} is - input type check (predicate)
 	 */
 	unregister<INPUT>(is: IS<INPUT>) {
 		assertIS(is);
@@ -203,7 +203,7 @@ export class Converter<OUTPUT> {
 	}
 
 	/**
-	 * @description set conversion rule for `type` if `conversion` is defined or unset if undefined
+	 * @description set conversion rule for type `name` if `conversion` is defined or unset if undefined
 	 * @param {string} name - one of types (`typeof` result)
 	 * @param {Conversion} [conversion]
 	 */
