@@ -283,3 +283,42 @@ export const dictionary = <KEY extends string | number, VALUE>(
 		return result;
 	};
 };
+
+type ProjectionBuild<C, S, O> = (this: C, source: S, options?: O, target?: Partial<ProjectionResult<C, S, O>>) => unknown;
+
+type ProjectionSchema<C, S, O> = {
+	[Key: string | number]: ProjectionSchemaItem<C, S, O>
+};
+
+type ProjectionSchemaItem<C, S, O> = ProjectionBuild<C, S, O> | ProjectionSchema<C, S, O>;
+
+type ProjectionResult<C, S, O> = {
+	[Key in keyof ProjectionSchema<C, S, O>]: unknown | ProjectionResult<C, S, O>
+}
+
+export const projection = <C, S, O>(
+	schema: ProjectionSchema<C, S, O>
+): ProjectionBuild<C, S, O> => {
+	const builders: Array<[string, ProjectionBuild<C, S, O>]> = Object
+		.entries(schema)
+		.map(([key, value]) => {
+			if (typeof value === 'function') {
+				return [key, value];
+			} else if (value && typeof value === 'object') {
+				return [key, projection(value)];
+			} else {
+				throw new EV('invalid schema item', { key, value });
+			}
+		});
+
+	return function(this: C, source: S, options?: O) {
+		return builders
+			.reduce(
+				(target: Record<string, unknown>, [key, build]) => {
+					target[key] = build.call(this, source, options, target);
+					return target;
+				},
+				{}
+			);
+	};
+};
