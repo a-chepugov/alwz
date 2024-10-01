@@ -68,7 +68,7 @@ describe('index', () => {
 
 	describe('Transformations', () => {
 
-		const bool = a.default.get('boolean')
+		const bool = a.converters.get('boolean')
 			.clone()
 			.string(function(v) { // string input processing
 				if (v === 'true' || v === 'yes') {
@@ -91,14 +91,14 @@ describe('index', () => {
 		});
 
 		test('parse colon-separated number/string records', () => {
-			const PathArray = a.default.get('array')
+			const PathArray = a.converters.get('array')
 				.clone()
 				.string((i) => [...i.matchAll(/\/(\w+)/g)].map((i) => i[1]))
 				.convert;
 
 			const DSV2Tuple = a.utils.tuple(
 				[String, String, Number, Number, String, PathArray, PathArray],
-				a.default.get('array')
+				a.converters.get('array')
 					.clone()
 					.string((i) => i.split(':'))
 					.convert
@@ -125,7 +125,7 @@ describe('index', () => {
 	describe('Converters', () => {
 
 		test('get prodefined list', () => {
-			const list = Array.from(a.default.keys());
+			const list = Array.from(a.converters.keys());
 			const predifined = ['boolean', 'byte', 'int', 'long', 'double', 'string'];
 			for (const item of predifined) {
 				assert.strictEqual(list.includes(item), true, `absent item - ${item}`);
@@ -133,19 +133,19 @@ describe('index', () => {
 		});
 
 		test('retrieving with existence check', () => {
-			const c1 = a.default.converter('number');
+			const c1 = a.converters.converter('number');
 			assert.strictEqual(c1 instanceof a.Converter, true);
-			const c2 = a.default.converter('date');
+			const c2 = a.converters.converter('date');
 			assert.strictEqual(c2 instanceof a.Converter, true);
 			assert.throws(() => {
-				a.default.converter('123');
+				a.converters.converter('123');
 			});
 		});
 
 		test('direct retrieving', () => {
-			const c1 = a.default.get('array');
+			const c1 = a.converters.get('array');
 			assert.strictEqual(c1 instanceof a.Converter, true);
-			const c2 = a.default.get('123');
+			const c2 = a.converters.get('123');
 			assert.strictEqual(c2 === undefined, true);
 		});
 
