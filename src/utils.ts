@@ -283,3 +283,77 @@ export const dictionary = <KEY extends string | number, VALUE>(
 		return result;
 	};
 };
+
+type ProjectionBuild<C, S, O> = (this: C, source: S, options?: O, target?: Partial<ProjectionResult<C, S, O>>) => unknown;
+
+type ProjectionSchema<C, S, O> = {
+	[Key: string | number]: ProjectionSchemaItem<C, S, O>
+};
+
+type ProjectionSchemaItem<C, S, O> = ProjectionBuild<C, S, O> | ProjectionSchema<C, S, O>;
+
+type ProjectionResult<C, S, O> = {
+	[Key in keyof ProjectionSchema<C, S, O>]: unknown | ProjectionResult<C, S, O>
+}
+
+/**
+ * @description project data into object according to schema
+ * @param {Schema} schema
+ * @returns {Function}
+ * @example
+ * const schema = {
+ *   // shallow element
+ *   a: (source) => source.x + 1,
+ *   // nested schema
+ *   b: {
+ *     c: (source) => source.x + 2,
+ *   },
+ *   // options ( second argument )
+ *   d: (source, options) => options,
+ *   // mid-process result access
+ *   e: (source, options, target) => { target._e = source.x + 3; },
+ *   // call context
+ *   f: function() { return this; },
+ * };
+ *
+ * const project = projection(schema);
+ * const reshape = project(schema);
+ * const source = { x: 1 };
+ * const options = { z: 5 };
+ * const context = { y: 11 };
+ *
+ * project.call(context, source, options);
+ * {
+ *   a: 2,
+ *   b: { c: 3 },
+ *   d: { z: 5 },
+ *   _e: 7, e: undefined,
+ *   f: { y: 11 },
+ * }
+ */
+export const projection = <C, S, O>(
+	schema: ProjectionSchema<C, S, O>
+): ProjectionBuild<C, S, O> => {
+	const builders: Array<[string, ProjectionBuild<C, S, O>]> = Object
+		.entries(schema)
+		.map(([key, value]) => {
+			if (typeof value === 'function') {
+				return [key, value];
+			} else if (value && typeof value === 'object') {
+				return [key, projection(value)];
+			} else {
+				throw new EV('invalid schema item', { key, value });
+			}
+		});
+
+	return function(this: C, source: S, options?: O) {
+		return builders
+			.reduce(
+				(target: Record<string, unknown>, [key, build]) => {
+					target[key] = build.call(this, source, options, target);
+					return target;
+				},
+				{}
+			);
+	};
+};

@@ -353,4 +353,121 @@ describe('utils', () => {
 		}
 	});
 
+	describe('projection', () => {
+		const projection = utils.projection;
+
+		test('creates function on initialization with object of functions or objects', () => {
+			const schema = { a: () => 'a', b: { c: () => 'c' } };
+			assert.strictEqual(typeof projection(schema), 'function');
+		});
+
+		test('throw on initilization with invalid schema', () => {
+			const schema = { a: 'a'};
+			assert.throws(() => projection(schema));
+		});
+
+		const source = { a: 1, b: 2, c: 3 };
+
+		test('produce shallow objects with shallow schema', () => {
+			const schema = {
+				a: (s) => s.a + s.b + s.c,
+				b: (s) => s.a * s.b * s.c,
+				c: (s) => s.a ** s.b ** s.c,
+			};
+
+			const project = projection(schema);
+			assert.deepStrictEqual(project(source), { a: 6, b: 6, c: 1 });
+		});
+
+		test('produce nested objects with nested schema', () => {
+			const schema = {
+				a: (s) => s.a + s.b + s.c,
+				b: {
+					c: (s) => s.a ** s.b ** s.c,
+				},
+			};
+
+			const project = projection(schema);
+			assert.deepStrictEqual(project(source), { a: 6, b: { c: 1 } });
+		});
+
+		test('target can be accessed and modified in contructors', () => {
+			const schema = {
+				a: (s, o, t) => {
+					t.a_ = 24;
+					return 1;
+				},
+				b: {
+					c: (s, o, t) => {
+						t.c_ = 42;
+						return 3;
+					},
+				},
+			};
+			const project = projection(schema);
+			assert.deepStrictEqual(
+				project(source),
+				{ a: 1, a_: 24, b: { c: 3, c_: 42 } }
+			);
+		});
+
+		test('pass additional options to constructors', () => {
+			const options = {a: 1};
+
+			const schema = {
+				a: function(s, o) {
+					assert.deepStrictEqual(o, options);
+				},
+				b: {
+					c: function(s, o) {
+						assert.deepStrictEqual(o, options);
+					},
+				},
+			};
+
+			const project = projection(schema);
+			project(source, options);
+		});
+
+		test('pass `this` to a constructors', () => {
+			const context = {a: 1};
+
+			const schema = {
+				a: function() {
+					assert.deepStrictEqual(this, context);
+				},
+				b: {
+					c: function() {
+						assert.deepStrictEqual(this, context);
+					},
+				},
+			};
+
+			const project = projection(schema);
+			project.call(context, source);
+		});
+
+		test('example', () => {
+			const schema = {
+				a: (source) => source.x + 1,
+				b: {
+					c: (source) => source.x + 2,
+				},
+				d: (source, options) => options,
+				e: (source, options, target) => { target._e = source.x + 6; },
+				f: function() { return this; },
+			};
+			const project = projection(schema);
+
+			const source = { x: 1 };
+			const options = { z: 5 };
+			const context = { y: 11 };
+
+			assert.deepStrictEqual(
+				project.call(context, source, options),
+				{ a: 2, b: { c: 3 }, d: { z: 5 }, _e: 7, e: undefined, f: { y: 11 } }
+			);
+		});
+	});
+
 });

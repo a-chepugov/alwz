@@ -14,7 +14,7 @@ tests
 _build.sh
 _lint.sh
 _test.sh
-babel.config.js
+babel.config.json
 jest.config.ts
 tsconfig.base.json
 tsconfig.cjs.json
