@@ -1,4 +1,4 @@
-import EV from './models/Error.js';
+import EV from './models/ErrorValue.js';
 import Converter, { Fallback, assertFallback, isConversion, assertConversion } from './models/Converter.js';
 import * as presets from './presets.js';
 

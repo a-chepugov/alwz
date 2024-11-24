@@ -1,5 +1,5 @@
 import Converter from './Converter.js';
-import EV from './Error.js';
+import EV from './ErrorValue.js';
 import Registry from './Registry.js';
 
 /**

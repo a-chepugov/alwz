@@ -174,6 +174,59 @@ is.object(null); // false
 is.Iterable(new Set()); // true
 ```
 
+## Checks
+
+*   **See**: [Is](Is)
+
+create readable check functions
+
+### Examples
+
+```javascript
+const { Is } = a;
+
+const isAlphaOrBeta = Is.variant(['Alpha', 'Beta']);
+isAlphaOrBeta('Alpha'); // true;
+isAlphaOrBeta('Gamma'); // false;
+
+class X {}
+class Y extends X {}
+
+const isX = Is.instance(X);
+isX(new X); // true
+isX(new Y); // true
+isX({}); // false
+```
+
+## Errors
+
+*   **See**: [ErrorValue](#errorvalue)
+
+create informative errors
+
+### Examples
+
+add additional value to an error
+
+```javascript
+const { ErrorValue } = a;
+const inc = (input) => typeof input === 'number'
+  ? input + 1
+  : new ErrorValue('invalid list', { input, date: Date.now() }).throw();
+
+inc('1'); // Error { message: 'invalid number', value: { input: '1', date: 946684800000 } }
+```
+
+intercept and wrap thrown ones
+
+```javascript
+try {
+ throw new Error('oops, something went wrong');
+} catch (error) {
+ throw new ErrorValue('urgent message', { data: 'some additional data' }, { cause: error });
+}
+```
+
 ## presets
 
 ### boolean
@@ -772,6 +825,63 @@ is.Iterable([]); // true
 is.Iterable({}); // false
 ```
 
+### type
+
+#### Parameters
+
+*   `type` &#x20;
+
+#### Examples
+
+```javascript
+const isString = type('string');
+isString(1); // false
+isString('1'); // true
+```
+
+### instance
+
+#### Parameters
+
+*   `prototype` &#x20;
+
+#### Examples
+
+```javascript
+class Test {}
+const isTest = instance(Test);
+isTest({}); // false
+isTest(new Test()); // true
+```
+
+### variant
+
+#### Parameters
+
+*   `list` &#x20;
+
+#### Examples
+
+```javascript
+const isVariant = variant([1, 2, 3]);
+isVariant(4); // false
+isVariant(3); // true
+```
+
+### check
+
+#### Parameters
+
+*   `guard` &#x20;
+
+#### Examples
+
+```javascript
+const isOdd = check((v) => v % 2 ? true : false);
+isOdd(0); // false
+isOdd(1); // true
+```
+
 ## Converter
 
 converts input data to specific type
@@ -942,3 +1052,23 @@ const clone = converter
 converter.convert(); // 1
 clone.convert(); // 2
 ```
+
+## ErrorValue
+
+**Extends Error**
+
+Error with value property
+
+### Parameters
+
+*   `message` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?**&#x20;
+*   `value` **any?**&#x20;
+*   `options` **any?**&#x20;
+
+### Properties
+
+*   `value` **any?** can be used to store additional cause info
+
+### throw
+
+throw this instance of error
