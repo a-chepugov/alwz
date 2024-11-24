@@ -1,6 +1,5 @@
 import * as numbers from './constants/numbers.js';
-
-type Guard<T> = (input?: unknown) => input is T;
+import { type Guard } from './models/Is.js';
 
 export const integers = Object.fromEntries(
 	Object.entries(numbers.integers)

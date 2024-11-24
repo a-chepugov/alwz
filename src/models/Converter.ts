@@ -1,4 +1,4 @@
-import EV from './Error.js';
+import EV from './ErrorValue.js';
 
 export type IS<T> = (input?: unknown) => input is T;
 
