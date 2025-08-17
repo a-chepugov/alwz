@@ -16,8 +16,6 @@ const a = require('alwz');
 
 ## Types
 
-*   **See**: [presets](#presets)
-
 convert data with presetted converters
 
 ### Examples
@@ -326,7 +324,7 @@ ulong.convert(Infinity); // MAX_SAFE_INTEGER
 ulong.convert(-Infinity); // 0
 ```
 
-### double
+### floats
 
 #### Examples
 
@@ -461,6 +459,42 @@ weakset.convert([Boolean, Number, String, true, 2, '3']); // WeakSet { Boolean, 
 promise.convert(Promise.resolve(1)); // Promise { 1 }
 promise.convert(42); // Promise { 42 }
 ```
+
+## cast
+
+*   **See**: [presets](#presets)
+
+convert data with presetted converters
+
+### Examples
+
+```javascript
+const { byte, ushort, int, long, array } = cast;
+
+byte(true); // 1
+ushort(Infinity); // 65535
+int('3'); // 3
+long(NaN); // 0
+long(['1', '2', '3']); // 1 | ['1','2','3'] => '1' => 1
+array('abc'); // ['abc']
+```
+
+### to
+
+#### Parameters
+
+*   `name` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** name of the preset to use for conversion
+
+#### Examples
+
+```javascript
+to('int')('11.1'); // 11
+to('abc'); // Error
+```
+
+*   Throws **[ErrorValue](#errorvalue)** if the preset name is unknown
+
+Returns **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** conversion function
 
 ## utils
 

@@ -9,9 +9,10 @@ import presets from './presets.js';
  * const a = require('alwz');
  */
 
+import cast from './cast.js';
+
 /**
  * @name Types
- * @see {@link presets presets}
  * @description convert data with presetted converters
  * @example
  * a.byte('3'); // 3
@@ -23,6 +24,33 @@ import presets from './presets.js';
  * a.array('abc'); // ['abc']
  * a.array([123, 'abc', {}, Math.max]); // [123, 'abc', {}, Math.max]
  */
+export const {
+	boolean,
+	number,
+	byte,
+	short,
+	int,
+	long,
+	ubyte,
+	ushort,
+	uint,
+	ulong,
+	double,
+	bigint,
+	string,
+	symbol,
+	array,
+	fn,
+	date,
+	object,
+	map,
+	weakmap,
+	set,
+	weakset,
+	promise,
+} = cast;
+
+export { default as cast } from './cast.js';
 
 /**
  * @name Structures
@@ -125,7 +153,7 @@ export const converters = new Aggregator()
  * a.to('byte')(Infinity); // 127
  * a.to('bigint')('42.5'); // 42n
  */
-export const to = converters.to;
+export { to as to } from './cast.js';
 
 /**
  * @name Converters
@@ -144,30 +172,6 @@ export const to = converters.to;
  * const Unknown = a.converters.get('123'); // undefined
  */
 export default converters;
-
-export const boolean = presets.boolean.convert;
-export const number = presets.number.convert;
-export const byte = presets.byte.convert;
-export const short = presets.short.convert;
-export const int = presets.int.convert;
-export const long = presets.long.convert;
-export const ubyte = presets.ubyte.convert;
-export const ushort = presets.ushort.convert;
-export const uint = presets.uint.convert;
-export const ulong = presets.ulong.convert;
-export const double = presets.double.convert;
-export const bigint = presets.bigint.convert;
-export const string = presets.string.convert;
-export const symbol = presets.symbol.convert;
-export const fn = presets.fn.convert;
-export const date = presets.date.convert;
-export const object = presets.object.convert;
-export const array = presets.array.convert;
-export const map = presets.map.convert;
-export const weakmap = presets.weakmap.convert;
-export const set = presets.set.convert;
-export const weakset = presets.weakset.convert;
-export const promise = presets.promise.convert;
 
 export * as utils from './utils.js';
 
