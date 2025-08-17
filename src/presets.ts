@@ -16,7 +16,7 @@ import is, { integers as intIs, floats as floatIs } from './is.js';
  * boolean.convert([false, true]); // false
  * boolean.convert([123]); // true
  */
-export const boolean = new Converter<boolean>(
+const boolean = new Converter<boolean>(
 	is.boolean,
 	Boolean
 )
@@ -42,7 +42,7 @@ export const boolean = new Converter<boolean>(
  * number.convert([ [ [ 42 ] ] ]); // 42
  * number.convert(new Date('1970-01-01T00:00:00.999Z')); // 999
  */
-export const number = new Converter<number>(
+const number = new Converter<number>(
 	is.number,
 	Number
 )
@@ -89,6 +89,16 @@ export const number = new Converter<number>(
  * int.convert(new Date(NaN)); // 0
 */
 
+const numeric = number.clone()
+	.undefined(() => 0)
+	.bigint(function(i) { return this.convert(Number(i)); })
+	.string(function(i) { return this.convert(Number(i)); })
+	.symbol(function(i) { return this.convert(string.convert(i)); })
+	.register(is.Date, function(i) { return this.convert(i.getTime()); })
+	;
+
+numeric.fallback = () => 0;
+
 /**
  * @memberof presets
  * @name signed
@@ -104,16 +114,6 @@ export const number = new Converter<number>(
  * long.convert(Infinity); // MAX_SAFE_INTEGER
  * long.convert(-Infinity); // MIN_SAFE_INTEGER
  */
-
-const numeric = number.clone()
-	.undefined(() => 0)
-	.bigint(function(i) { return this.convert(Number(i)); })
-	.string(function(i) { return this.convert(Number(i)); })
-	.symbol(function(i) { return this.convert(string.convert(i)); })
-	.register(is.Date, function(i) { return this.convert(i.getTime()); })
-	;
-
-numeric.fallback = () => 0;
 
 /**
  * @memberof presets
@@ -131,16 +131,7 @@ numeric.fallback = () => 0;
  * ulong.convert(Infinity); // MAX_SAFE_INTEGER
  * ulong.convert(-Infinity); // 0
  */
-export const {
-	byte,
-	short,
-	int,
-	long,
-	ubyte,
-	ushort,
-	uint,
-	ulong,
-} = Object.fromEntries(
+export const integers = Object.fromEntries(
 	Object.entries(numbers.integers)
 		.map(([name, [min, max]]) => {
 
@@ -159,7 +150,7 @@ export const {
 			converter.is = intIs[name as keyof typeof numbers.integers];
 
 			return [name, converter];
-		}))
+		})) as Record<keyof typeof numbers.integers, Converter<number>>
 ;
 
 /**
@@ -169,9 +160,7 @@ export const {
  * double.convert(Infinity); // Number.MAX_VALUE
  * double.convert(NaN); // 0
  */
-export const {
-	double,
-} = Object.fromEntries(
+export const floats = Object.fromEntries(
 	Object.entries(numbers.floats)
 		.map(([name, [min, max]]) => {
 			const converter = numeric.clone()
@@ -187,7 +176,7 @@ export const {
 			converter.is = floatIs[name as keyof typeof numbers.floats];
 
 			return [name, converter];
-		}))
+		})) as Record<keyof typeof numbers.floats, Converter<number>>
 ;
 
 /**
@@ -199,13 +188,13 @@ export const {
  * bigint.convert(Symbol.for('42')); // 42n
  * bigint.convert(new Date('1970-01-01T00:00:00.999Z')); // 999n
  */
-export const bigint = new Converter<bigint>(
+const bigint = new Converter<bigint>(
 	is.bigint,
 	() => BigInt(0)
 )
 	.undefined(() => BigInt(0))
 	.boolean((i) => BigInt(i))
-	.number((i) => BigInt(Math.trunc(double.convert(i))))
+	.number((i) => BigInt(Math.trunc(floats.double.convert(i))))
 	.string(function(i) { return this.convert(Number(i)); })
 	.symbol(function(i) { return this.convert(string.convert(i)); })
 	.register(is.null, () => BigInt(0))
@@ -225,7 +214,7 @@ export const bigint = new Converter<bigint>(
  * string.convert(Symbol.for('42')); // '42'
  * string.convert(new Date('1970-01-01T00:00:00.999Z')); // '1970-01-01T00:00:00.999Z'
  */
-export const string = new Converter<string>(
+const string = new Converter<string>(
 	is.string,
 	String
 )
@@ -255,7 +244,7 @@ export const string = new Converter<string>(
  * symbol.convert([1.5, 2, 3]); // Symbol('1.5')
  * symbol.convert(new Date('1970-01-01T00:00:00.999Z')); // Symbol('1970-01-01T00:00:00.999Z')
  */
-export const symbol = new Converter<symbol>(
+const symbol = new Converter<symbol>(
 	is.symbol,
 	(i) => Symbol.for(string.convert(i))
 );
@@ -271,7 +260,7 @@ export const symbol = new Converter<symbol>(
  * array.convert(new Set([1, 2, 3])); // [1, 2, 3]
  * array.convert(new Map([[1, 2], [3, 4], [5, 6]])); // [[1, 2], [3, 4], [5, 6]]
  */
-export const array = new Converter<Array<any>>(
+const array = new Converter<Array<any>>(
 	is.Array,
 	(i) => ([i])
 )
@@ -293,7 +282,7 @@ export const array = new Converter<Array<any>>(
  */
 
 // eslint-disable-next-line no-unused-vars
-export const fn = new Converter<Function>(
+const fn = new Converter<Function>(
 	is.function,
 	(i) => () => i
 );
@@ -305,7 +294,7 @@ export const fn = new Converter<Function>(
  * date.convert([222, 333]); // Date('1970-01-01T00:00:00.222Z')
  * date.convert('abc'); // Date(NaN)
  */
-export const date = new Converter<Date>(
+const date = new Converter<Date>(
 	is.Date,
 	() => new Date(NaN)
 )
@@ -328,7 +317,7 @@ export const date = new Converter<Date>(
  * object.convert('2'); // String { 2 }
  * object.convert([1, '2', 3n]); // [1, '2', 3n]
  */
-export const object = new Converter<object>(
+const object = new Converter<object>(
 	is.object,
 	Object
 );
@@ -338,7 +327,7 @@ export const object = new Converter<object>(
  * @example
  * map.convert([ [true, 1], 2, '3']); // Map { [true, 1] }
  */
-export const map = new Converter<Map<unknown, unknown>>(
+const map = new Converter<Map<unknown, unknown>>(
 	is.Map,
 	() => new Map()
 )
@@ -359,7 +348,7 @@ export const map = new Converter<Map<unknown, unknown>>(
  * @example
  * weakmap.convert([ [Boolean, 'bool'], [Number, 'num'], [String, 'str'], [true, 1], 2, '3']); // WeakMap { [Boolean, 'bool'], [Number, 'num'], [String, 'str'] }
  */
-export const weakmap = new Converter<WeakMap<any, unknown>>(
+const weakmap = new Converter<WeakMap<any, unknown>>(
 	is.WeakMap,
 	() => new WeakMap()
 )
@@ -382,7 +371,7 @@ export const weakmap = new Converter<WeakMap<any, unknown>>(
  * @example
  * set.convert([1, '2', 3]); // Set {1, '2', 3}
  */
-export const set = new Converter<Set<unknown>>(
+const set = new Converter<Set<unknown>>(
 	is.Set,
 	(i) => new Set().add(i)
 )
@@ -396,7 +385,7 @@ export const set = new Converter<Set<unknown>>(
  * @example
  * weakset.convert([Boolean, Number, String, true, 2, '3']); // WeakSet { Boolean, Number, String }
  */
-export const weakset = new Converter<WeakSet<any>>(
+const weakset = new Converter<WeakSet<any>>(
 	is.WeakSet,
 	() => new WeakSet()
 )
@@ -417,8 +406,29 @@ export const weakset = new Converter<WeakSet<any>>(
  * promise.convert(Promise.resolve(1)); // Promise { 1 }
  * promise.convert(42); // Promise { 42 }
  */
-export const promise = new Converter<Promise<any>>(
+const promise = new Converter<Promise<any>>(
 	is.Promise,
 	(i) => Promise.resolve(i)
 );
+
+export default {
+	boolean,
+
+	number,
+	...integers,
+	...floats,
+	bigint,
+
+	string,
+	symbol,
+	array,
+	fn,
+	date,
+	object,
+	map,
+	weakmap,
+	set,
+	weakset,
+	promise,
+};
 

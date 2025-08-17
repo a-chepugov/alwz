@@ -1,6 +1,6 @@
 // @ts-nocheck
 import assert from 'assert';
-import * as a from './index.js';
+import a from './presets.js';
 
 const isNaN = (o: any) => o !== o;
 
@@ -86,7 +86,7 @@ describe('presets', () => {
 
 		for (let converterIndex = 0; converterIndex < names.length; converterIndex++) {
 			const converterName = names[converterIndex];
-			const converter = a.to(converterName);
+			const converter = a[converterName];
 
 			describe(converterName, () => {
 				for (const data of datas) {
@@ -95,7 +95,7 @@ describe('presets', () => {
 					const name = `${String(converterName)} on (${String(input)}) must give ${String(result)}`;
 
 					test(name, () => {
-						assert.strictEqual(converter(input), result);
+						assert.strictEqual(converter.convert(input), result);
 					});
 				}
 			});
@@ -304,7 +304,7 @@ describe('presets', () => {
 					n += check ? ` | c:${check}` : '';
 
 					test(n, () => {
-						const data = work(input);
+						const data = work.convert(input);
 						if (type) {
 							assert.strictEqual(typeof data, type);
 						}

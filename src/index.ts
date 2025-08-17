@@ -1,5 +1,5 @@
 import Aggregator from './models/Aggregator.js';
-import * as presets from './presets.js';
+import presets from './presets.js';
 
 /**
  * @name Import
