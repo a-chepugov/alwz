@@ -532,7 +532,7 @@ constrain variable value within a given range
 *   `lower` **OUTPUT** lower range border (optional, default `-Number.MAX_VALUE`)
 *   `upper` **OUTPUT** upper range border (optional, default `Number.MAX_VALUE`)
 *   `fallback` **Fallback\<OUTPUT>** fallback value generator
-*   `conversion` **Conversion\<any, OUTPUT>** input data conversion (optional, default `presets.double.convert`)
+*   `initiator` **Conversion\<any, OUTPUT>** input data initial conversion (optional, default `presets.double.convert`)
 
 #### Examples
 
@@ -568,7 +568,7 @@ constrain variable to given variants
 
 *   `values` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<OUTPUT>** valid values list
 *   `fallback` **Fallback\<OUTPUT>** fallback value generator (optional, default `()=>values[0]`)
-*   `conversion` **Conversion\<any, OUTPUT>** input data conversion (optional, default `presets.double.convert`)
+*   `initiator` **Conversion\<any, OUTPUT>** input data initial conversion (optional, default `presets.double.convert`)
 
 #### Examples
 
@@ -610,7 +610,7 @@ cast data into an object with a given schema
 #### Parameters
 
 *   `schema` **Record<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), Conversion\<any, OUTPUT>>**&#x20;
-*   `conversion` **Conversion\<any, OUTPUT>** input data conversion (optional, default `presets.object.convert`)
+*   `initiator` **Conversion\<any, OUTPUT>** input data initial conversion (optional, default `presets.object.convert`)
 
 #### Examples
 
@@ -631,7 +631,7 @@ Returns **Conversion\<any, OUTPUT>**&#x20;
 
 ### dictionary
 
-cast data into a dictionary
+cast data into a dictionary (object with values of the same type)
 
 #### Parameters
 
@@ -651,11 +651,11 @@ Returns **Conversion\<any, Record<([string](https://developer.mozilla.org/docs/W
 
 ## projection
 
-project data into object according to schema
+project some data into another according to schema
 
 ### Parameters
 
-*   `schema` **Schema**&#x20;
+*   `schema` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)**&#x20;
 
 ### Examples
 
@@ -676,12 +676,11 @@ const schema = {
 };
 
 const project = projection(schema);
-const reshape = project(schema);
-const source = { x: 1 };
+const input = { x: 1 };
 const options = { z: 5 };
 const context = { y: 11 };
 
-project.call(context, source, options);
+project.call(context, input, options);
 {
   a: 2,
   b: { c: 3 },
@@ -691,7 +690,7 @@ project.call(context, source, options);
 }
 ```
 
-Returns **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)**&#x20;
+Returns **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** transform function that can optionally take a context (this) and additional options
 
 ## is
 

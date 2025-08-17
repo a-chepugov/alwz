@@ -112,23 +112,23 @@ export const tuple = (
  * @param {OUTPUT} lower - lower range border
  * @param {OUTPUT} upper - upper range border
  * @param {Fallback<OUTPUT>} fallback - fallback value generator
- * @param {Conversion<*, OUTPUT>} conversion - input data conversion
+ * @param {Conversion<*, OUTPUT>} initiator - input data initial conversion
  * @returns {Conversion<*, OUTPUT>}
  */
 export const range = <OUTPUT = number>(
 	lower: OUTPUT = -Number.MAX_VALUE as OUTPUT,
 	upper: OUTPUT = Number.MAX_VALUE as OUTPUT,
 	fallback?: Fallback<OUTPUT>,
-	conversion: Conversion<unknown, OUTPUT> = presets.double.convert as Conversion<unknown, OUTPUT>
+	initiator: Conversion<unknown, OUTPUT> = presets.double.convert as Conversion<unknown, OUTPUT>
 ): Conversion<unknown, OUTPUT> => {
-	assertConversion(conversion);
+	assertConversion(initiator);
 
-	lower = conversion(lower);
-	upper = conversion(upper);
+	lower = initiator(lower);
+	upper = initiator(upper);
 
 	const fallbackActual = fallback === undefined
 		? (input?: unknown) => {
-			const converted = conversion(input);
+			const converted = initiator(input);
 			return upper <= converted ? upper : lower;
 		}
 		: fallback;
@@ -136,9 +136,9 @@ export const range = <OUTPUT = number>(
 	assertFallback(fallbackActual);
 
 	return (input?: unknown) => {
-		const converted = conversion(input);
-		if ((lower <= converted) && (converted <= upper)) {
-			return converted;
+		const initiated = initiator(input);
+		if ((lower <= initiated) && (initiated <= upper)) {
+			return initiated;
 		}
 
 		return fallbackActual(input);
@@ -178,24 +178,24 @@ export const range = <OUTPUT = number>(
  *
  * @param {Array<OUTPUT>} values - valid values list
  * @param {Fallback<OUTPUT>} fallback - fallback value generator
- * @param {Conversion<*, OUTPUT>} conversion - input data conversion
+ * @param {Conversion<*, OUTPUT>} initiator - input data initial conversion
  * @returns {Conversion<*, OUTPUT>}
  */
 export const variant = <OUTPUT = number>(
 	values: Array<OUTPUT>,
 	fallback: Fallback<OUTPUT> = () => values[0] as OUTPUT,
-	conversion: Conversion<unknown, OUTPUT> = presets.double.convert as Conversion<unknown, OUTPUT>
+	initiator: Conversion<unknown, OUTPUT> = presets.double.convert as Conversion<unknown, OUTPUT>
 ): Conversion<unknown, OUTPUT> => {
-	assertConversion(conversion);
+	assertConversion(initiator);
 	assertFallback(fallback);
 
 	if (!Array.isArray(values)) {
 		throw new InvalidArgument('variant values must be an array of allowed values', values);
 	}
-	values = values.map((value) => conversion(value));
+	values = values.map((value) => initiator(value));
 
 	return (input?: unknown) => {
-		const converted = conversion(input);
+		const converted = initiator(input);
 		if (values.includes(converted)) {
 			return converted;
 		}
@@ -220,12 +220,12 @@ export const variant = <OUTPUT = number>(
  * obj({ a: 999, b: [{ c: 2.5, d: 3 }, null] }); // { a: 255, b: [{ c: 2, d: '3' }, { c: 0, d: '' }] }
  *
  * @param {Record<string, Conversion<any, OUTPUT>>} schema
- * @param {Conversion<any, OUTPUT>} conversion - input data conversion
+ * @param {Conversion<any, OUTPUT>} initiator - input data initial conversion
  * @returns {Conversion<any, OUTPUT>}
  */
 export const object = <OUTPUT extends object, Keys extends keyof OUTPUT>(
 	schema: { [key in Keys]: Conversion<any, OUTPUT[key]> },
-	conversion: Conversion<any, any> = presets.object.convert as any
+	initiator: Conversion<any, any> = presets.object.convert as any
 ): Conversion<any, OUTPUT> => {
 	if (typeof schema !== 'object' || schema === null) {
 		throw new InvalidArgument('schema must must be an object', schema);
@@ -236,11 +236,11 @@ export const object = <OUTPUT extends object, Keys extends keyof OUTPUT>(
 		assertConversion(conversion);
 	}
 
-	assertConversion(conversion);
+	assertConversion(initiator);
 
 	return (input: any) => {
 		const result = {} as OUTPUT;
-		const source = conversion(input);
+		const source = initiator(input);
 
 		for (const key in schema) {
 			const type = schema[key] as Conversion<any, any>;
@@ -252,7 +252,7 @@ export const object = <OUTPUT extends object, Keys extends keyof OUTPUT>(
 
 /**
  * @memberof utils
- * @description cast data into a dictionary
+ * @description cast data into a dictionary (object with values of the same type)
  * @example
  * const dictOfInt = utils.dictionary(a.int);
  *
@@ -284,22 +284,22 @@ export const dictionary = <KEY extends string | number, VALUE>(
 	};
 };
 
-type ProjectionBuild<C, S, O> = (this: C, source: S, options?: O, target?: Partial<ProjectionResult<C, S, O>>) => unknown;
+type ProjectFunction<C, I, O> = (this: C, input: I, options?: O, target?: Partial<ProjectionResult<C, I, O>>) => unknown;
 
-type ProjectionSchema<C, S, O> = {
-	[Key: string | number]: ProjectionSchemaItem<C, S, O>
+type ProjectionSchema<C, I, O> = {
+	[Key: string | number]: ProjectionSchemaItem<C, I, O>
 };
 
-type ProjectionSchemaItem<C, S, O> = ProjectionBuild<C, S, O> | ProjectionSchema<C, S, O>;
+type ProjectionSchemaItem<C, I, O> = ProjectFunction<C, I, O> | ProjectionSchema<C, I, O>;
 
-type ProjectionResult<C, S, O> = {
-	[Key in keyof ProjectionSchema<C, S, O>]: unknown | ProjectionResult<C, S, O>
+type ProjectionResult<C, I, O> = {
+	[Key in keyof ProjectionSchema<C, I, O>]: unknown | ProjectionResult<C, I, O>
 }
 
 /**
- * @description project data into object according to schema
- * @param {Schema} schema
- * @returns {Function}
+ * @description project some data into another according to schema
+ * @param {Object} schema
+ * @returns {Function} transform function that can optionally take a context (this) and additional options
  * @example
  * const schema = {
  *   // shallow element
@@ -317,12 +317,11 @@ type ProjectionResult<C, S, O> = {
  * };
  *
  * const project = projection(schema);
- * const reshape = project(schema);
- * const source = { x: 1 };
+ * const input = { x: 1 };
  * const options = { z: 5 };
  * const context = { y: 11 };
  *
- * project.call(context, source, options);
+ * project.call(context, input, options);
  * {
  *   a: 2,
  *   b: { c: 3 },
@@ -331,10 +330,10 @@ type ProjectionResult<C, S, O> = {
  *   f: { y: 11 },
  * }
  */
-export const projection = <C, S, O>(
-	schema: ProjectionSchema<C, S, O>
-): ProjectionBuild<C, S, O> => {
-	const builders: Array<[string, ProjectionBuild<C, S, O>]> = Object
+export const projection = <Context, Input, Options>(
+	schema: ProjectionSchema<Context, Input, Options>
+): ProjectFunction<Context, Input, Options> => {
+	const builders: Array<[string, ProjectFunction<Context, Input, Options>]> = Object
 		.entries(schema)
 		.map(([key, value]) => {
 			if (typeof value === 'function') {
@@ -346,11 +345,11 @@ export const projection = <C, S, O>(
 			}
 		});
 
-	return function(this: C, source: S, options?: O) {
+	return function(this: Context, input: Input, options?: Options) {
 		return builders
 			.reduce(
 				(target: Record<string, unknown>, [key, build]) => {
-					target[key] = build.call(this, source, options, target);
+					target[key] = build.call(this, input, options, target);
 					return target;
 				},
 				{}
