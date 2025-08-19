@@ -3,8 +3,14 @@ import { Names as TypeNames, Type, TypesEnum } from '../constants/types.js';
 
 export type Guard<T> = (input?: unknown) => input is T;
 
+/** @namespace Is
+ * @description guard function builders
+ * @example
+ * import Is from 'alwz/Is';
+ */
 export default {
 	/**
+	 * @memberof Is
 	 * @example
 	 * const isString = type('string');
 	 * isString(1); // false
@@ -19,6 +25,7 @@ export default {
 	},
 
 	/**
+	 * @memberof Is
 	 * @example
 	 * class Test {}
 	 * const isTest = instance(Test);
@@ -35,6 +42,7 @@ export default {
 	},
 
 	/**
+	 * @memberof Is
 	 * @example
 	 * const isVariant = variant([1, 2, 3]);
 	 * isVariant(4); // false
@@ -49,6 +57,7 @@ export default {
 	},
 
 	/**
+	 * @memberof Is
 	 * @example
 	 * const isOdd = check((v) => v % 2 ? true : false);
 	 * isOdd(0); // false

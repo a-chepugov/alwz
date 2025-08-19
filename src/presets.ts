@@ -4,6 +4,9 @@ import is, { integers as intIs, floats as floatIs } from './is.js';
 
 /**
  * @namespace presets
+ * @example
+ * import presets from 'alwz/presets';
+ * const { boolean, byte, int, string, ... } = presets;
  */
 
 /**

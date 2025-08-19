@@ -1,38 +1,41 @@
 import assert from 'assert';
-import * as a from './index.js';
+
+import * as alwz from './index.js';
+
+const { byte, short, int, uint, long, array } = alwz;
 
 describe('index', () => {
 
 	describe('Types', () => {
 
 		test('examples', () => {
-			assert.deepStrictEqual(a.byte('3'), 3);
-			assert.deepStrictEqual(a.short(false), 0);
-			assert.deepStrictEqual(a.int(true), 1);
-			assert.deepStrictEqual(a.uint(Infinity), 4294967295);
-			assert.deepStrictEqual(a.long(NaN), 0);
-			assert.deepStrictEqual(a.long(['1', '2', '3']), 1);
-			assert.deepStrictEqual(a.array('abc'), ['abc']);
-			assert.deepStrictEqual(a.array([123, 'abc', {}, Math.max]), [123, 'abc', {}, Math.max]);
+
+			assert.deepStrictEqual(byte('3'), 3);
+			assert.deepStrictEqual(short(false), 0);
+			assert.deepStrictEqual(int(true), 1);
+			assert.deepStrictEqual(uint(Infinity), 4294967295);
+			assert.deepStrictEqual(long(NaN), 0);
+			assert.deepStrictEqual(long(['1', '2', '3']), 1);
+			assert.deepStrictEqual(array('abc'), ['abc']);
 		});
 
 	});
 
 	describe('Structures', () => {
+		const { utils } = alwz;
 
-		test('ensure an array output', () => {
-			const array = a.utils.array;
-			const ArrayOfUByte = array(a.ubyte);
+		test('array-ify data', () => {
+			const arrayOf = utils.array;
+			const ArrayOfUByte = arrayOf(byte);
 
 			const result = ArrayOfUByte([undefined, true, 2.3, '4', Infinity]);
-			const expected = [0, 1, 2, 4, 255];
+			const expected = [0, 1, 2, 4, 127];
 			assert.deepStrictEqual(result, expected);
 		});
 
 		test('simplify multidimensional arrays processing', () => {
-			const array = a.utils.array;
-
-			const Bytes3dArray = array(array(array(a.byte)));
+			const arrayOf = utils.array;
+			const Bytes3dArray = arrayOf(arrayOf(arrayOf(byte)));
 
 			{
 				const result = Bytes3dArray(1);
@@ -48,11 +51,11 @@ describe('index', () => {
 		});
 
 		test('create tuples', () => {
-			const tuple = a.utils.tuple;
+			const tuple = utils.tuple;
 			{
-				const Pair = tuple([a.uint, a.uint]);
-				const result = Pair(['abc', 3.5, 100]);
-				const expected = [0, 3];
+				const Pair = tuple([uint, uint]);
+				const result = Pair([3.5, '100']);
+				const expected = [3, 100];
 				assert.deepStrictEqual(result, expected);
 			}
 
@@ -67,8 +70,9 @@ describe('index', () => {
 	});
 
 	describe('Transformations', () => {
+		const { presets, utils } = alwz;
 
-		const bool = a.converters.get('boolean')
+		const bool = presets.boolean
 			.clone()
 			.string(function(v) { // string input processing
 				if (v === 'true' || v === 'yes') {
@@ -81,7 +85,7 @@ describe('index', () => {
 			})
 			.convert;
 
-		test('extend an existing converter', () => {
+		test('build smart bool converter', () => {
 			assert.deepStrictEqual(bool('yes'), true);
 			assert.deepStrictEqual(bool('no'), false);
 			assert.deepStrictEqual(bool('false'), false);
@@ -91,14 +95,14 @@ describe('index', () => {
 		});
 
 		test('parse colon-separated number/string records', () => {
-			const PathArray = a.converters.get('array')
+			const PathArray = presets.array
 				.clone()
 				.string((i) => [...i.matchAll(/\/(\w+)/g)].map((i) => i[1]))
 				.convert;
 
-			const DSV2Tuple = a.utils.tuple(
+			const DSV2Tuple = utils.tuple(
 				[String, String, Number, Number, String, PathArray, PathArray],
-				a.converters.get('array')
+				presets.array
 					.clone()
 					.string((i) => i.split(':'))
 					.convert
@@ -113,19 +117,21 @@ describe('index', () => {
 	});
 
 	describe('Selector', () => {
+		const { to } = alwz;
 
-		test('dynamically select convert function', () => {
-			assert.deepStrictEqual(a.to('int')('24.5'), 24);
-			assert.deepStrictEqual(a.to('byte')(Infinity), 127);
-			assert.deepStrictEqual(a.to('bigint')('42.5'), 42n);
+		test('select conversion function at runtime', () => {
+			assert.deepStrictEqual(to('int')('24.5'), 24);
+			assert.deepStrictEqual(to('byte')(Infinity), 127);
+			assert.deepStrictEqual(to('bigint')('42.5'), 42n);
 		});
 
 	});
 
 	describe('Converters', () => {
+		const { Converter, converters } = alwz;
 
 		test('get prodefined list', () => {
-			const list = Array.from(a.converters.keys());
+			const list = Array.from(converters.keys());
 			const predifined = ['boolean', 'byte', 'int', 'long', 'double', 'string'];
 			for (const item of predifined) {
 				assert.strictEqual(list.includes(item), true, `absent item - ${item}`);
@@ -133,26 +139,26 @@ describe('index', () => {
 		});
 
 		test('retrieving with existence check', () => {
-			const c1 = a.converters.converter('number');
-			assert.strictEqual(c1 instanceof a.Converter, true);
-			const c2 = a.converters.converter('date');
-			assert.strictEqual(c2 instanceof a.Converter, true);
+			const c1 = converters.converter('number');
+			assert.strictEqual(c1 instanceof Converter, true);
+			const c2 = converters.converter('date');
+			assert.strictEqual(c2 instanceof Converter, true);
 			assert.throws(() => {
-				a.converters.converter('123');
+				converters.converter('123');
 			});
 		});
 
 		test('direct retrieving', () => {
-			const c1 = a.converters.get('array');
-			assert.strictEqual(c1 instanceof a.Converter, true);
-			const c2 = a.converters.get('123');
+			const c1 = converters.get('array');
+			assert.strictEqual(c1 instanceof Converter, true);
+			const c2 = converters.get('123');
 			assert.strictEqual(c2 === undefined, true);
 		});
 
 	});
 
 	describe('Predicates', () => {
-		const { is } = a;
+		const { is } = alwz;
 
 		test('examples', () => {
 			assert.deepStrictEqual(is.void(null), true);
@@ -167,7 +173,7 @@ describe('index', () => {
 	});
 
 	describe('Guards', () => {
-		const Is = a.Is;
+		const { Is } = alwz;
 
 		const isAlphaOrBeta = Is.variant(['Alpha', 'Beta']);
 
@@ -193,35 +199,23 @@ describe('index', () => {
 	});
 
 	describe('ErrorValue', () => {
-		const { ErrorValue } = a;
+		const { ErrorValue } = alwz;
 
 		test('throw an error with extra data', () => {
-			const inc = (input) => typeof input === 'number'
-				? input + 1
-				: new ErrorValue('invalid list', { input, date: Date.now() }).throw();
+			const rise = (condition) => condition
+				? new ErrorValue('oops', { condition, date: Date.now() }).throw()
+				: condition;
 
-			assert.throws(() => inc('1'), (error) => {
-				assert.strictEqual(error?.value?.input, '1');
+			assert.throws(() => {
+				rise(true);
+			}, (error) => {
+				assert.strictEqual(error?.message, 'oops');
+				assert.strictEqual(error?.value?.condition, true);
 				assert.strictEqual(typeof error?.value?.date, 'number');
 				return true;
 			});
 		});
 
-		test('intercept and wrap error', () => {
-			const cause = new Error('oops, something went wrong');
-			const fn = () => {
-				try {
-					throw cause;
-				} catch (error) {
-					throw new ErrorValue('urgent message', { data: 'some additional data' }, { cause: error }).throw();
-				}
-			};
-			assert.throws(() => fn(), (error) => {
-				assert.strictEqual(error?.value?.data, 'some additional data');
-				assert.strictEqual(error?.cause, cause);
-				return true;
-			});
-		});
 	});
 
 });

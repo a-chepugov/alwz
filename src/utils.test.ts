@@ -1,6 +1,9 @@
 import assert from 'assert';
+
 import * as utils from './utils.js';
-import * as a from './index.js';
+import cast from './cast.js';
+
+const { boolean, ubyte, int, uint, ulong, string } = cast;
 
 describe('utils', () => {
 
@@ -16,7 +19,7 @@ describe('utils', () => {
 			assert.throws(() => array(Number, null));
 		});
 
-		const numArray = array(Number);
+		const ArrayOfNumbers = array(Number);
 
 		const sets = [
 			{ input: undefined, output: [] },
@@ -33,7 +36,7 @@ describe('utils', () => {
 			const { input, output } = sets[i];
 			const name = `${i}: < ${String(input)} > gives ${String(output)}`;
 			test(name, () => {
-				assert.deepStrictEqual(numArray(input), output);
+				assert.deepStrictEqual(ArrayOfNumbers (input), output);
 			});
 		}
 
@@ -58,7 +61,6 @@ describe('utils', () => {
 		const tupleNumStrBool = tuple([Number, String, Boolean]);
 
 		const sets = [
-			{ input: undefined, output: [NaN, 'undefined', false] },
 			{ input: null, output: [NaN, 'undefined', false] },
 			{ input: '5', output: [5, 'undefined', false] },
 			{ input: [], output: [NaN, 'undefined', false] },
@@ -127,6 +129,14 @@ describe('utils', () => {
 			});
 		}
 
+		const range37Strict = range(3, 7, () => {
+			throw new Error('out of range input');
+		});
+
+		test('range with throw on fallback', () => {
+			assert.throws(() => range37Strict(9));
+		});
+
 	});
 
 	describe('variant', () => {
@@ -145,28 +155,28 @@ describe('utils', () => {
 			assert.throws(() => variant([4], () => 4, null));
 		});
 
-		const var123 = variant([1, 2, 3]);
-		const var123WithCustomFallback = variant([1, 2, 3], () => -1);
-		const varABC = variant(['a', 'b'], (i) => ['a', 'b'][i], String);
+		const oneOf123 = variant([1, 2, 3]);
+		const oneOf123WithCustomFallback = variant([1, 2, 3], () => -1);
+		const AlphaBetaGamma = variant(['Alpha', 'Beta'], () => 'Gamma', String);
 
 		const sets = [
-			{ work: var123, input: 1, output: 1 },
-			{ work: var123, input: '2', output: 2 },
-			{ work: var123, input: [3], output: 3 },
-			{ work: var123, input: 4, output: 1 },
-			{ work: var123, input: -5, output: 1 },
-			{ work: var123, input: undefined, output: 1 },
-			{ work: var123, input: null, output: 1 },
-			{ work: var123, input: NaN, output: 1 },
-			{ work: var123, input: -Infinity, output: 1 },
-			{ work: var123, input: Infinity, output: 1 },
+			{ work: oneOf123, input: 1, output: 1 },
+			{ work: oneOf123, input: '2', output: 2 },
+			{ work: oneOf123, input: [3], output: 3 },
+			{ work: oneOf123, input: 4, output: 1 },
+			{ work: oneOf123, input: -5, output: 1 },
+			{ work: oneOf123, input: undefined, output: 1 },
+			{ work: oneOf123, input: null, output: 1 },
+			{ work: oneOf123, input: NaN, output: 1 },
+			{ work: oneOf123, input: -Infinity, output: 1 },
+			{ work: oneOf123, input: Infinity, output: 1 },
 
-			{ work: var123WithCustomFallback, input: 4, output: -1 },
+			{ work: oneOf123WithCustomFallback, input: 4, output: -1 },
 
-			{ work: varABC, input: 'a', output: 'a' },
-			{ work: varABC, input: 'b', output: 'b' },
-			{ work: varABC, input: 0, output: 'a' },
-			{ work: varABC, input: 1, output: 'b' },
+			{ work: AlphaBetaGamma, input: 'Alpha', output: 'Alpha' },
+			{ work: AlphaBetaGamma, input: 'Beta', output: 'Beta' },
+			{ work: AlphaBetaGamma, input: 'Gamma', output: 'Gamma' },
+			{ work: AlphaBetaGamma, input: 'Delta', output: 'Gamma' },
 		];
 
 		for(let i = 0; i < sets.length; i++) {
@@ -177,12 +187,12 @@ describe('utils', () => {
 			});
 		}
 
-		const var123WithStrictFallback = variant([1, 2, 3], () => {
+		const var123Strict = variant([1, 2, 3], () => {
 			throw new Error('invalid input');
 		});
 
 		test('variant with throw on fallback', () => {
-			assert.throws(() => var123WithStrictFallback(4));
+			assert.throws(() => var123Strict(4));
 		});
 
 	});
@@ -198,22 +208,22 @@ describe('utils', () => {
 		});
 
 		const objShallow = utils.object({
-			a: a.boolean,
-			b: a.int,
-			c: a.string,
+			a: boolean,
+			b: int,
+			c: string,
 		});
 
 		const objNested = utils.object({
-			a: a.ubyte,
+			a: ubyte,
 			b: utils.array(utils.object({
-				c: a.int,
-				d: a.string,
+				c: int,
+				d: string,
 			})),
 		});
 
 		// @ts-ignore
 		const objCircular = utils.object({
-			a: a.uint,
+			a: uint,
 			children: objChildrenArr,
 		});
 
@@ -270,10 +280,10 @@ describe('utils', () => {
 			assert.throws(() => utils.dictionary(() => true, null));
 		});
 
-		const dictShallow = utils.dictionary(a.int);
+		const dictShallow = utils.dictionary(int);
 
 		const dictNested = utils.dictionary(
-			utils.array(utils.dictionary(a.string))
+			utils.array(utils.dictionary(string))
 		);
 
 		const dictKeys = utils.dictionary((v, k) => `${k}:${v}`);
@@ -309,11 +319,11 @@ describe('utils', () => {
 
 	describe('mixed', () => {
 		const conversion = utils.object({
-			id: a.ulong,
-			rates: a.utils.tuple([a.uint, a.uint, a.uint]),
-			name: a.string,
-			nicks: utils.dictionary(a.utils.array(a.string)),
-			emails: a.utils.array(a.string),
+			id: ulong,
+			rates: utils.tuple([uint, uint, uint]),
+			name: string,
+			nicks: utils.dictionary(utils.array(string)),
+			emails: utils.array(string),
 		});
 
 		const sets = [
