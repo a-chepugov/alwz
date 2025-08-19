@@ -1,6 +1,6 @@
 import EV from './models/ErrorValue.js';
 import Converter, { Fallback, assertFallback, isConversion, assertConversion } from './models/Converter.js';
-import * as presets from './presets.js';
+import presets from './presets.js';
 
 type Conversion<INPUT, OUTPUT> = (input: INPUT) => OUTPUT;
 
@@ -10,22 +10,22 @@ const InvalidArgument = class extends EV {};
  * @namespace utils
  * @description extra utils functions
  * @example
- * const { array, tuple, range, variant, object, dictionary } = a.utils;
+ * import { array, tuple, ... } from 'alwz/utils';
  */
 
 /**
  * @memberof utils
  * @description constrain data to an array elements of a given type
  * @example
- * const Numbers = array(Number);
+ * const ArrayOfNumbers = array(Number);
  *
- * Numbers(); // []
- * Numbers([]); // []
- * Numbers([true, 2, "3", {}]); // [1, 2, 3, NaN]
+ * ArrayOfNumbers(null); // []
+ * ArrayOfNumbers([]); // []
+ * ArrayOfNumbers([true, 2, '3', {}]); // [1, 2, 3, NaN]
  *
  * @example <caption>sparse arrays behavior</caption>
  * // Be aware of sparse arrays behavior - conversion is not performed for empty items
- * numArray[1, , 3] // [1, , 3]
+ * ArrayOfNumbers([1, , 3]) // [1, , 3]
  * @param {Conversion<*, OUTPUT>} conversion - item conversion
  * @param {Conversion<*, Array<*>>} initiator - input data initial conversion
  * @returns {Conversion<*, Array<OUTPUT>>}
@@ -51,7 +51,6 @@ export const array = <OUTPUT>(
  * @example
  * const NumStrBool = tuple([Number, String, Boolean]);
  *
- * NumStrBool(); // [NaN, 'undefined', false]
  * NumStrBool(null); // [NaN, 'undefined', false]
  * NumStrBool([]); // [NaN, '', false]
  * NumStrBool('5'); // [5, 'undefined', false]
@@ -88,47 +87,54 @@ export const tuple = (
 /**
  * @memberof utils
  * @description constrain variable value within a given range
- * @example
+ * @example <caption>cast to values in range</caption>
  * const range37 = range(3, 7);
  *
- * range37(1); // 3
  * range37(5); // 5
- * range37(9); // 7
+ * range37(1); // 3 (replaced by the minimum possible value)
+ * range37(9); // 7 (replaced by the maximum possible value)
  *
- *
+ * @example <caption>custom behavior for out of range values</caption>
  * const range37WithCustomFallback = range(3, 7, () => -1);
  *
- * range37WithCustomFallback(1); // -1
  * range37WithCustomFallback(5); // 5
+ * range37WithCustomFallback(1); // -1
  * range37WithCustomFallback(9); // -1
  *
+ * @example <caption>prohibition of out of range input</caption>
+ * const range37Strict = range(3, 7, () => {
+ *   throw new Error('out of range input');
+ * });
  *
+ * range37Strict(9); // throws an error
+ *
+ * @example <caption>non-numeric comparable elements can be used</caption>
  * const rangeString = range('k', 'w', undefined, String);
  *
- * rangeString('a'); // k
  * rangeString('n'); // n
+ * rangeString('a'); // k
  * rangeString('z'); // w
  *
  * @param {OUTPUT} lower - lower range border
  * @param {OUTPUT} upper - upper range border
  * @param {Fallback<OUTPUT>} fallback - fallback value generator
- * @param {Conversion<*, OUTPUT>} conversion - input data conversion
+ * @param {Conversion<*, OUTPUT>} initiator - input data initial conversion
  * @returns {Conversion<*, OUTPUT>}
  */
 export const range = <OUTPUT = number>(
 	lower: OUTPUT = -Number.MAX_VALUE as OUTPUT,
 	upper: OUTPUT = Number.MAX_VALUE as OUTPUT,
 	fallback?: Fallback<OUTPUT>,
-	conversion: Conversion<unknown, OUTPUT> = presets.double.convert as Conversion<unknown, OUTPUT>
+	initiator: Conversion<unknown, OUTPUT> = presets.double.convert as Conversion<unknown, OUTPUT>
 ): Conversion<unknown, OUTPUT> => {
-	assertConversion(conversion);
+	assertConversion(initiator);
 
-	lower = conversion(lower);
-	upper = conversion(upper);
+	lower = initiator(lower);
+	upper = initiator(upper);
 
 	const fallbackActual = fallback === undefined
 		? (input?: unknown) => {
-			const converted = conversion(input);
+			const converted = initiator(input);
 			return upper <= converted ? upper : lower;
 		}
 		: fallback;
@@ -136,9 +142,9 @@ export const range = <OUTPUT = number>(
 	assertFallback(fallbackActual);
 
 	return (input?: unknown) => {
-		const converted = conversion(input);
-		if ((lower <= converted) && (converted <= upper)) {
-			return converted;
+		const initiated = initiator(input);
+		if ((lower <= initiated) && (initiated <= upper)) {
+			return initiated;
 		}
 
 		return fallbackActual(input);
@@ -148,54 +154,54 @@ export const range = <OUTPUT = number>(
 /**
  * @memberof utils
  * @description constrain variable to given variants
- * @example
+ * @example <caption>cast to elements from the list only</caption>
  * const oneOf123 = variant([1, 2, 3]);
  *
  * oneOf123(1); // 1
  * oneOf123(2); // 2
  * oneOf123(3); // 3
- * oneOf123(4); // 1
+ * oneOf123(4); // 1 (replaced by the first element - default behavior)
  * oneOf123(-5); // 1
  *
- *
+ * @example <caption>custom default element</caption>
  * const oneOf123WithCustomFallback = variant([1, 2, 3], () => -1);
  *
  * oneOf123WithCustomFallback(4); // -1
  *
- *
+ * @example <caption>prohibition of unlisted items</caption>
  * oneOf123Strict([1, 2, 3], () => {
  *   throw new Error('invalid input');
  * });
- * oneOf123Strict(4); // throws an Error
  *
+ * oneOf123Strict(4); // throws an error
  *
- * const oneOfAB = variant(['a', 'b'], (i) => ['a', 'b'][i], String);
- *
- * oneOfAB('a'); // 'a'
- * oneOfAB('b'); // 'b'
- * oneOfAB(0); // 'a'
- * oneOfAB(1); // 'b'
+ * @example <caption>non-numeric elements can be used</caption>
+ * const AlphaBetaGamma = variant(['Alpha', 'Beta'], () => 'Gamma', String);
+ * AlphaBetaGamma('Alpha'); // 'Alpha'
+ * AlphaBetaGamma('Beta'); // 'Beta'
+ * AlphaBetaGamma('Gamma'); // 'Gamma'
+ * AlphaBetaGamma('Delta'); // 'Gamma'
  *
  * @param {Array<OUTPUT>} values - valid values list
  * @param {Fallback<OUTPUT>} fallback - fallback value generator
- * @param {Conversion<*, OUTPUT>} conversion - input data conversion
+ * @param {Conversion<*, OUTPUT>} initiator - input data initial conversion
  * @returns {Conversion<*, OUTPUT>}
  */
 export const variant = <OUTPUT = number>(
 	values: Array<OUTPUT>,
 	fallback: Fallback<OUTPUT> = () => values[0] as OUTPUT,
-	conversion: Conversion<unknown, OUTPUT> = presets.double.convert as Conversion<unknown, OUTPUT>
+	initiator: Conversion<unknown, OUTPUT> = presets.double.convert as Conversion<unknown, OUTPUT>
 ): Conversion<unknown, OUTPUT> => {
-	assertConversion(conversion);
+	assertConversion(initiator);
 	assertFallback(fallback);
 
 	if (!Array.isArray(values)) {
 		throw new InvalidArgument('variant values must be an array of allowed values', values);
 	}
-	values = values.map((value) => conversion(value));
+	values = values.map((value) => initiator(value));
 
 	return (input?: unknown) => {
-		const converted = conversion(input);
+		const converted = initiator(input);
 		if (values.includes(converted)) {
 			return converted;
 		}
@@ -209,10 +215,10 @@ export const variant = <OUTPUT = number>(
  * @description cast data into an object with a given schema
  * @example
  * const obj = object({
- *   a: a.ubyte,
+ *   a: ubyte,
  *   b: array(object({
- *     c: a.int,
- *     d: a.string,
+ *     c: int,
+ *     d: string,
  *   })),
  * });
  *
@@ -220,12 +226,12 @@ export const variant = <OUTPUT = number>(
  * obj({ a: 999, b: [{ c: 2.5, d: 3 }, null] }); // { a: 255, b: [{ c: 2, d: '3' }, { c: 0, d: '' }] }
  *
  * @param {Record<string, Conversion<any, OUTPUT>>} schema
- * @param {Conversion<any, OUTPUT>} conversion - input data conversion
+ * @param {Conversion<any, OUTPUT>} initiator - input data initial conversion
  * @returns {Conversion<any, OUTPUT>}
  */
 export const object = <OUTPUT extends object, Keys extends keyof OUTPUT>(
 	schema: { [key in Keys]: Conversion<any, OUTPUT[key]> },
-	conversion: Conversion<any, any> = presets.object.convert as any
+	initiator: Conversion<any, any> = presets.object.convert as any
 ): Conversion<any, OUTPUT> => {
 	if (typeof schema !== 'object' || schema === null) {
 		throw new InvalidArgument('schema must must be an object', schema);
@@ -236,11 +242,11 @@ export const object = <OUTPUT extends object, Keys extends keyof OUTPUT>(
 		assertConversion(conversion);
 	}
 
-	assertConversion(conversion);
+	assertConversion(initiator);
 
 	return (input: any) => {
 		const result = {} as OUTPUT;
-		const source = conversion(input);
+		const source = initiator(input);
 
 		for (const key in schema) {
 			const type = schema[key] as Conversion<any, any>;
@@ -252,12 +258,12 @@ export const object = <OUTPUT extends object, Keys extends keyof OUTPUT>(
 
 /**
  * @memberof utils
- * @description cast data into a dictionary
+ * @description cast data into a dictionary (object with values of the same type)
  * @example
- * const dictOfInt = utils.dictionary(a.int);
+ * const dictOfInt = utils.dictionary(int);
  *
  * dictOfInt(undefined); // { }
- * dictInt({ a: null, b: true, c: '2', d: [3, 4] }); // { a: 0, b: 1, c: 2, d: 3 }
+ * dictOfInt({ a: null, b: true, c: '2', d: [3, 4] }); // { a: 0, b: 1, c: 2, d: 3 }
  *
  * @param {(value: any, key: string | number) => VALUE} conversion - item conversion
  * @param {Conversion<any, any>} initiator - input data conversion
@@ -284,22 +290,23 @@ export const dictionary = <KEY extends string | number, VALUE>(
 	};
 };
 
-type ProjectionBuild<C, S, O> = (this: C, source: S, options?: O, target?: Partial<ProjectionResult<C, S, O>>) => unknown;
+type ProjectFunction<C, I, O> = (this: C, input: I, options?: O, target?: Partial<ProjectionResult<C, I, O>>) => unknown;
 
-type ProjectionSchema<C, S, O> = {
-	[Key: string | number]: ProjectionSchemaItem<C, S, O>
+type ProjectionSchema<C, I, O> = {
+	[Key: string | number]: ProjectionSchemaItem<C, I, O>
 };
 
-type ProjectionSchemaItem<C, S, O> = ProjectionBuild<C, S, O> | ProjectionSchema<C, S, O>;
+type ProjectionSchemaItem<C, I, O> = ProjectFunction<C, I, O> | ProjectionSchema<C, I, O>;
 
-type ProjectionResult<C, S, O> = {
-	[Key in keyof ProjectionSchema<C, S, O>]: unknown | ProjectionResult<C, S, O>
+type ProjectionResult<C, I, O> = {
+	[Key in keyof ProjectionSchema<C, I, O>]: unknown | ProjectionResult<C, I, O>
 }
 
 /**
- * @description project data into object according to schema
- * @param {Schema} schema
- * @returns {Function}
+ * @memberof utils
+ * @description project some data into another according to schema
+ * @param {Object} schema
+ * @returns {Function} transform function that can optionally take a context (this) and additional options
  * @example
  * const schema = {
  *   // shallow element
@@ -317,12 +324,11 @@ type ProjectionResult<C, S, O> = {
  * };
  *
  * const project = projection(schema);
- * const reshape = project(schema);
- * const source = { x: 1 };
+ * const input = { x: 1 };
  * const options = { z: 5 };
  * const context = { y: 11 };
  *
- * project.call(context, source, options);
+ * project.call(context, input, options);
  * {
  *   a: 2,
  *   b: { c: 3 },
@@ -331,10 +337,10 @@ type ProjectionResult<C, S, O> = {
  *   f: { y: 11 },
  * }
  */
-export const projection = <C, S, O>(
-	schema: ProjectionSchema<C, S, O>
-): ProjectionBuild<C, S, O> => {
-	const builders: Array<[string, ProjectionBuild<C, S, O>]> = Object
+export const projection = <Context, Input, Options>(
+	schema: ProjectionSchema<Context, Input, Options>
+): ProjectFunction<Context, Input, Options> => {
+	const builders: Array<[string, ProjectFunction<Context, Input, Options>]> = Object
 		.entries(schema)
 		.map(([key, value]) => {
 			if (typeof value === 'function') {
@@ -346,11 +352,11 @@ export const projection = <C, S, O>(
 			}
 		});
 
-	return function(this: C, source: S, options?: O) {
+	return function(this: Context, input: Input, options?: Options) {
 		return builders
 			.reduce(
 				(target: Record<string, unknown>, [key, build]) => {
-					target[key] = build.call(this, source, options, target);
+					target[key] = build.call(this, input, options, target);
 					return target;
 				},
 				{}

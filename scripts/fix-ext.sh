@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Change files extension and import/export extension in code
 #
@@ -12,14 +12,14 @@
 
 ROOT_PATH=$1
 
-if ! [ $ROOT_PATH ]; then
+if ! [ "$ROOT_PATH" ]; then
 	echo "ERROR - empty ROOT_PATH"
 	exit 1
 fi
 
 TARGET_EXT=$2
 
-if ! [ $TARGET_EXT ]; then
+if ! [ "$TARGET_EXT" ]; then
 	echo "ERROR - empty TARGET_EXT"
 	exit 1
 fi
@@ -38,5 +38,5 @@ process_source_map () {
   mv "$FILENAME" "${FILENAME%.js.map}.${TARGET_EXT}.map"
 }
 
-find $ROOT_PATH -name *.js | while read FILENAME; do process_source "$FILENAME"; done
-find $ROOT_PATH -name *.js.map | while read FILENAME; do process_source_map "$FILENAME"; done
+find "$ROOT_PATH" -name "*.js" | while read FILENAME; do process_source "$FILENAME"; done
+find "$ROOT_PATH" -name "*.js.map" | while read FILENAME; do process_source_map "$FILENAME"; done

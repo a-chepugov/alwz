@@ -1,14 +1,41 @@
 {
   "name": "alwz",
-  "version": "2.8.0",
+  "version": "2.9.0",
   "description": "Extendable library for typecasting",
   "type": "module",
   "main": "./build/main/index.js",
   "types": "./build/types/index.d.ts",
   "exports": {
-    "require": "./build/cjs/index.cjs",
-    "import": "./build/esm/index.mjs",
-    "types": "./build/types/index.d.ts"
+    ".": {
+      "require": "./build/cjs/index.cjs",
+      "import": "./build/esm/index.mjs",
+      "types": "./build/types/index.d.ts"
+    },
+    "./presets": {
+      "require": "./build/cjs/presets.cjs",
+      "import": "./build/esm/presets.mjs",
+      "types": "./build/types/presets.d.ts"
+    },
+    "./cast": {
+      "require": "./build/cjs/cast.cjs",
+      "import": "./build/esm/cast.mjs",
+      "types": "./build/types/cast.d.ts"
+    },
+    "./utils": {
+      "require": "./build/cjs/utils.cjs",
+      "import": "./build/esm/utils.mjs",
+      "types": "./build/types/utils.d.ts"
+    },
+    "./is": {
+      "require": "./build/cjs/is.cjs",
+      "import": "./build/esm/is.mjs",
+      "types": "./build/types/is.d.ts"
+    },
+    "./Is": {
+      "require": "./build/cjs/models/Is.cjs",
+      "import": "./build/esm/models/Is.mjs",
+      "types": "./build/types/models/Is.d.ts"
+    }
   },
   "scripts": {
     "prepublishOnly": "npm run test && npm run lint && npm run build:clear && npm run test:build && npm run readme",
@@ -22,9 +49,6 @@
     "build:clear": "npm run clean && npm run build",
     "readme": "documentation readme build/main/index.js --markdown-toc=false --section=Usage",
     "preversion": "npm run test",
-    "version:major": "npm version major",
-    "version:minor": "npm version minor",
-    "version:patch": "npm version patch",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --fix --ext .ts",
     "test:build:main": "jest --collectCoverage=false --testMatch=**/tests/index.js",
