@@ -1,6 +1,6 @@
 // @ts-nocheck
 import assert from 'assert';
-import a from './presets.js';
+import presets from './presets.js';
 
 const isNaN = (o: any) => o !== o;
 
@@ -86,7 +86,7 @@ describe('presets', () => {
 
 		for (let converterIndex = 0; converterIndex < names.length; converterIndex++) {
 			const converterName = names[converterIndex];
-			const converter = a[converterName];
+			const converter = presets[converterName];
 
 			describe(converterName, () => {
 				for (const data of datas) {
@@ -126,7 +126,7 @@ describe('presets', () => {
 				{ input: new Set, check: (o, i) => o() === i },
 				{ input: new WeakSet, check: (o, i) => o() === i },
 				{ input: Promise.resolve(), check: (o, i) => o() === i },
-			].map(({ input, result, check }) => ({ work: a.fn, type: 'function', input, result, check })),
+			].map(({ input, result, check }) => ({ work: presets.fn, type: 'function', input, result, check })),
 		}, {
 			name: 'date', tests: [
 				{ input: undefined, check: (o) => isNaN(o.getTime()) },
@@ -157,7 +157,7 @@ describe('presets', () => {
 				{ input: new Set, check: (o) => isNaN(o.getTime()) },
 				{ input: new WeakSet, check: (o) => isNaN(o.getTime()) },
 				{ input: Promise.resolve(), check: (o) => isNaN(o.getTime()) },
-			].map(({ input, result, check }) => ({ work: a.date, instance: Date, input, result, check })),
+			].map(({ input, result, check }) => ({ work: presets.date, instance: Date, input, result, check })),
 		}, {
 			name: 'object', tests: [
 				{ input: undefined, result: {} },
@@ -180,7 +180,7 @@ describe('presets', () => {
 				{ input: new Set([1, 2]), check: (o, i) => o === i },
 				{ input: new WeakSet, check: (o, i) => o === i },
 				{ input: Promise.resolve(), check: (o, i) => o === i },
-			].map(({ input, result, check, type }) => ({ work: a.object, type: type || 'object', instance: Object, input, result, check })),
+			].map(({ input, result, check, type }) => ({ work: presets.object, type: type || 'object', instance: Object, input, result, check })),
 		}, {
 			name: 'array', tests: [
 				{ input: undefined, check: (o) => o.length === 0 },
@@ -202,7 +202,7 @@ describe('presets', () => {
 				{ input: new Set([1, 2]), check: (o) => o.length === 2 },
 				{ input: new WeakSet, check: (o, i) => o[0] === i },
 				{ input: Promise.resolve(), check: (o, i) => o[0] === i },
-			].map(({ input, result, check }) => ({ work: a.array, instance: Array, input, result, check })),
+			].map(({ input, result, check }) => ({ work: presets.array, instance: Array, input, result, check })),
 		}, {
 			name: 'map', tests: [
 				{ input: undefined, check: (o) => o.size === 0},
@@ -222,7 +222,7 @@ describe('presets', () => {
 				{ input: new Set([3, 4]), check: (o) => o.size === 0 },
 				{ input: new Set([[3], [4]]), check: (o) => o.size === 2 },
 				{ input: new WeakSet([Number, String, Object]), check: (o) => o.size === 0 },
-			].map(({ input, result, check }) => ({ work: a.map, instance: Map, input, result, check })),
+			].map(({ input, result, check }) => ({ work: presets.map, instance: Map, input, result, check })),
 		}, {
 			name: 'weakmap', tests: [
 				{ input: undefined, check: (o, i) => !o.has(i) },
@@ -241,7 +241,7 @@ describe('presets', () => {
 				{ input: [[Math.abs, Math.abs]], check: (o, i) => o.has(i[0][0]) },
 				{ input: new Date(8), check: (o, i) => !o.has(i) },
 				{ input: new WeakMap, check: (o, i) => o === i },
-			].map(({ input, result, check }) => ({ work: a.weakmap, instance: WeakMap, input, result, check })),
+			].map(({ input, result, check }) => ({ work: presets.weakmap, instance: WeakMap, input, result, check })),
 		}, {
 			name: 'set', tests: [
 				{ input: undefined, check: (o) => o.size === 0 },
@@ -262,7 +262,7 @@ describe('presets', () => {
 				{ input: new Set([3, 4]), check: (o) => o.size === 2 },
 				{ input: new WeakSet([Number, String, Object]), check: (o) => o.size === 1 },
 				{ input: Promise.resolve(), check: (o) => o.size === 1 },
-			].map(({ input, result, check }) => ({ work: a.set, instance: Set, input, result, check })),
+			].map(({ input, result, check }) => ({ work: presets.set, instance: Set, input, result, check })),
 		}, {
 			name: 'weakset', tests: [
 				{ input: undefined, check: (o, i) => !o.has(i) },
@@ -285,12 +285,12 @@ describe('presets', () => {
 				{ input: [Math.abs], check: (o, i) => o.has(i[0]) },
 				{ input: new Date(8), check: (o, i) => !o.has(i) },
 				{ input: new WeakSet, check: (o, i) => (i === o) },
-			].map(({ input, result, check }) => ({ work: a.weakset, instance: WeakSet, input, result, check })),
+			].map(({ input, result, check }) => ({ work: presets.weakset, instance: WeakSet, input, result, check })),
 		}, {
 			name: 'promise', tests: [
 				{ input: Promise.resolve(1), check: (o, i) => (i === o) },
 				{ input: 2, result: Promise.resolve(2) },
-			].map(({ input, result, check }) => ({ work: a.promise, instance: Promise, input, result, check })),
+			].map(({ input, result, check }) => ({ work: presets.promise, instance: Promise, input, result, check })),
 		}];
 
 		for (const {name, tests } of sets) {

@@ -21,16 +21,24 @@ export const floats = Object.fromEntries(
 		})
 ) as Record<keyof typeof numbers.floats, Guard<number>>;
 
-/** @module is
- * @description guard functions (pattern matching check)
+/** @namespace is
+ * @description type guard functions
+ * @example
+ * import is from 'alwz/is';
  */
 export default {
 
 	/** @function undefined
+	 * @example
+	 * is.undefined() // true
+	 * is.undefined(0) // false
 	 * @memberof is */
 	undefined: (i?: unknown): i is undefined => i === undefined,
 
 	/** @function null
+	 * @example
+	 * is.null(null) // true
+	 * is.null(0) // false
 	 * @memberof is */
 	null: (i?: unknown): i is null => i === null,
 
@@ -71,13 +79,13 @@ export default {
 	...floats,
 
 	/** @name integers
-	 * @description byte, short, int, long
+	 * @description byte, short, int, long, ubyte, ushort, uint, ulong
 	 * @example
 	 * is.int(NaN) // false
-	 * is.long(Infinity) // false
 	 * is.uint(-1) // false
 	 * is.uint(1) // true
 	 * is.uint(1.5) // false
+	 * is.long(Infinity) // false
 	 * @memberof is.number */
 
 	/** @name floats
@@ -117,9 +125,6 @@ export default {
 	Error: (i?: unknown): i is Error => i instanceof Error,
 
 	/** @function Array
-	 * @example
-	 * is.Array({}) // false
-	 * is.Array([]) // true
 	 * @memberof is */
 	Array: Array.isArray,
 

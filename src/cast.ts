@@ -3,9 +3,10 @@ import ErrorValue from './models/ErrorValue.js';
 
 /**
  * @namespace cast
- * @description convert data with presetted converters
+ * @description cast functions (based on presets list)
  * @see {@link presets presets}
  * @example
+ * import cast from 'alwz/cast';
  * const { byte, ushort, int, long, array } = cast;
  *
  * byte(true); // 1

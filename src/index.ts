@@ -1,28 +1,21 @@
 import Aggregator from './models/Aggregator.js';
 import presets from './presets.js';
 
-/**
- * @name Import
- * @example
- * import * as a from 'alwz';
- * // or
- * const a = require('alwz');
- */
-
 import cast from './cast.js';
 
 /**
  * @name Types
- * @description convert data with presetted converters
+ * @description Guarantee data type
  * @example
- * a.byte('3'); // 3
- * a.short(false); // 0
- * a.int(true); // 1
- * a.uint(Infinity); // 4294967295
- * a.long(NaN); // 0
- * a.long(['1', '2', '3']); // 1 | ['1','2','3'] => '1' => 1
- * a.array('abc'); // ['abc']
- * a.array([123, 'abc', {}, Math.max]); // [123, 'abc', {}, Math.max]
+ * import { byte, short, int, uint, long, array } from 'alwz';
+ *
+ * byte('3'); // 3
+ * short(false); // 0
+ * int(true); // 1
+ * uint(Infinity); // 4294967295
+ * long(NaN); // 0
+ * long(['1', '2', '3']); // 1 | ['1','2','3'] => '1' => 1
+ * array('abc'); // ['abc']
  */
 export const {
 	boolean,
@@ -55,24 +48,26 @@ export { default as cast } from './cast.js';
 /**
  * @name Structures
  * @see {@link utils utils}
- * @description construct complex data
- * @example <caption>ensure an array output</caption>
- * const array = a.utils.array;
- * const ArrayOfUByte = array(a.ubyte);
- * ArrayOfUByte([undefined, true, 2.3, '4', Infinity]); // [0, 1, 2, 4, 255]
+ * @description ensure structure for complex data
+ * @example <caption>normalize array elements</caption>
+ * import { utils } from 'alwz';
+ * const arrayOf = utils.array;
  *
- * @example <caption>simplify multidimensional arrays processing</caption>
- * const array = a.utils.array;
+ * const ArrayOfUByte = arrayOf(byte);
  *
- * const Bytes3dArray = array(array(array(a.byte)));
+ * ArrayOfUByte([undefined, true, 2.3, '4', Infinity]); // [0, 1, 2, 4, 127]
  *
- * Bytes3dArray(1); // [[[1]]];
- * Bytes3dArray([[[null, NaN, 'a'], [true, '2', 3]], [[Infinity]]]); // [[[0, 0, 0], [1, 2, 3]], [[127]]];
+ * @example <caption>simplify nested arrays processing</caption>
+ * const arrayOf = utils.array;
+ * const NestedBytesArray = arrayOf(arrayOf(byte));
+ *
+ * NestedBytesArray(1); // [[1]];
+ * NestedBytesArray([[null, NaN, 'a'], [true, '2', 3], Infinity]); // [[[0, 0, 0], [1, 2, 3]], [[127]]];
  *
  * @example <caption>create tuples</caption>
- * const tuple = a.utils.tuple;
- * const PairOfUint = tuple([a.uint, a.uint]);
- * PairOfUint(['abc', 3.5, 100]); // [0, 3]
+ * const tuple = utils.tuple;
+ * const PairOfUint = tuple([uint, uint]);
+ * PairOfUint([3.5, '100']); // [3, 100]
  *
  * const PairOfNumbers = tuple([Number, Number]);
  * PairOfNumbers(['abc', 3.5, 100]); // [NaN, 3.5]
@@ -80,12 +75,13 @@ export { default as cast } from './cast.js';
 
 /**
  * @name Transformations
- * @see {@link Converter Converter}
- * @description create custom converters
+ * @see {@link presets presets}
+ * @description predefined converters
  *
- * @example <caption>extend an existing converter</caption>
- * // make boolean smarter
- * const bool = a.converters.get('boolean')
+ * @example <caption>build smart bool converter</caption>
+ * import { presets } from 'alwz';
+ *
+ * const bool = presets.boolean
  *   .clone()
  *   .string(function(v) { // string input processing
  *     if (v === 'true' || v === 'yes') {
@@ -103,14 +99,14 @@ export { default as cast } from './cast.js';
  * bool('false'); // false
  *
  * @example <caption>parse colon-separated number/string records</caption>
- * const PathArray = a.converters.get('array')
+ * const PathArray = presets.array
  *   .clone()
  *   .string((i) => [...i.matchAll(/\/(\w+)/g)].map((i) => i[1]))
  *   .convert;
  *
- * const DSV2Tuple = a.utils.tuple(
+ * const DSV2Tuple = utils.tuple(
  *   [String, String, Number, Number, String, PathArray, PathArray],
- *   a.converters.get('array')
+ *   presets.array
  *     .clone()
  *     .string((i) => i.split(':'))
  *     .convert
@@ -119,7 +115,11 @@ export { default as cast } from './cast.js';
  * const input = 'user:12345:1000:1000:ordinar user:/home/user:/bin/sh';
  * DSV2Tuple(input); // ['user', '12345', 1000, 1000, 'ordinar user', ['home', 'user'], ['bin', 'sh']];
  */
+export { default as presets } from './presets.js';
 
+/**
+ * deprecated
+ */
 export const converters = new Aggregator()
 	.register('boolean', presets.boolean)
 	.register('number', presets.number)
@@ -145,42 +145,28 @@ export const converters = new Aggregator()
 	.register('weakset', presets.weakset)
 	.register('promise', presets.promise);
 
-/**
- * @name Selector
- * @description dynamically select convert function (based on predefined converters)
- * @example
- * a.to('int')('24.5'); // 24
- * a.to('byte')(Infinity); // 127
- * a.to('bigint')('42.5'); // 42n
- */
-export { to as to } from './cast.js';
+export default converters;
 
 /**
- * @name Converters
- * @description registry of predefined converters
+ * @name Selector
+ * @description dynamically select conversion function at runtime (from predefined list)
  * @example
- * // get list of predefined converters
- * Array.from(a.converters.keys()); // ['boolean', 'byte', 'int', 'long', 'double', 'string', ...];
+ * import { to } from 'alwz';
  *
- * // retrieving with existence check
- * const Num = a.converters.converter('number'); // Converter<number>
- * const Str = a.converters.converter('string'); // Converter<string>
- * a.converters.converter('123'); // Error
- *
- * // direct retrieving
- * const Arr = a.converters.get('array'); // Converter<Array>
- * const Unknown = a.converters.get('123'); // undefined
+ * to('int')('24.5'); // 24
+ * to('byte')(Infinity); // 127
+ * to('bigint')('42.5'); // 42n
  */
-export default converters;
+export { to as to } from './cast.js';
 
 export * as utils from './utils.js';
 
 /**
  * @name Predicates
  * @see {@link is is}
- * @description data type checks
+ * @description check data type
  * @example
- * const { is } = a;
+ * import { is } from 'alwz';
  *
  * is.void(0); // false
  * is.void(null); // true
@@ -192,15 +178,13 @@ export * as utils from './utils.js';
  * is.Iterable(new Set()); // true
  */
 export { default as is } from './is.js';
-export { default as Converter } from './models/Converter.js';
-export { default as Aggregator } from './models/Aggregator.js';
 
 /**
  * @name Checks
  * @see {@link Is}
- * @description create readable check functions
+ * @description create type guard functions
  * @example
- * const { Is } = a;
+ * import { Is } from 'alwz';
  *
  * const isAlphaOrBeta = Is.variant(['Alpha', 'Beta']);
  * isAlphaOrBeta('Alpha'); // true;
@@ -216,23 +200,20 @@ export { default as Aggregator } from './models/Aggregator.js';
  */
 export { default as Is } from './models/Is.js';
 
+export { default as Converter } from './models/Converter.js';
+export { default as Aggregator } from './models/Aggregator.js';
+
 /**
  * @name Errors
  * @see {@link ErrorValue}
- * @description create informative errors
- * @example <caption>add additional value to an error</caption>
- * const { ErrorValue } = a;
- * const inc = (input) => typeof input === 'number'
- *   ? input + 1
- *   : new ErrorValue('invalid list', { input, date: Date.now() }).throw();
+ * @description create informative errors (ternary-friendly)
+ * @example
+ * import { ErrorValue } from 'alwz';
  *
- * inc('1'); // Error { message: 'invalid number', value: { input: '1', date: 946684800000 } }
+ * const rise = (condition) => condition
+ *   ? new ErrorValue('oops', { condition, date: Date.now() }).throw()
+ *   : condition;
  *
- * @example <caption>intercept and wrap thrown ones</caption>
- * try {
- *  throw new Error('oops, something went wrong');
- * } catch (error) {
- *  throw new ErrorValue('urgent message', { data: 'some additional data' }, { cause: error });
- * }
+ * rise(true); // throws ErrorValue with extra message and data
  */
 export { default as ErrorValue } from './models/ErrorValue.js';
